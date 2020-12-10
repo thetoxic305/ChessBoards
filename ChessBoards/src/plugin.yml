@@ -1,0 +1,9 @@
+main: water.of.cup.ChessBoards
+name: ChessBoards
+version: '0.1'
+description: Adds chess boards to Minecraft.
+author: Nicholas Kopiwoda
+api-version: 1.14
+commands:
+  newChessBoard:
+    description: Gives the player a chess board item.
