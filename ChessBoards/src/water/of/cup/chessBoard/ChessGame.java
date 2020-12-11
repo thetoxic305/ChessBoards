@@ -10,17 +10,13 @@ public class ChessGame {
 	ChessPiece[][] board;
 	int[] selectedPiece;
 	ItemStack gameItem;
-	boolean whiteKingMoved;
-	boolean blackKingMoved;
-	boolean whiteRook1Moved;
-	boolean blackRook1Moved;
-	boolean whiteRook2Moved;
-	boolean blackRook2Moved;
+	boolean[][] movedPieces;
 
 	public ChessGame(ItemStack item) {
 		selectedPiece = new int[] { -1, -1 };
 		turn = "WHITE";
 		this.gameItem = item;
+		movedPieces = new boolean[8][8];
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -65,37 +61,57 @@ public class ChessGame {
 	}
 
 	public void click(int[] loc) {
-		// TODO: make map only render for near by players
-
 		// move piece if possible
 		if (locationOnBoard(selectedPiece)) {
 			ChessPiece piece = board[selectedPiece[1]][selectedPiece[0]];
 
 			// check if move is possible
-			if (piece != null && piece.getColor().equals(turn) && piece.getMoves(board, selectedPiece)[loc[1]][loc[0]]) {
+			if (piece != null && piece.getColor().equals(turn)
+					&& piece.getMoves(board, selectedPiece, getMovedPieces())[loc[1]][loc[0]]) {
 				// MoveMade!
-				
-				board[loc[1]][loc[0]] = piece;
-				board[selectedPiece[1]][selectedPiece[0]] = null;
-				selectedPiece = new int[] { -1, -1 };
-				
-				switchTurn();
-				
-				// CheckIfGameOver
-				if (!ChessUtils.colorHasMoves(board, turn)) {
-					//Check if winner
-					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
-						//Other side won
+
+				// check if move is castle
+				ChessPiece otherPiece = board[loc[1]][loc[0]];
+				if (otherPiece != null && piece.toString().contains("KING") && otherPiece.toString().contains("ROOK")
+						&& piece.getColor().equals(otherPiece.getColor())) {
+
+					if (loc[0] == 0) {
+						// left rook castle
+						board[selectedPiece[1]][2] = piece;
+						board[selectedPiece[1]][selectedPiece[0]] = null;
+						board[loc[1]][3] = otherPiece;
+						board[loc[1]][loc[0]] = null;
 						
 					} else {
-						//tied game
-						
+						// right rook castle
+						board[selectedPiece[1]][6] = piece;
+						board[selectedPiece[1]][selectedPiece[0]] = null;
+						board[loc[1]][5] = otherPiece;
+						board[loc[1]][loc[0]] = null;
 					}
-						
-					
-					
+				} else {
+
+					board[loc[1]][loc[0]] = piece;
+					board[selectedPiece[1]][selectedPiece[0]] = null;
+
+					movedPieces[loc[1]][loc[0]] = true;
+					movedPieces[selectedPiece[1]][selectedPiece[0]] = true;
+
+					selectedPiece = new int[] { -1, -1 };
 				}
-				
+				switchTurn();
+
+				// CheckIfGameOver
+				if (!ChessUtils.colorHasMoves(board, turn)) {
+					// Check if winner
+					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
+						// Other side won
+
+					} else {
+						// tied game
+
+					}
+				}
 			}
 		}
 
@@ -109,6 +125,7 @@ public class ChessGame {
 			}
 		}
 
+		// TODO: make map only render for near by players
 		renderBoardForPlayers();
 	}
 
@@ -132,5 +149,9 @@ public class ChessGame {
 		if (location[1] >= 0 && location[0] >= 0 && location[1] < board.length && location[0] < board[0].length)
 			return true;
 		return false;
+	}
+
+	public boolean[][] getMovedPieces() {
+		return movedPieces;
 	}
 }

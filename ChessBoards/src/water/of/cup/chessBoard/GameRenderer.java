@@ -30,7 +30,7 @@ public class GameRenderer extends MapRenderer {
 		boolean[][] moves = new boolean[8][8];
 		if (game.locationOnBoard(selectedLocation) && board[selectedLocation[1]][selectedLocation[0]] != null) {
 			player.sendMessage("movesFound");
-			moves = board[selectedLocation[1]][selectedLocation[0]].getMoves(board, selectedLocation);
+			moves = board[selectedLocation[1]][selectedLocation[0]].getMoves(board, selectedLocation, game.getMovedPieces());
 		}
 		
 		// clear board

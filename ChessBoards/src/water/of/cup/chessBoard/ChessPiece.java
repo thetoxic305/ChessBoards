@@ -4,11 +4,12 @@ public enum ChessPiece {
 	BLACK_PAWN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_QUEEN, BLACK_KING, WHITE_PAWN, WHITE_BISHOP, WHITE_KNIGHT,
 	WHITE_ROOK, WHITE_QUEEN, WHITE_KING;
 
-	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc) {
-		return getMoves(board, pieceLoc, false);
+	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces) {
+		return getMoves(board, pieceLoc, movedPieces, false);
 	}
 
-	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean canEndangerKing) {
+	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces,
+			boolean canEndangerKing) {
 		boolean[][] moves = new boolean[8][8];
 
 		int x = pieceLoc[0];
@@ -17,11 +18,11 @@ public enum ChessPiece {
 		int[][] directions;
 
 		// moves for each piece
+		int row = 0;
 		switch (this) {
 		case BLACK_PAWN:
 		case WHITE_PAWN:
 			int forward = 0;
-			int row = 0;
 			if (this.getColor().equals("BLACK")) {
 				forward = 1;
 				row = 1;
@@ -71,6 +72,42 @@ public enum ChessPiece {
 			break;
 		case BLACK_KING:
 		case WHITE_KING:
+			// check if king can castle
+			if (getColor().equals("WHITE")) {
+				row = 7;
+			} else if (getColor().equals("BLACK")) {
+				row = 0;
+			}
+			// check if king has moved
+			if (!movedPieces[row][4]) {
+				// left rook
+				if (!movedPieces[row][0]) {
+					boolean movesWork = true;
+					for (int i = 1; i < 4; i++) {
+						//check if all the tiles between king and rook are safe
+						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
+							movesWork = false;
+							break;
+						}
+					}
+					if (movesWork)
+					moves[row][0] = true;
+				}
+				
+				// right rook
+				if (!movedPieces[row][7]) {
+					boolean movesWork = true;
+					for (int i = 5; i < 7; i++) {
+						//check if all the tiles between king and rook are safe
+						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
+							movesWork = false;
+							break;
+						}
+					}
+					if (movesWork)
+					moves[row][7] = true;
+				}
+			}
 			directions = new int[][] { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 }, { 1, 0 }, { -1, 0 }, { 0, 1 },
 					{ 0, -1 } };
 			// loop through directions to see what moves are available
@@ -123,10 +160,10 @@ public enum ChessPiece {
 				int cX = x;
 				int cY = y;
 
-				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], true)) {
+				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], canEndangerKing)) {
 					cX += direction[0];
 					cY += direction[1];
-					if (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], canEndangerKing))
+					if (checkMovePossible(pieceLoc, board, cX, cY, true))
 						moves[cY][cX] = true;
 					if (checkMovePossible(pieceLoc, board, cX, cY, true, true, true))
 						break;
@@ -185,8 +222,8 @@ public enum ChessPiece {
 		ChessPiece[][] testBoard = ChessUtils.cloneBoard(board);
 		testBoard[y][x] = this;
 		testBoard[pieceLoc[1]][pieceLoc[0]] = null;
-		if (!canEndangerKing && !getColor().equals("EMPTY") && ChessUtils.locationThreatened(
-				ChessUtils.locateKing(testBoard, getColor()), testBoard))
+		if (!canEndangerKing && !getColor().equals("EMPTY")
+				&& ChessUtils.locationThreatened(ChessUtils.locateKing(testBoard, getColor()), testBoard))
 			return false;
 
 		// checks concluded

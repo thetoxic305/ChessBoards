@@ -21,7 +21,7 @@ public class ChessUtils {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && !attackingPiece.getColor().equals(board[location[1]][location[0]].getColor())
-						&& attackingPiece.getMoves(board, new int[] { x, y }, true)[location[1]][location[0]])
+						&& attackingPiece.getMoves(board, new int[] { x, y }, new boolean[8][8], true)[location[1]][location[0]])
 					return true;
 			}
 		}
@@ -103,14 +103,14 @@ public class ChessUtils {
 		return board;
 	}
 
-	public static boolean[][] allMovesForColor(ChessPiece[][] board, String color) {
+	public static boolean[][] allMovesForColor(ChessPiece[][] board, String color, boolean[][] movedPieces) {
 		boolean[][] moves = new boolean[board.length][board[0].length];
 
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && !attackingPiece.getColor().equals(color)) {
-					moves = combineMoves(moves, attackingPiece.getMoves(board, new int[] { x, y }));
+					moves = combineMoves(moves, attackingPiece.getMoves(board, new int[] { x, y }, movedPieces));
 				}
 			}
 		}
@@ -130,7 +130,7 @@ public class ChessUtils {
 	}
 	
 	public static boolean colorHasMoves(ChessPiece[][] board, String color) {
-		boolean[][] moves = allMovesForColor(board, color);
+		boolean[][] moves = allMovesForColor(board, color, new boolean[8][8]);
 		for (boolean[] line : moves) {
 			for (boolean move : line) {
 				if (move)
