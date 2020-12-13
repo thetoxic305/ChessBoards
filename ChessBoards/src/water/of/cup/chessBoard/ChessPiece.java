@@ -1,14 +1,17 @@
 package water.of.cup.chessBoard;
 
+import java.util.ArrayList;
+
 public enum ChessPiece {
 	BLACK_PAWN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_QUEEN, BLACK_KING, WHITE_PAWN, WHITE_BISHOP, WHITE_KNIGHT,
 	WHITE_ROOK, WHITE_QUEEN, WHITE_KING;
 
-	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces) {
-		return getMoves(board, pieceLoc, movedPieces, false);
+	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces,
+			ArrayList<String> record) {
+		return getMoves(board, pieceLoc, movedPieces, record, false);
 	}
 
-	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces,
+	public boolean[][] getMoves(ChessPiece[][] board, int[] pieceLoc, boolean[][] movedPieces, ArrayList<String> record,
 			boolean canEndangerKing) {
 		boolean[][] moves = new boolean[8][8];
 
@@ -49,6 +52,39 @@ public enum ChessPiece {
 				moves[y + forward][x - 1] = true;
 
 			}
+
+			// En passant take
+			int oppositeRow = 0;
+			ChessPiece oppositePieceType = null;
+			if (getColor().equals("WHITE")) {
+				oppositePieceType = ChessPiece.BLACK_PAWN;
+				oppositeRow = 1;
+				row = 3;
+			} else if (getColor().equals("BLACK")) {
+				oppositePieceType = ChessPiece.WHITE_PAWN;
+				row = 4;
+				oppositeRow = 6;
+			}
+			int[] files = new int[] { x + 1, x - 1 };
+
+			// check if pieces are on row
+			if (y == row) {
+				for (int file : files) {
+					if (file >= 0 && oppositePieceType.equals(board[row][file])) {
+						// check that last move was pawn in adjacent file moving up two squares
+						if (record.size() > 0 && record.get(record.size() - 1).equals(ChessUtils.getNotationPosition(file, oppositeRow)
+								+ ChessUtils.getNotationPosition(file, row))) {
+							// check that move is possible
+							ChessPiece[][] testBoard = ChessUtils.cloneBoard(board);
+							testBoard[row][file] = null;
+							if (checkMovePossible(pieceLoc, testBoard, file, y + forward, canEndangerKing, false)) {
+								moves[y + forward][file] = true;
+							}
+						}
+					}
+				}
+			}
+
 			break;
 		case BLACK_BISHOP:
 		case WHITE_BISHOP:
@@ -84,28 +120,28 @@ public enum ChessPiece {
 				if (!movedPieces[row][0]) {
 					boolean movesWork = true;
 					for (int i = 1; i < 4; i++) {
-						//check if all the tiles between king and rook are safe
+						// check if all the tiles between king and rook are safe
 						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
 							movesWork = false;
 							break;
 						}
 					}
 					if (movesWork)
-					moves[row][0] = true;
+						moves[row][0] = true;
 				}
-				
+
 				// right rook
 				if (!movedPieces[row][7]) {
 					boolean movesWork = true;
 					for (int i = 5; i < 7; i++) {
-						//check if all the tiles between king and rook are safe
+						// check if all the tiles between king and rook are safe
 						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
 							movesWork = false;
 							break;
 						}
 					}
 					if (movesWork)
-					moves[row][7] = true;
+						moves[row][7] = true;
 				}
 			}
 			directions = new int[][] { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 }, { 1, 0 }, { -1, 0 }, { 0, 1 },
@@ -228,6 +264,30 @@ public enum ChessPiece {
 
 		// checks concluded
 		return true;
+	}
+
+	public String getNotationCharacter() {
+		switch (this) {
+		case BLACK_BISHOP:
+		case WHITE_BISHOP:
+			return "B";
+		case BLACK_KING:
+		case WHITE_KING:
+			return "K";
+		case BLACK_KNIGHT:
+		case WHITE_KNIGHT:
+			return "N";
+		case BLACK_PAWN:
+		case WHITE_PAWN:
+			return "";
+		case BLACK_QUEEN:
+		case WHITE_QUEEN:
+			return "Q";
+		case BLACK_ROOK:
+		case WHITE_ROOK:
+			return "R";
+		}
+		return "";
 	}
 
 }

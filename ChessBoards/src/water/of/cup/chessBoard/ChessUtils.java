@@ -1,5 +1,7 @@
 package water.of.cup.chessBoard;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
@@ -8,7 +10,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import net.minecraft.server.v1_14_R1.ArgumentScoreholder.c;
+
 public class ChessUtils {
+	
+	private static String[] xPositionLetters = new String[] {"a", "b", "c", "d", "e", "f", "g", "h"};
+			
 	public static boolean locationThreatened(int[] location, ChessPiece[][] originalBoard) {
 		// returns true if a piece could be taken at this location
 		ChessPiece[][] board = cloneBoard(originalBoard);
@@ -21,7 +28,7 @@ public class ChessUtils {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && !attackingPiece.getColor().equals(board[location[1]][location[0]].getColor())
-						&& attackingPiece.getMoves(board, new int[] { x, y }, new boolean[8][8], true)[location[1]][location[0]])
+						&& attackingPiece.getMoves(board, new int[] { x, y }, new boolean[8][8], new ArrayList<String>(), true)[location[1]][location[0]])
 					return true;
 			}
 		}
@@ -110,7 +117,7 @@ public class ChessUtils {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && !attackingPiece.getColor().equals(color)) {
-					moves = combineMoves(moves, attackingPiece.getMoves(board, new int[] { x, y }, movedPieces));
+					moves = combineMoves(moves, attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, new ArrayList<String>()));
 				}
 			}
 		}
@@ -138,5 +145,9 @@ public class ChessUtils {
 			}
 		}
 		return false;
+	}
+
+	public static String getNotationPosition(int x, int y) {
+		return xPositionLetters[x] + (8 - y);
 	}
 }
