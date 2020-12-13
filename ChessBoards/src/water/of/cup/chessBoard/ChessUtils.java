@@ -20,9 +20,6 @@ public class ChessUtils {
 		// returns true if a piece could be taken at this location
 		ChessPiece[][] board = cloneBoard(originalBoard);
 
-		// place King
-		//board[location[1]][location[0]] = piece;
-
 		// check if piece in danger
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {

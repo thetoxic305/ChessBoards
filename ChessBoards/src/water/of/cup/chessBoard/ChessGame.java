@@ -129,31 +129,39 @@ public class ChessGame {
 				}
 				switchTurn();
 
-				// CheckIfGameOver
-				if (!ChessUtils.colorHasMoves(board, turn)) {
-					// Check if winner
-					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
-						// Other side won
-						notation += "++";
-						
-					} else {
-						// tied game
-
-					}
-				} else
 				// Check if move creates check
 				if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
-					// Other side won
 					notation += "+";
+					// check if move creates checkmate
+					if (!ChessUtils.colorHasMoves(board, turn)) {
+						notation += "+";
+					}
 				}
 				
 				//log move
 				record.add(notation);
 				Bukkit.getLogger().info(notation);
+				
+				// CheckIfGameOver
+				if (!ChessUtils.colorHasMoves(board, turn)) {
+					// Check if winner
+					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
+						// Other side won
+						if (turn.equals("WHITE")) {
+							record.add("0-1");
+						} else {
+							record.add("1-0");
+						}
+
+					} else {
+						// tied game
+						record.add("1/2-1/2");
+					}
+				} 
 			}
 		}
 
-		selectedPiece = loc.clone(); // Might cause issues
+		selectedPiece = loc.clone();
 
 		// Make sure selectedPiece has correct turn
 		if (locationOnBoard(selectedPiece)) {

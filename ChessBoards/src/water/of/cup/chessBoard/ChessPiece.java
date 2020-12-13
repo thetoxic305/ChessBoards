@@ -72,7 +72,7 @@ public enum ChessPiece {
 				for (int file : files) {
 					if (file >= 0 && oppositePieceType.equals(board[row][file])) {
 						// check that last move was pawn in adjacent file moving up two squares
-						if (record.size() > 0 && record.get(record.size() - 1).equals(ChessUtils.getNotationPosition(file, oppositeRow)
+						if (record.size() > 0 && record.get(record.size() - 1).replaceAll("+", "").equals(ChessUtils.getNotationPosition(file, oppositeRow)
 								+ ChessUtils.getNotationPosition(file, row))) {
 							// check that move is possible
 							ChessPiece[][] testBoard = ChessUtils.cloneBoard(board);
