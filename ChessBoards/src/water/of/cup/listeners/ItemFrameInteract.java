@@ -41,40 +41,6 @@ public class ItemFrameInteract implements Listener {
 
 		ItemFrame itemFrame = (ItemFrame) e.getRightClicked();
 
-		// check if itemFrame has no item
-		if (itemFrame.getItem().getType().equals(Material.AIR)) {
-
-			// check if player is holding chessboard
-			if (player.getInventory().getItemInMainHand().equals(ChessUtils.getChessBoardItem())) {
-				ItemStack chessBoardItem = new ItemStack(Material.FILLED_MAP, 1);
-
-				ChessGame game = new ChessGame(chessBoardItem);
-
-				MapMeta mapMeta = (MapMeta) chessBoardItem.getItemMeta();
-				MapView mapView = Bukkit.createMap(player.getWorld());
-
-				mapView.setTrackingPosition(false);
-
-				for (MapRenderer renderer : mapView.getRenderers())
-					mapView.removeRenderer(renderer);
-
-				GameRenderer customRenderer = new GameRenderer(game);
-				mapView.addRenderer(customRenderer);
-				mapMeta.setMapView(mapView);
-
-				chessBoardItem.setItemMeta(mapMeta);
-
-				itemFrame.setItem(chessBoardItem, true);
-
-				// remove 1 chessboard
-				player.getInventory().getItemInMainHand()
-						.setAmount(player.getInventory().getItemInMainHand().getAmount() - 1);
-				chessBoardManager.addGame(game);
-
-				e.setCancelled(true);
-			}
-		}
-
 		// attempt to find a chess game
 		Vector direction = player.getEyeLocation().getDirection();
 		RayTraceResult result = player.getWorld().rayTraceBlocks(player.getEyeLocation(),

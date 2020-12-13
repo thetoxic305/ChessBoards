@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.commands.ChessBoardCommands;
+import water.of.cup.listeners.BlockPlace;
 import water.of.cup.listeners.BoardInteract;
 import water.of.cup.listeners.ItemFrameInteract;
 
@@ -40,7 +41,7 @@ public class ChessBoards extends JavaPlugin {
 		imageManager.loadImages();
 		
 		getCommand("newChessBoard").setExecutor(new ChessBoardCommands());
-		registerListeners(new ItemFrameInteract(), new BoardInteract());
+		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
@@ -63,7 +64,7 @@ public class ChessBoards extends JavaPlugin {
 	public void addChessBoardRecipe() {
 		ItemStack chessboard = ChessUtils.getChessBoardItem();
 
-		NamespacedKey key = new NamespacedKey(this, "Chess Board");
+		NamespacedKey key = new NamespacedKey(this, "chess_board");
 		ShapedRecipe recipe = new ShapedRecipe(key, chessboard);
 
 		ArrayList<String> shapeArr = (ArrayList<String>) config.get("settings.chessboard.recipe.shape");

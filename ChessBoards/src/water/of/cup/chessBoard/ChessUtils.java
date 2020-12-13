@@ -4,16 +4,18 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Rotation;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
-
-import net.minecraft.server.v1_14_R1.ArgumentScoreholder.c;
+import water.of.cup.ChessBoards;
 
 public class ChessUtils {
-	
+
+	private static ChessBoards pluginInstance = ChessBoards.getInstance();
 	private static String[] xPositionLetters = new String[] {"a", "b", "c", "d", "e", "f", "g", "h"};
 			
 	public static boolean locationThreatened(int[] location, ChessPiece[][] originalBoard) {
@@ -51,8 +53,10 @@ public class ChessUtils {
 	}
 
 	public static ItemStack getChessBoardItem() {
-		ItemStack chessboard = new ItemStack(Material.PAPER);
-		ItemMeta chessboardMeta = (ItemMeta) chessboard.getItemMeta();
+		NamespacedKey key = new NamespacedKey(pluginInstance, "chess_board");
+		ItemStack chessboard = new ItemStack(Material.SPRUCE_TRAPDOOR);
+		ItemMeta chessboardMeta = chessboard.getItemMeta();
+		chessboardMeta.getPersistentDataContainer().set(key, PersistentDataType.DOUBLE, Math.PI);
 		chessboardMeta.setDisplayName(ChatColor.DARK_BLUE + "Chess Board");
 		chessboard.setItemMeta(chessboardMeta);
 
