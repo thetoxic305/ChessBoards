@@ -48,6 +48,11 @@ public class ItemFrameInteract implements Listener {
 		if (result != null) {
 			if (chessBoardManager.hasGame(itemFrame.getItem())) {
 				// chess game found
+				if(player.isSneaking()) {
+					player.sendMessage("Opening chest GUI...");
+					return;
+				}
+
 				player.sendMessage("Game found");
 
 				ChessGame game = chessBoardManager.getGame(itemFrame.getItem());

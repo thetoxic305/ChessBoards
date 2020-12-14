@@ -28,11 +28,10 @@ public class BoardInteract implements Listener {
 	@EventHandler
 	public void clickBoard(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
-
-		
 		
 		// attempt to find a chess game
-		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) ||
+				e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			Vector direction = player.getEyeLocation().getDirection();
 			RayTraceResult result = player.getWorld().rayTraceBlocks(player.getEyeLocation(),
 					direction, 3.5);
@@ -47,6 +46,11 @@ public class BoardInteract implements Listener {
 							// chess game found
 							if(e.getHand().equals(EquipmentSlot.HAND)) {
 								e.setCancelled(true);
+								return;
+							}
+
+							if(player.isSneaking()) {
+								player.sendMessage("Opening chest GUI...");
 								return;
 							}
 							

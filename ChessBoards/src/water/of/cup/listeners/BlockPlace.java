@@ -1,6 +1,7 @@
 package water.of.cup.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockFace;
@@ -28,6 +29,9 @@ public class BlockPlace implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         ItemStack itemStack = player.getInventory().getItemInMainHand();
+
+        if(itemStack.getItemMeta() == null) return;
+
         NamespacedKey key = new NamespacedKey(pluginInstance, "chess_board");
         if(itemStack.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.DOUBLE)) {
             event.setCancelled(true);
