@@ -1,20 +1,26 @@
 package water.of.cup.chessBoard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import water.of.cup.inventories.ChessCreateGameInventory;
 
 public class ChessGame {
-	String turn;
-	ChessPiece[][] board;
-	int[] selectedPiece;
-	ItemStack gameItem;
-	boolean[][] movedPieces;
-	ArrayList<String> record;
+	private String turn;
+	private ChessPiece[][] board;
+	private int[] selectedPiece;
+	private ItemStack gameItem;
+	private boolean[][] movedPieces;
+	private ArrayList<String> record;
+	private ChessGameState gameState;
+	private Player whitePlayer;
+	private Player blackPlayer;
 
 	public ChessGame(ItemStack item) {
 		record = new ArrayList<String>();
@@ -22,6 +28,10 @@ public class ChessGame {
 		turn = "WHITE";
 		this.gameItem = item;
 		movedPieces = new boolean[8][8];
+		gameState = ChessGameState.IDLE;
+
+		whitePlayer = null;
+		blackPlayer = null;
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -65,7 +75,16 @@ public class ChessGame {
 		return selectedPiece;
 	}
 
-	public void click(int[] loc) {
+	public void click(int[] loc, Player player) {
+		if(this.gameState != ChessGameState.INGAME) return;
+		if(!this.hasPlayer(player)) return;
+
+		String color = "WHITE";
+		if(blackPlayer.equals(player)) color = "BLACK";
+
+		// Make sure player is ingame and correct turn
+		if(this.turn != color) return;
+
 		// move piece if possible
 		if (locationOnBoard(selectedPiece)) {
 			ChessPiece piece = board[selectedPiece[1]][selectedPiece[0]];
@@ -203,5 +222,15 @@ public class ChessGame {
 
 	public ArrayList<String> getRecord() {
 		return record;
+	}
+
+	public ChessGameState getGameState() {
+		return this.gameState;
+	}
+
+	public boolean hasPlayer(Player player) {
+		if(this.blackPlayer != null && this.blackPlayer.equals(player)) return true;
+		if(this.whitePlayer != null && this.whitePlayer.equals(player)) return true;
+		return false;
 	}
 }

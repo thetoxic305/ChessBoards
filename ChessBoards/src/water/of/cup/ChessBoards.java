@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -19,15 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.commands.ChessBoardCommands;
-import water.of.cup.listeners.BlockPlace;
-import water.of.cup.listeners.BoardInteract;
-import water.of.cup.listeners.ItemFrameInteract;
+import water.of.cup.inventories.ChessCreateGameInventory;
+import water.of.cup.listeners.*;
 
 public class ChessBoards extends JavaPlugin {
 
 	private static ChessBoards instance;
 	private static ChessBoardManager chessBoardManager = new ChessBoardManager();
-	private static ImageManager imageManager = new ImageManager(); 
+	private static ImageManager imageManager = new ImageManager();
+	private HashMap<Player, ChessCreateGameInventory> createGameManager = new HashMap<>();
 	List<Integer> mapIDsNotToRender = new ArrayList<>();
 	private File configFile;
 	private FileConfiguration config;
@@ -41,7 +42,7 @@ public class ChessBoards extends JavaPlugin {
 		imageManager.loadImages();
 		
 		getCommand("newChessBoard").setExecutor(new ChessBoardCommands());
-		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace());
+		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
@@ -148,5 +149,9 @@ public class ChessBoards extends JavaPlugin {
 	
 	public ImageManager getImageManager() {
 		return imageManager;
+	}
+
+	public HashMap<Player, ChessCreateGameInventory> getCreateGameManager() {
+		return createGameManager;
 	}
 }

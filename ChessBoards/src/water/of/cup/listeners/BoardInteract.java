@@ -18,7 +18,9 @@ import org.bukkit.util.Vector;
 import water.of.cup.ChessBoards;
 import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessGame;
+import water.of.cup.chessBoard.ChessGameState;
 import water.of.cup.chessBoard.ChessUtils;
+import water.of.cup.inventories.ChessCreateGameInventory;
 
 public class BoardInteract implements Listener {
 
@@ -48,22 +50,29 @@ public class BoardInteract implements Listener {
 								e.setCancelled(true);
 								return;
 							}
-
-							if(player.isSneaking()) {
-								player.sendMessage("Opening chest GUI...");
-								return;
-							}
 							
 							player.sendMessage("Game found");
 							
 							ChessGame game = chessBoardManager.getGame(itemFrame.getItem());
+
+							if(game.getGameState().equals(ChessGameState.IDLE) || game.getGameState().equals(ChessGameState.WAITING_PLAYER)) {
+								if(game.getGameState().equals(ChessGameState.IDLE)) {
+									ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory();
+									chessCreateGameInventory.displayCreateGame(player, true);
+									instance.getCreateGameManager().put(player, chessCreateGameInventory);
+								} else {
+
+								}
+								return;
+							}
+
 							double hitx = result.getHitPosition().getX();
 							double hity = result.getHitPosition().getZ();
 
 							int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, itemFrame.getRotation(), direction);
 							
 							player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
-							game.click(loc);
+							game.click(loc, player);
 							
 							e.setCancelled(true);
 						}

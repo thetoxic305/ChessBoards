@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 
 public class ChessBoardManager {
-	ArrayList<ChessGame> games;
+	private ArrayList<ChessGame> games;
 	
 	public boolean addGame(ChessGame game) {
 		
