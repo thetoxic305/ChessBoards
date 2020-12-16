@@ -13,7 +13,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
     private Inventory inv;
     private boolean ranked;
-    private int gameTime = 60*60 + 15;
+    private int gameTime = 60*60;
     private int wager;
     public static final String INVENTORY_NAME = "Chess | Create Game";
 
