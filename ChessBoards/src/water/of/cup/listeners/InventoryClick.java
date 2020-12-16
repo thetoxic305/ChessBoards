@@ -18,6 +18,9 @@ public class InventoryClick implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+
+        if(event.getClickedInventory() == null) return;
+
         if (event.getView().getTitle().contains(ChessCreateGameInventory.INVENTORY_NAME)
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
