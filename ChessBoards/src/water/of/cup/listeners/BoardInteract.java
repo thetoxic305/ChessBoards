@@ -3,6 +3,7 @@ package water.of.cup.listeners;
 import java.util.Collection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -21,6 +22,7 @@ import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.inventories.ChessCreateGameInventory;
+import water.of.cup.inventories.ChessJoinGameInventory;
 
 public class BoardInteract implements Listener {
 
@@ -51,17 +53,27 @@ public class BoardInteract implements Listener {
 								return;
 							}
 							
-							player.sendMessage("Game found");
-							
 							ChessGame game = chessBoardManager.getGame(itemFrame.getItem());
+
+							player.sendMessage("Game found! Status: " + game.getGameState().toString());
+
+							if(chessBoardManager.getGameByPlayer(player) != null
+									&& chessBoardManager.getGameByPlayer(player) != game) {
+								player.sendMessage("You must finish your game before joining another.");
+								return;
+							}
 
 							if(game.getGameState().equals(ChessGameState.IDLE) || game.getGameState().equals(ChessGameState.WAITING_PLAYER)) {
 								if(game.getGameState().equals(ChessGameState.IDLE)) {
-									ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory();
+									ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory(game);
 									chessCreateGameInventory.displayCreateGame(player, true);
 									instance.getCreateGameManager().put(player, chessCreateGameInventory);
 								} else {
-
+									if(game.getPlayerQueue().size() < 3) {
+										game.addPlayerToDecisionQueue(player);
+									} else {
+										player.sendMessage(ChatColor.RED + "Too many players queuing!");
+									}
 								}
 								return;
 							}

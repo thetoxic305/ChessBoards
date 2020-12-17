@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
@@ -41,5 +42,29 @@ public class ChessBoardManager {
 	public void loadGames() {
 		games = new ArrayList<ChessGame>();
 		
+	}
+
+	public ChessGame getGameByPlayer(Player player) {
+		for(ChessGame game : games) {
+			if(game.hasPlayer(player)) return game;
+		}
+
+		return null;
+	}
+
+	public ChessGame getGameByQueuePlayer(Player player) {
+		for(ChessGame game : games) {
+			if(game.getPlayerQueue().contains(player)) return game;
+		}
+
+		return null;
+	}
+
+	public ChessGame getGameByDecisionQueuePlayer(Player player) {
+		for(ChessGame game : games) {
+			if(game.getPlayerDecideQueue().contains(player)) return game;
+		}
+
+		return null;
 	}
 }

@@ -2,6 +2,8 @@ package water.of.cup.chessBoard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,6 +12,8 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import water.of.cup.inventories.ChessCreateGameInventory;
+import water.of.cup.inventories.ChessJoinGameInventory;
+import water.of.cup.inventories.ChessWaitingPlayerInventory;
 
 public class ChessGame {
 	private String turn;
@@ -21,6 +25,12 @@ public class ChessGame {
 	private ChessGameState gameState;
 	private Player whitePlayer;
 	private Player blackPlayer;
+	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
+	private boolean ranked;
+	private int gameTime;
+	private int wager;
+	private Set<Player> playerQueue = new HashSet<>();
+	private Set<Player> playerDecideQueue = new HashSet<>();
 
 	public ChessGame(ItemStack item) {
 		record = new ArrayList<String>();
@@ -228,9 +238,104 @@ public class ChessGame {
 		return this.gameState;
 	}
 
+	public void setGameState(ChessGameState gameState) {
+		this.gameState = gameState;
+	}
+
+	public void setWhitePlayer(Player player) {
+		 this.whitePlayer = player;
+	}
+
+	public void setBlackPlayer(Player player) {
+		 this.blackPlayer = player;
+	}
+
+	public Player getWhitePlayer() {
+		return this.whitePlayer;
+	}
+
+	public Player getBlackPlayer() {
+		return this.blackPlayer;
+	}
+
+	public void openWaitingPlayerInventory() {
+		this.chessWaitingPlayerInventory = new ChessWaitingPlayerInventory(this);
+		this.chessWaitingPlayerInventory.display(this.whitePlayer, true);
+	}
+
+	public ChessWaitingPlayerInventory getChessWaitingPlayerInventory() {
+		return this.chessWaitingPlayerInventory;
+	}
+
 	public boolean hasPlayer(Player player) {
 		if(this.blackPlayer != null && this.blackPlayer.equals(player)) return true;
 		if(this.whitePlayer != null && this.whitePlayer.equals(player)) return true;
 		return false;
+	}
+
+	public void addPlayerToQueue(Player player) {
+		if(this.playerQueue.size() >= 3) return;
+
+		if(this.playerDecideQueue.contains(player)) this.playerDecideQueue.remove(player);
+
+		this.playerQueue.add(player);
+
+		// Re-render for the player waiting for match
+		this.chessWaitingPlayerInventory.display(this.whitePlayer, false);
+	}
+
+	public void addPlayerToDecisionQueue(Player player) {
+		this.playerDecideQueue.add(player);
+
+		// Display game options to new player
+		new ChessJoinGameInventory(this, player).display(player, true, false);
+	}
+
+	public void removePlayerFromQueue(Player player) {
+		// Remove player from queue
+		if(this.getPlayerQueue().contains(player)) this.getPlayerQueue().remove(player);
+
+		// Re-render for the player waiting for match
+		this.chessWaitingPlayerInventory.display(this.whitePlayer, false);
+	}
+
+	public void setPlayerQueue(Set<Player> playerQueue) {
+		this.playerQueue = playerQueue;
+	}
+
+	public void setPlayerDecideQueue(Set<Player> playerDecideQueue) {
+		this.playerDecideQueue = playerDecideQueue;
+	}
+
+	public Set<Player> getPlayerQueue() {
+		return  this.playerQueue;
+	}
+
+	public Set<Player> getPlayerDecideQueue() {
+		return this.playerDecideQueue;
+	}
+
+	public boolean isRanked() {
+		return ranked;
+	}
+
+	public void setRanked(boolean ranked) {
+		this.ranked = ranked;
+	}
+
+	public int getGameTime() {
+		return gameTime;
+	}
+
+	public void setGameTime(int gameTime) {
+		this.gameTime = gameTime;
+	}
+
+	public int getWager() {
+		return wager;
+	}
+
+	public void setWager(int wager) {
+		this.wager = wager;
 	}
 }
