@@ -70,7 +70,7 @@ public enum ChessPiece {
 			// check if pieces are on row
 			if (y == row) {
 				for (int file : files) {
-					if (file >= 0 && oppositePieceType.equals(board[row][file])) {
+					if (file >= 0 && file < 8 && oppositePieceType.equals(board[row][file])) {
 						// check that last move was pawn in adjacent file moving up two squares
 						if (record.size() > 0 && record.get(record.size() - 1).replaceAll("+", "").equals(ChessUtils.getNotationPosition(file, oppositeRow)
 								+ ChessUtils.getNotationPosition(file, row))) {
