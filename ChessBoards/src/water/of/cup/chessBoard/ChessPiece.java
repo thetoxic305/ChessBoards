@@ -72,8 +72,9 @@ public enum ChessPiece {
 				for (int file : files) {
 					if (file >= 0 && file < 8 && oppositePieceType.equals(board[row][file])) {
 						// check that last move was pawn in adjacent file moving up two squares
-						if (record.size() > 0 && record.get(record.size() - 1).replaceAll("+", "").equals(ChessUtils.getNotationPosition(file, oppositeRow)
-								+ ChessUtils.getNotationPosition(file, row))) {
+						if (record.size() > 0 && record.get(record.size() - 1).replaceAll("\\+", "")
+								.equals(ChessUtils.getNotationPosition(file, oppositeRow)
+										+ ChessUtils.getNotationPosition(file, row))) {
 							// check that move is possible
 							ChessPiece[][] testBoard = ChessUtils.cloneBoard(board);
 							testBoard[row][file] = null;
@@ -109,39 +110,43 @@ public enum ChessPiece {
 		case BLACK_KING:
 		case WHITE_KING:
 			// check if king can castle
-			if (getColor().equals("WHITE")) {
-				row = 7;
-			} else if (getColor().equals("BLACK")) {
-				row = 0;
-			}
-			// check if king has moved
-			if (!movedPieces[row][4]) {
-				// left rook
-				if (!movedPieces[row][0]) {
-					boolean movesWork = true;
-					for (int i = 1; i < 4; i++) {
-						// check if all the tiles between king and rook are safe
-						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
-							movesWork = false;
-							break;
-						}
-					}
-					if (movesWork)
-						moves[row][0] = true;
-				}
 
-				// right rook
-				if (!movedPieces[row][7]) {
-					boolean movesWork = true;
-					for (int i = 5; i < 7; i++) {
-						// check if all the tiles between king and rook are safe
-						if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
-							movesWork = false;
-							break;
+			if (canEndangerKing == false) {
+				
+				if (getColor().equals("WHITE")) {
+					row = 7;
+				} else if (getColor().equals("BLACK")) {
+					row = 0;
+				}
+				// check if king has moved
+				if (!movedPieces[row][4]) {
+					// left rook
+					if (!movedPieces[row][0]) {
+						boolean movesWork = true;
+						for (int i = 1; i < 4; i++) {
+							// check if all the tiles between king and rook are safe
+							if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
+								movesWork = false;
+								break;
+							}
 						}
+						if (movesWork)
+							moves[row][0] = true;
 					}
-					if (movesWork)
-						moves[row][7] = true;
+
+					// right rook
+					if (!movedPieces[row][7]) {
+						boolean movesWork = true;
+						for (int i = 5; i < 7; i++) {
+							// check if all the tiles between king and rook are safe
+							if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
+								movesWork = false;
+								break;
+							}
+						}
+						if (movesWork)
+							moves[row][7] = true;
+					}
 				}
 			}
 			directions = new int[][] { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 }, { 1, 0 }, { -1, 0 }, { 0, 1 },
