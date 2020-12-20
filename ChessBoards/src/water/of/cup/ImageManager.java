@@ -1,6 +1,8 @@
 package water.of.cup;
 
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +23,8 @@ public class ImageManager {
 		// Make sure all images are places inside /ChessBoards/images on the server
 		for (ChessPiece piece : ChessPiece.values()) {
 			try {
-				File file = new File(ChessBoards.getInstance().getDataFolder() + "/images/" + piece.toString() + ".png");
+				File file = new File(
+						ChessBoards.getInstance().getDataFolder() + "/images/" + piece.toString() + ".png");
 				BufferedImage image = ImageIO.read(file);
 				images.put(piece, image);
 			} catch (IOException e) {
@@ -32,6 +35,14 @@ public class ImageManager {
 	}
 
 	public BufferedImage getImage(ChessPiece piece) {
-		return images.get(piece);
+		BufferedImage image = images.get(piece);
+		if (piece.getColor().equals("BLACK")) {
+			// flip black images
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, -1);
+			tx.translate(-image.getWidth(null), -image.getHeight(null));
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+			image = op.filter(image, null);
+		}
+		return image;
 	}
 }
