@@ -40,7 +40,7 @@ public class GUIUtils {
     public static ItemStack createGuiPlayerItem(Player player) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("§a" + player.getName());
+        meta.setDisplayName(ChatColor.YELLOW + player.getName());
 
         // TODO: Add lore containing player's stats
 

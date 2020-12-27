@@ -16,8 +16,8 @@ import water.of.cup.ChessBoards;
 public class ChessUtils {
 
 	private static ChessBoards pluginInstance = ChessBoards.getInstance();
-	private static String[] xPositionLetters = new String[] {"a", "b", "c", "d", "e", "f", "g", "h"};
-			
+	private static String[] xPositionLetters = new String[] { "a", "b", "c", "d", "e", "f", "g", "h" };
+
 	public static boolean locationThreatened(int[] location, ChessPiece[][] originalBoard) {
 		// returns true if a piece could be taken at this location
 		ChessPiece[][] board = cloneBoard(originalBoard);
@@ -26,8 +26,10 @@ public class ChessUtils {
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
-				if (attackingPiece != null && !attackingPiece.getColor().equals(board[location[1]][location[0]].getColor())
-						&& attackingPiece.getMoves(board, new int[] { x, y }, new boolean[8][8], new ArrayList<String>(), true)[location[1]][location[0]])
+				if (attackingPiece != null
+						&& !attackingPiece.getColor().equals(board[location[1]][location[0]].getColor())
+						&& attackingPiece.getMoves(board, new int[] { x, y }, new boolean[8][8],
+								new ArrayList<String>(), true)[location[1]][location[0]])
 					return true;
 			}
 		}
@@ -41,6 +43,22 @@ public class ChessUtils {
 					return new int[] { x, y };
 			}
 		}
+		return new int[] { -1, -1 };
+	}
+
+	public static int[] locatePromotedPawn(ChessPiece[][] board, String color) {
+		int y = 7;
+		ChessPiece pieceType = ChessPiece.BLACK_PAWN;
+		if (color.equals("WHITE")) {
+			y = 0;
+			pieceType = ChessPiece.WHITE_PAWN;
+		}
+
+		for (int x = 0; x < 8; x++) {
+			if (board[y][x].equals(pieceType))
+				return new int[] { x, y };
+		}
+
 		return new int[] { -1, -1 };
 	}
 
@@ -118,7 +136,8 @@ public class ChessUtils {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && !attackingPiece.getColor().equals(color)) {
-					moves = combineMoves(moves, attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, new ArrayList<String>()));
+					moves = combineMoves(moves,
+							attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, new ArrayList<String>()));
 				}
 			}
 		}
@@ -136,7 +155,7 @@ public class ChessUtils {
 		}
 		return moves;
 	}
-	
+
 	public static boolean colorHasMoves(ChessPiece[][] board, String color) {
 		boolean[][] moves = allMovesForColor(board, color, new boolean[8][8]);
 		for (boolean[] line : moves) {

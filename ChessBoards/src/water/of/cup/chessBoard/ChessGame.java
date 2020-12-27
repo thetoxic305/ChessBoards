@@ -31,6 +31,7 @@ public class ChessGame {
 	private int wager;
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
+	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
 
 	public ChessGame(ItemStack item) {
 		record = new ArrayList<String>();
@@ -42,6 +43,7 @@ public class ChessGame {
 
 		whitePlayer = null;
 		blackPlayer = null;
+		pawnPromotion = "NONE";
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -86,14 +88,42 @@ public class ChessGame {
 	}
 
 	public void click(int[] loc, Player player) {
-		if(this.gameState != ChessGameState.INGAME) return;
-		if(!this.hasPlayer(player)) return;
+		if (this.gameState != ChessGameState.INGAME)
+			return;
+
+		if (!this.hasPlayer(player))
+			return;
 
 		String color = "WHITE";
-		if(blackPlayer.equals(player)) color = "BLACK";
+		if (blackPlayer.equals(player))
+			color = "BLACK";
 
 		// Make sure player is ingame and correct turn
-		if(this.turn != color) return;
+		if (this.turn != color)
+			return;
+
+		// pawn promotion
+		if (!pawnPromotion.equals("NONE")) {
+
+			if (loc[1] <= 2 || loc[1] >= 5 || loc[0] <= 1 || loc[0] >= 6) // no piece selected
+				return;
+
+			String[] promotionPieces = new String[] { "ROOK", "KNIGHT", "BISHOP", "QUEEN" };
+			int[] pawnPosition = ChessUtils.locatePromotedPawn(board, pawnPromotion);
+
+			board[pawnPosition[1]][pawnPosition[0]] = ChessPiece
+					.valueOf(pawnPromotion + "_" + promotionPieces[loc[0] - 2]);
+
+			record.set(record.size() - 1, record.get(record.size() - 1) + "="
+					+ board[pawnPosition[1]][pawnPosition[0]].getNotationCharacter());
+
+			switchTurn();
+			pawnPromotion = "NONE";
+			selectedPiece = new int[] { -1, -1 };
+
+			renderBoardForPlayers();
+			return;
+		}
 
 		// move piece if possible
 		if (locationOnBoard(selectedPiece)) {
@@ -104,8 +134,7 @@ public class ChessGame {
 					&& piece.getMoves(board, selectedPiece, getMovedPieces(), record)[loc[1]][loc[0]]) {
 				// MoveMade!
 				String notation = "";
-				
-				
+
 				// check if move is castle
 				ChessPiece otherPiece = board[loc[1]][loc[0]];
 				if (otherPiece != null && piece.toString().contains("KING") && otherPiece.toString().contains("ROOK")
@@ -129,7 +158,13 @@ public class ChessGame {
 						notation = "0-0";
 					}
 				} else {
-					// TODO: check if pawn reached end
+					// check if pawn reached end
+					if ((piece == ChessPiece.BLACK_PAWN && loc[1] == 7)
+							|| (piece == ChessPiece.WHITE_PAWN && loc[1] == 0)) {
+						pawnPromotion = piece.getColor();
+					} else {
+						pawnPromotion = "NONE";
+					}
 
 					// check if move is en passent
 					if (piece.toString().contains("PAWN") && otherPiece == null && loc[0] != selectedPiece[0]) {
@@ -140,8 +175,8 @@ public class ChessGame {
 					// non-castle move made
 					notation = piece.getNotationCharacter()
 							+ ChessUtils.getNotationPosition(selectedPiece[0], selectedPiece[1]);
-					
-					//add piece taken to notation
+
+					// add piece taken to notation
 					if (otherPiece != null) {
 						notation += "x";
 					}
@@ -156,21 +191,27 @@ public class ChessGame {
 					selectedPiece = new int[] { -1, -1 };
 
 				}
-				switchTurn();
 
-				// Check if move creates check
-				if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
-					notation += "+";
-					// check if move creates checkmate
-					if (!ChessUtils.colorHasMoves(board, turn)) {
+				// run only if no pawn promotion
+				if (pawnPromotion.equals("NONE")) {
+
+					switchTurn();
+
+					// Check if move creates check
+					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 						notation += "+";
+						// check if move creates checkmate
+						if (!ChessUtils.colorHasMoves(board, turn)) {
+							notation += "+";
+						}
 					}
+
 				}
-				
-				//log move
+
+				// log move
 				record.add(notation);
 				Bukkit.getLogger().info(notation);
-				
+
 				// CheckIfGameOver
 				if (!ChessUtils.colorHasMoves(board, turn)) {
 					// Check if winner
@@ -181,12 +222,11 @@ public class ChessGame {
 						} else {
 							record.add("1-0");
 						}
-
 					} else {
 						// tied game
 						record.add("1/2-1/2");
 					}
-				} 
+				}
 			}
 		}
 
@@ -243,11 +283,11 @@ public class ChessGame {
 	}
 
 	public void setWhitePlayer(Player player) {
-		 this.whitePlayer = player;
+		this.whitePlayer = player;
 	}
 
 	public void setBlackPlayer(Player player) {
-		 this.blackPlayer = player;
+		this.blackPlayer = player;
 	}
 
 	public Player getWhitePlayer() {
@@ -268,15 +308,19 @@ public class ChessGame {
 	}
 
 	public boolean hasPlayer(Player player) {
-		if(this.blackPlayer != null && this.blackPlayer.equals(player)) return true;
-		if(this.whitePlayer != null && this.whitePlayer.equals(player)) return true;
+		if (this.blackPlayer != null && this.blackPlayer.equals(player))
+			return true;
+		if (this.whitePlayer != null && this.whitePlayer.equals(player))
+			return true;
 		return false;
 	}
 
 	public void addPlayerToQueue(Player player) {
-		if(this.playerQueue.size() >= 3) return;
+		if (this.playerQueue.size() >= 3)
+			return;
 
-		if(this.playerDecideQueue.contains(player)) this.playerDecideQueue.remove(player);
+		if (this.playerDecideQueue.contains(player))
+			this.playerDecideQueue.remove(player);
 
 		this.playerQueue.add(player);
 
@@ -293,7 +337,8 @@ public class ChessGame {
 
 	public void removePlayerFromQueue(Player player) {
 		// Remove player from queue
-		if(this.getPlayerQueue().contains(player)) this.getPlayerQueue().remove(player);
+		if (this.getPlayerQueue().contains(player))
+			this.getPlayerQueue().remove(player);
 
 		// Re-render for the player waiting for match
 		this.chessWaitingPlayerInventory.display(this.whitePlayer, false);
@@ -308,7 +353,7 @@ public class ChessGame {
 	}
 
 	public Set<Player> getPlayerQueue() {
-		return  this.playerQueue;
+		return this.playerQueue;
 	}
 
 	public Set<Player> getPlayerDecideQueue() {
@@ -337,5 +382,9 @@ public class ChessGame {
 
 	public void setWager(int wager) {
 		this.wager = wager;
+	}
+
+	public String getPawnPromotion() {
+		return pawnPromotion;
 	}
 }
