@@ -135,7 +135,7 @@ public class ChessUtils {
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
 				ChessPiece attackingPiece = board[y][x];
-				if (attackingPiece != null && !attackingPiece.getColor().equals(color)) {
+				if (attackingPiece != null && attackingPiece.getColor().equals(color)) {
 					moves = combineMoves(moves,
 							attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, new ArrayList<String>()));
 				}

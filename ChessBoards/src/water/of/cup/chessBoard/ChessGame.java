@@ -138,11 +138,11 @@ public class ChessGame {
 				// MoveMade!
 				String notation = "";
 
-				//reset fiftyMoveDrawCount if piece is pawn
+				// reset fiftyMoveDrawCount if piece is pawn
 				if (piece.toString().contains("PAWN")) {
 					fiftyMoveDrawCount = 0;
 				}
-				
+
 				// check if move is castle
 				ChessPiece otherPiece = board[loc[1]][loc[0]];
 				if (otherPiece != null && piece.toString().contains("KING") && otherPiece.toString().contains("ROOK")
@@ -227,31 +227,29 @@ public class ChessGame {
 					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 						// Other side won
 						if (turn.equals("WHITE")) {
-							record.add("0-1");
+							gameOver("BLACK");
 						} else {
-							record.add("1-0");
+							gameOver("WHITE");
 						}
 					} else {
 						// tied game
-						record.add("1/2-1/2");
+						gameOver("DRAW");
 					}
-					//TODO: end game
+					return;
 				}
-				
+
 				// check if draw from position repeat three times
 				String boardString = ChessUtils.boardToString(board);
 				boardStates.add(boardString);
 				if (getBoardRepeats(boardString) >= 3) {
 					// draw
-					record.add("1/2-1/2");
-					//TODO: end game
+					gameOver("DRAW");
 				}
-				
+
 				// check fifty move draw
 				if (fiftyMoveDrawCount >= 50) {
 					// draw
-					record.add("1/2-1/2");
-					//TODO: end game
+					gameOver("DRAW");
 				}
 			}
 		}
@@ -270,9 +268,47 @@ public class ChessGame {
 		renderBoardForPlayers();
 	}
 
+	public void gameOver(String winningColor) {
+		renderBoardForPlayers();
+		
+		Player winner = whitePlayer;
+		Player loser = blackPlayer;
+		String losingColor = "BLACK";
+		if (winningColor.equals("WHITE")) {
+			// White player won
+
+			record.add("1-0");
+		} else if (winningColor.equals("BLACK")) {
+			// Black player won
+
+			losingColor = "WHITE";
+			winner = blackPlayer;
+			loser = whitePlayer;
+
+			record.add("0-1");
+		} else {
+			// Tied game
+			record.add("1/2-1/2");
+			String winMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
+					+ loser.getDisplayName() + " as " + losingColor;
+			
+			winner.sendMessage(winMessage);
+			loser.sendMessage(winMessage);
+
+			return;
+		}
+		String winMessage = winner.getDisplayName() + " won as " + winningColor.toLowerCase() + " against "
+				+ loser.getDisplayName() + " as " + losingColor;
+		
+		winner.sendMessage(winMessage);
+		loser.sendMessage(winMessage);
+
+		setGameState(ChessGameState.IDLE);
+	}
+
 	private int getBoardRepeats(String boardString) {
 		int count = 0;
-		
+
 		for (String pastBoard : boardStates) {
 			if (pastBoard.equals(boardString))
 				count++;
