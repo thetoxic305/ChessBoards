@@ -53,13 +53,15 @@ public class InventoryClick implements Listener {
                 }
 
                 player.closeInventory();
+                
+                chessCreateGameInventory.getChessGame().resetBoard(true);
+                
                 chessCreateGameInventory.getChessGame().setGameState(ChessGameState.WAITING_PLAYER);
                 chessCreateGameInventory.getChessGame().setWhitePlayer(player);
-                chessCreateGameInventory.getChessGame().resetBoard();
 
                 // Sets game settings
                 chessCreateGameInventory.getChessGame().setRanked(chessCreateGameInventory.isRanked());
-                chessCreateGameInventory.getChessGame().setGameTime(chessCreateGameInventory.getGameTime());
+                chessCreateGameInventory.getChessGame().setClocks(chessCreateGameInventory.getGameTimeString());
                 chessCreateGameInventory.getChessGame().setWager(chessCreateGameInventory.getWager());
 
                 chessCreateGameInventory.getChessGame().openWaitingPlayerInventory();
@@ -135,6 +137,7 @@ public class InventoryClick implements Listener {
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
 
                     chessGame.setGameState(ChessGameState.INGAME);
+                    chessGame.startClocks();
                     chessGame.setBlackPlayer(clickedPlayer);
 
                     clickedPlayer.closeInventory();

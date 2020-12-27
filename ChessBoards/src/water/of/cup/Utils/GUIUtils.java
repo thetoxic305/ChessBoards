@@ -1,5 +1,8 @@
 package water.of.cup.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,6 +39,15 @@ public class GUIUtils {
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
+    
+    public static ItemStack createItemStack(String displayName, Material material, List<String> lore) {
+        ItemStack itemStack = new ItemStack(material, 1);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setLore(lore);
+        itemMeta.setDisplayName(displayName);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
 
     public static ItemStack createGuiPlayerItem(Player player) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -58,8 +70,24 @@ public class GUIUtils {
         String rankedString = chessGame.isRanked() ? ChatColor.RED + "Ranked" : ChatColor.GREEN + "Unranked";
         ItemStack ranked =  GUIUtils.createItemStack(rankedString, Material.EXPERIENCE_BOTTLE);
 
-        String gameTimeString = chessGame.getGameTime() / (60*60) + "h" + (chessGame.getGameTime() % (60*60)) / 60 + "m";
-        ItemStack gameTimeItem = GUIUtils.createItemStack(ChatColor.GREEN + "Game Time: " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK);
+        String gameTimeString = chessGame.getGameTimeString();
+        int minutes = new Integer(gameTimeString.substring(0, gameTimeString.indexOf(" ")));
+        ArrayList<String> timeLore = new ArrayList<String>();
+        
+		// set the lore to the type of timed Chess Game
+		if (minutes <= 1) {
+			//Bullet game
+			timeLore.add("Bullet");
+		} else if (minutes <= 5) {
+			//Blitz game
+			timeLore.add("Blitz");
+		} else {
+			//Rapid game
+			timeLore.add("Rapid");
+		}
+        
+        
+        ItemStack gameTimeItem = GUIUtils.createItemStack(ChatColor.GREEN + "Game Time: " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK, timeLore);
 
         ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + chessGame.getWager(), Material.GOLD_INGOT);
 

@@ -6,16 +6,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+
+import water.of.cup.ChessBoards;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
 
 public class ChessGame {
+	private ChessBoards instance = ChessBoards.getInstance();
+
 	private String turn;
 	private ChessPiece[][] board;
 	private int[] selectedPiece;
@@ -27,32 +33,41 @@ public class ChessGame {
 	private Player blackPlayer;
 	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
 	private boolean ranked;
-	private int gameTime;
 	private int wager;
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
 	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
 	private ArrayList<String> boardStates;
 	private int fiftyMoveDrawCount;
+	private String gameTimeString;
+	
+	private Clock clock;
+	private int clockTime;
+	private int clockIncrement;
 
 	public ChessGame(ItemStack item) {
 		this.gameItem = item;
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
+		gameTimeString = null;
 
-		resetBoard();
+		resetBoard(false);
 	}
 
-	public void resetBoard() {
+	public void resetBoard(boolean renderBoard) {
 		// set base values
-
+		clock = null;
+		
 		record = new ArrayList<String>();
 		boardStates = new ArrayList<String>();
 		selectedPiece = new int[] { -1, -1 };
 		turn = "WHITE";
 		movedPieces = new boolean[8][8];
 		pawnPromotion = "NONE";
+		clockTime = 1;
+		clockIncrement = 0;
+		gameTimeString = null;
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -68,6 +83,9 @@ public class ChessGame {
 				{ ChessPiece.WHITE_ROOK, ChessPiece.WHITE_KNIGHT, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_QUEEN,
 						ChessPiece.WHITE_KING, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT,
 						ChessPiece.WHITE_ROOK } };
+
+		if (renderBoard)
+			renderBoardForPlayers();
 	}
 
 	public ChessPiece[][] getBoard() {
@@ -76,7 +94,7 @@ public class ChessGame {
 
 	public void renderBoardForPlayers() {
 		MapMeta mapMeta = (MapMeta) gameItem.getItemMeta();
-		
+
 		MapView mapView = mapMeta.getMapView();
 
 		mapView.setTrackingPosition(false);
@@ -128,7 +146,7 @@ public class ChessGame {
 					+ board[pawnPosition[1]][pawnPosition[0]].getNotationCharacter());
 
 			switchTurn();
-			
+
 			// Check if move creates check
 			if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 				record.set(record.size() - 1, record.get(record.size() - 1) + "+");
@@ -137,7 +155,7 @@ public class ChessGame {
 					record.set(record.size() - 1, record.get(record.size() - 1) + "+");
 				}
 			}
-			
+
 			pawnPromotion = "NONE";
 			selectedPiece = new int[] { -1, -1 };
 
@@ -284,8 +302,11 @@ public class ChessGame {
 		// TODO: make map only render for near by players
 		renderBoardForPlayers();
 	}
-
 	public void gameOver(String winningColor) {
+		gameOver(winningColor, "won");
+	}
+
+	public void gameOver(String winningColor, String winMessage) {
 		renderBoardForPlayers();
 
 		Player winner = whitePlayer;
@@ -306,11 +327,11 @@ public class ChessGame {
 		} else {
 			// Tied game
 			record.add("1/2-1/2");
-			String winMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
+			String endMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
 					+ loser.getDisplayName() + " as " + losingColor;
 
-			winner.sendMessage(winMessage);
-			loser.sendMessage(winMessage);
+			winner.sendMessage(endMessage);
+			loser.sendMessage(endMessage);
 
 			whitePlayer = null;
 			blackPlayer = null;
@@ -321,11 +342,11 @@ public class ChessGame {
 		whitePlayer = null;
 		blackPlayer = null;
 
-		String winMessage = winner.getDisplayName() + " won as " + winningColor.toLowerCase() + " against "
-				+ loser.getDisplayName() + " as " + losingColor;
+		String endMessage = winner.getDisplayName() + " " + winMessage + " as " + winningColor.toLowerCase() + " against "
+				+ loser.getDisplayName() + " as " + losingColor.toLowerCase();
 
-		winner.sendMessage(winMessage);
-		loser.sendMessage(winMessage);
+		winner.sendMessage(endMessage);
+		loser.sendMessage(endMessage);
 
 		setGameState(ChessGameState.IDLE);
 	}
@@ -340,7 +361,17 @@ public class ChessGame {
 		return count;
 	}
 
+	public void startClocks() {
+		clock = new Clock(clockTime, this);
+		clock.runTaskTimer(instance, 1, 1);
+	}
+
 	private void switchTurn() {
+		if (clock != null) {
+			clock.incementTime(turn, clockIncrement);
+			clock.run();
+		}
+		
 		if (turn.equals("WHITE")) {
 			turn = "BLACK";
 		} else if (turn.equals("BLACK")) {
@@ -464,14 +495,6 @@ public class ChessGame {
 		this.ranked = ranked;
 	}
 
-	public int getGameTime() {
-		return gameTime;
-	}
-
-	public void setGameTime(int gameTime) {
-		this.gameTime = gameTime;
-	}
-
 	public int getWager() {
 		return wager;
 	}
@@ -482,5 +505,28 @@ public class ChessGame {
 
 	public String getPawnPromotion() {
 		return pawnPromotion;
+	}
+
+	public void setClocks(String timeType) {
+		gameTimeString = timeType;
+		int minutes = new Integer(timeType.substring(0, timeType.indexOf(" ")));
+		setClocks(minutes * 60);
+
+		if (timeType.contains("|")) {
+			int stringPos = timeType.indexOf("|");
+			clockIncrement = new Integer(timeType.substring(stringPos + 2, stringPos + 3));
+		}
+	}
+
+	public void setClocks(double time) {
+		clockTime = (int) time;
+	}
+
+	public String getGameTimeString() {
+		return gameTimeString;
+	}
+
+	public String getTurn() {
+		return turn;
 	}
 }
