@@ -36,16 +36,22 @@ public class ChessGame {
 	private int fiftyMoveDrawCount;
 
 	public ChessGame(ItemStack item) {
+		this.gameItem = item;
+		gameState = ChessGameState.IDLE;
+		whitePlayer = null;
+		blackPlayer = null;
+
+		resetBoard();
+	}
+
+	public void resetBoard() {
+		// set base values
+
 		record = new ArrayList<String>();
 		boardStates = new ArrayList<String>();
 		selectedPiece = new int[] { -1, -1 };
 		turn = "WHITE";
-		this.gameItem = item;
 		movedPieces = new boolean[8][8];
-		gameState = ChessGameState.IDLE;
-
-		whitePlayer = null;
-		blackPlayer = null;
 		pawnPromotion = "NONE";
 
 		// set up chess board
@@ -62,6 +68,8 @@ public class ChessGame {
 				{ ChessPiece.WHITE_ROOK, ChessPiece.WHITE_KNIGHT, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_QUEEN,
 						ChessPiece.WHITE_KING, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT,
 						ChessPiece.WHITE_ROOK } };
+						
+		renderBoardForPlayers();
 	}
 
 	public ChessPiece[][] getBoard() {
@@ -270,7 +278,7 @@ public class ChessGame {
 
 	public void gameOver(String winningColor) {
 		renderBoardForPlayers();
-		
+
 		Player winner = whitePlayer;
 		Player loser = blackPlayer;
 		String losingColor = "BLACK";
@@ -291,15 +299,22 @@ public class ChessGame {
 			record.add("1/2-1/2");
 			String winMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
 					+ loser.getDisplayName() + " as " + losingColor;
-			
+
 			winner.sendMessage(winMessage);
 			loser.sendMessage(winMessage);
 
+			whitePlayer = null;
+			blackPlayer = null;
+
 			return;
 		}
+
+		whitePlayer = null;
+		blackPlayer = null;
+
 		String winMessage = winner.getDisplayName() + " won as " + winningColor.toLowerCase() + " against "
 				+ loser.getDisplayName() + " as " + losingColor;
-		
+
 		winner.sendMessage(winMessage);
 		loser.sendMessage(winMessage);
 
