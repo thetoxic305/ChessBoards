@@ -180,11 +180,11 @@ public enum ChessPiece {
 				int cX = x;
 				int cY = y;
 
-				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], canEndangerKing)) {
+				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], true)) {
 					cX += direction[0];
 					cY += direction[1];
 
-					if (checkMovePossible(pieceLoc, board, cX, cY, true))
+					if (checkMovePossible(pieceLoc, board, cX, cY, canEndangerKing))
 						moves[cY][cX] = true;
 					if (checkMovePossible(pieceLoc, board, cX, cY, true, true, true))
 						break;
@@ -201,10 +201,10 @@ public enum ChessPiece {
 				int cX = x;
 				int cY = y;
 
-				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], canEndangerKing)) {
+				while (checkMovePossible(pieceLoc, board, cX + direction[0], cY + direction[1], true)) {
 					cX += direction[0];
 					cY += direction[1];
-					if (checkMovePossible(pieceLoc, board, cX, cY, true))
+					if (checkMovePossible(pieceLoc, board, cX, cY, canEndangerKing))
 						moves[cY][cX] = true;
 					if (checkMovePossible(pieceLoc, board, cX, cY, true, true, true))
 						break;
