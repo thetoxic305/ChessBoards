@@ -44,8 +44,11 @@ public class BoardInteract implements Listener {
 						.getNearbyEntities(result.getHitBlock().getLocation(), 2, 2, 2);
 				for (Entity entity : nearbyEntites) {
 					if (entity instanceof ItemFrame) {
-						
 						ItemFrame itemFrame = (ItemFrame) entity;
+						
+						if (!itemFrame.getAttachedFace().equals(result.getHitBlockFace()))
+							return;
+						
 						if (chessBoardManager.hasGame(itemFrame.getItem())) {
 							// chess game found
 							if(e.getHand().equals(EquipmentSlot.HAND)) {
