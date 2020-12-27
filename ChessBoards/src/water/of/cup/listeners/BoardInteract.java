@@ -46,7 +46,7 @@ public class BoardInteract implements Listener {
 					if (entity instanceof ItemFrame) {
 						ItemFrame itemFrame = (ItemFrame) entity;
 						
-						if (!itemFrame.getAttachedFace().equals(result.getHitBlockFace()))
+						if (itemFrame.getAttachedFace().getOppositeFace() != result.getHitBlockFace())
 							return;
 						
 						if (chessBoardManager.hasGame(itemFrame.getItem())) {
