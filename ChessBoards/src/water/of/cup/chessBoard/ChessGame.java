@@ -32,9 +32,11 @@ public class ChessGame {
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
 	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
+	private ArrayList<String> boardStates;
 
 	public ChessGame(ItemStack item) {
 		record = new ArrayList<String>();
+		boardStates = new ArrayList<String>();
 		selectedPiece = new int[] { -1, -1 };
 		turn = "WHITE";
 		this.gameItem = item;
@@ -227,6 +229,14 @@ public class ChessGame {
 						record.add("1/2-1/2");
 					}
 				}
+				
+				// check if draw from position repeat three times
+				String boardString = ChessUtils.boardToString(board);
+				boardStates.add(boardString);
+				if (getBoardRepeats(boardString) >= 3) {
+					// draw
+					record.add("1/2-1/2");
+				}
 			}
 		}
 
@@ -242,6 +252,16 @@ public class ChessGame {
 
 		// TODO: make map only render for near by players
 		renderBoardForPlayers();
+	}
+
+	private int getBoardRepeats(String boardString) {
+		int count = 0;
+		
+		for (String pastBoard : boardStates) {
+			if (pastBoard.equals(boardString))
+				count++;
+		}
+		return count;
 	}
 
 	private void switchTurn() {

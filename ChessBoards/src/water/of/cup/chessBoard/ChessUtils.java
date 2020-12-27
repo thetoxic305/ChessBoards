@@ -170,4 +170,30 @@ public class ChessUtils {
 	public static String getNotationPosition(int x, int y) {
 		return xPositionLetters[x] + (8 - y);
 	}
+
+	public static String boardToString(ChessPiece[][] board) {
+		String stringBoard = "";
+		for (ChessPiece[] row : board) {
+			for (ChessPiece piece : row) {
+				if (piece == null) {
+					stringBoard += " ";
+					continue;
+				}
+				
+				String pieceChar = piece.getNotationCharacter();
+				
+				if (pieceChar.equals(" "))
+					pieceChar = "P";
+				
+				if (piece.getColor().equals("BLACK"))
+					pieceChar = pieceChar.toLowerCase();
+				
+				stringBoard += pieceChar;
+
+			}
+			stringBoard += "|";
+		}
+
+		return stringBoard;
+	}
 }
