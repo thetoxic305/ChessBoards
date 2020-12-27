@@ -33,6 +33,7 @@ public class ChessGame {
 	private Set<Player> playerDecideQueue = new HashSet<>();
 	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
 	private ArrayList<String> boardStates;
+	private int fiftyMoveDrawCount;
 
 	public ChessGame(ItemStack item) {
 		record = new ArrayList<String>();
@@ -137,6 +138,11 @@ public class ChessGame {
 				// MoveMade!
 				String notation = "";
 
+				//reset fiftyMoveDrawCount if piece is pawn
+				if (piece.toString().contains("PAWN")) {
+					fiftyMoveDrawCount = 0;
+				}
+				
 				// check if move is castle
 				ChessPiece otherPiece = board[loc[1]][loc[0]];
 				if (otherPiece != null && piece.toString().contains("KING") && otherPiece.toString().contains("ROOK")
@@ -178,9 +184,10 @@ public class ChessGame {
 					notation = piece.getNotationCharacter()
 							+ ChessUtils.getNotationPosition(selectedPiece[0], selectedPiece[1]);
 
-					// add piece taken to notation
+					// add piece taken to notation and reset fiftyMoveDrawCount
 					if (otherPiece != null) {
 						notation += "x";
+						fiftyMoveDrawCount = 0;
 					}
 					notation += ChessUtils.getNotationPosition(loc[0], loc[1]);
 
@@ -228,6 +235,7 @@ public class ChessGame {
 						// tied game
 						record.add("1/2-1/2");
 					}
+					//TODO: end game
 				}
 				
 				// check if draw from position repeat three times
@@ -236,6 +244,14 @@ public class ChessGame {
 				if (getBoardRepeats(boardString) >= 3) {
 					// draw
 					record.add("1/2-1/2");
+					//TODO: end game
+				}
+				
+				// check fifty move draw
+				if (fiftyMoveDrawCount >= 50) {
+					// draw
+					record.add("1/2-1/2");
+					//TODO: end game
 				}
 			}
 		}
