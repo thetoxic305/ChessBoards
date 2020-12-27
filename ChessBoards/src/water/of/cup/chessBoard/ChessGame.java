@@ -68,8 +68,6 @@ public class ChessGame {
 				{ ChessPiece.WHITE_ROOK, ChessPiece.WHITE_KNIGHT, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_QUEEN,
 						ChessPiece.WHITE_KING, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT,
 						ChessPiece.WHITE_ROOK } };
-						
-		renderBoardForPlayers();
 	}
 
 	public ChessPiece[][] getBoard() {
@@ -78,6 +76,7 @@ public class ChessGame {
 
 	public void renderBoardForPlayers() {
 		MapMeta mapMeta = (MapMeta) gameItem.getItemMeta();
+		
 		MapView mapView = mapMeta.getMapView();
 
 		mapView.setTrackingPosition(false);
@@ -129,6 +128,16 @@ public class ChessGame {
 					+ board[pawnPosition[1]][pawnPosition[0]].getNotationCharacter());
 
 			switchTurn();
+			
+			// Check if move creates check
+			if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
+				record.set(record.size() - 1, record.get(record.size() - 1) + "+");
+				// check if move creates checkmate
+				if (!ChessUtils.colorHasMoves(board, turn)) {
+					record.set(record.size() - 1, record.get(record.size() - 1) + "+");
+				}
+			}
+			
 			pawnPromotion = "NONE";
 			selectedPiece = new int[] { -1, -1 };
 
