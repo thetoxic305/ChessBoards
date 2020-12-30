@@ -1,11 +1,15 @@
 package water.of.cup;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -15,9 +19,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import water.of.cup.chessBoard.ChessBoardManager;
+import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.commands.ChessBoardCommands;
 import water.of.cup.inventories.ChessCreateGameInventory;
@@ -46,10 +53,39 @@ public class ChessBoards extends JavaPlugin {
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
+
+		File folder = new File(getDataFolder() + "/saved_games");
+		File[] listOfFiles = folder.listFiles();
+
+		for (File file : listOfFiles) {
+			if (file.isFile()) {
+				try {
+					int gameId = Integer.parseInt(file.getName().split("_")[1].split(Pattern.quote("."))[0]);
+					BufferedReader br = new BufferedReader(new FileReader(file));
+					String encodedData = br.readLine();
+
+					ItemStack chessBoardItem = new ItemStack(Material.FILLED_MAP, 1);
+					MapMeta mapMeta = (MapMeta) chessBoardItem.getItemMeta();
+					MapView mapView = Bukkit.getMap(gameId);
+					mapMeta.setMapView(mapView);
+					chessBoardItem.setItemMeta(mapMeta);
+
+					ChessGame newChessGame = new ChessGame(chessBoardItem, encodedData, gameId);
+					newChessGame.renderBoardForPlayers();
+
+					chessBoardManager.addGame(newChessGame);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
 	public void onDisable() {
+		for(ChessGame chessGame : chessBoardManager.getGames()) {
+			chessGame.storeGame();
+		}
 		/* Disable all current async tasks */
 		Bukkit.getScheduler().cancelTasks(this);
 	}
@@ -124,6 +160,11 @@ public class ChessBoards extends JavaPlugin {
 			if(!config.contains(key)) {
 				config.set(key, defaultConfig.get(key));
 			}
+		}
+
+		File savedGamesDir = new File(getDataFolder(), "saved_games");
+		if (!savedGamesDir.exists()) {
+			savedGamesDir.mkdir();
 		}
 
 		this.saveConfig();

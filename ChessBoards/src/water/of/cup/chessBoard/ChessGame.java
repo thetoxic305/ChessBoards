@@ -1,9 +1,15 @@
 package water.of.cup.chessBoard;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,20 +39,22 @@ public class ChessGame {
 	private Player blackPlayer;
 	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
 	private boolean ranked;
-	private int wager;
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
 	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
 	private ArrayList<String> boardStates;
 	private int fiftyMoveDrawCount;
 	private String gameTimeString;
-	
+	private int gameId;
+
 	private Clock clock;
 	private int clockTime;
 	private int clockIncrement;
 
-	public ChessGame(ItemStack item) {
+	public ChessGame(ItemStack item, int gameId) {
 		this.gameItem = item;
+		this.gameId = gameId; // gameId is equal to the mapId
+
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
@@ -55,10 +63,88 @@ public class ChessGame {
 		resetBoard(false);
 	}
 
+	public ChessGame(ItemStack item, String gameString, int gameId) {
+		this.gameItem = item;
+		this.gameId = gameId;
+
+		gameState = ChessGameState.IDLE;
+		whitePlayer = null;
+		blackPlayer = null;
+		gameTimeString = null;
+		resetBoard(false);
+
+		for (String arg : gameString.split(";")) {
+
+			String key = arg.substring(0, arg.indexOf(":"));
+			String result = arg.substring(arg.indexOf(":") + 1);
+
+			if (key.equals("Turn")) {
+				gameState = ChessGameState.INGAME;
+				turn = result;
+				clock = new Clock(0, this);
+				continue;
+			}
+
+			if (key.equals("BoardStates")) {
+				String lastState = "";
+				for (String state : result.split(",")) {
+					boardStates.add(state);
+					lastState = state;
+				}
+				Bukkit.getLogger().info(lastState);
+				board = ChessUtils.boardFromString(lastState);
+			}
+
+			if (key.equals("Record")) {
+				for (String line : result.split(","))
+					record.add(line);
+			}
+
+			if (key.equals("BlackPlayer")) {
+				blackPlayer = Bukkit.getPlayer(UUID.fromString(result));
+			}
+
+			if (key.equals("WhitePlayer")) {
+				whitePlayer = Bukkit.getPlayer(UUID.fromString(result));
+			}
+
+			if (key.equals("Ranked")) {
+				ranked = Boolean.parseBoolean(result);
+			}
+
+			if (key.equals("PawnPromotion")) {
+				pawnPromotion = result;
+			}
+
+			if (key.equals("FiftyMoveDrawCount")) {
+				fiftyMoveDrawCount = Integer.parseInt(result);
+			}
+
+			if (key.equals("ClockIncrement")) {
+				clockIncrement = Integer.parseInt(result);
+			}
+
+			if (key.equals("WhiteTime")) {
+				clock.incementTime("WHITE", Double.parseDouble(result));
+			}
+
+			if (key.equals("BlackTime")) {
+				clock.incementTime("BLACK", Double.parseDouble(result));
+			}
+
+		}
+		
+		if (gameState == ChessGameState.INGAME) {
+			renderBoardForPlayers();
+			clock.runTaskTimer(instance, 1, 1);
+		}
+
+	}
+
 	public void resetBoard(boolean renderBoard) {
 		// set base values
 		clock = null;
-		
+
 		record = new ArrayList<String>();
 		boardStates = new ArrayList<String>();
 		selectedPiece = new int[] { -1, -1 };
@@ -127,7 +213,7 @@ public class ChessGame {
 			color = "BLACK";
 
 		// Make sure player is ingame and correct turn
-		if (this.turn != color)
+		if (!this.turn.equals(color))
 			return;
 
 		// pawn promotion
@@ -302,6 +388,7 @@ public class ChessGame {
 		// TODO: make map only render for near by players
 		renderBoardForPlayers();
 	}
+
 	public void gameOver(String winningColor) {
 		gameOver(winningColor, "won");
 	}
@@ -342,8 +429,8 @@ public class ChessGame {
 		whitePlayer = null;
 		blackPlayer = null;
 
-		String endMessage = winner.getDisplayName() + " " + winMessage + " as " + winningColor.toLowerCase() + " against "
-				+ loser.getDisplayName() + " as " + losingColor.toLowerCase();
+		String endMessage = winner.getDisplayName() + " " + winMessage + " as " + winningColor.toLowerCase()
+				+ " against " + loser.getDisplayName() + " as " + losingColor.toLowerCase();
 
 		winner.sendMessage(endMessage);
 		loser.sendMessage(endMessage);
@@ -371,7 +458,7 @@ public class ChessGame {
 			clock.incementTime(turn, clockIncrement);
 			clock.run();
 		}
-		
+
 		if (turn.equals("WHITE")) {
 			turn = "BLACK";
 		} else if (turn.equals("BLACK")) {
@@ -495,14 +582,6 @@ public class ChessGame {
 		this.ranked = ranked;
 	}
 
-	public int getWager() {
-		return wager;
-	}
-
-	public void setWager(int wager) {
-		this.wager = wager;
-	}
-
 	public String getPawnPromotion() {
 		return pawnPromotion;
 	}
@@ -528,5 +607,72 @@ public class ChessGame {
 
 	public String getTurn() {
 		return turn;
+	}
+
+	public String toString() {
+		String gameString = "";
+
+		gameString += "MapID:" + ((MapMeta) gameItem.getItemMeta()).getMapView().getId() + ";";
+
+		if (gameState == ChessGameState.INGAME) {
+			gameString += "Turn:" + turn + ";";
+
+			gameString += "BoardStates:";
+			for (String boardState : boardStates) {
+				gameString += boardState + ",";
+			}
+			gameString = gameString.substring(0, gameString.length() - 1);
+			gameString += ";";
+
+			gameString += "Record:";
+			for (String line : record) {
+				gameString += line + ",";
+			}
+			gameString = gameString.substring(0, gameString.length() - 1);
+			gameString += ";";
+
+			gameString += "BlackPlayer:" + blackPlayer.getUniqueId().toString() + ";";
+			gameString += "WhitePlayer:" + whitePlayer.getUniqueId().toString() + ";";
+
+			gameString += "Ranked:" + ranked + ";";
+			gameString += "PawnPromotion:" + pawnPromotion + ";";
+			gameString += "FiftyMoveDrawCount:" + fiftyMoveDrawCount + ";";
+
+			gameString += "ClockIncrement:" + clockIncrement + ";";
+
+			gameString += "WhiteTime:" + clock.getWhiteTime() + ";";
+			gameString += "BlackTime:" + clock.getBlackTime() + ";";
+
+		}
+
+		return gameString;
+	}
+
+	public void storeGame() {
+		String mapData = this.toString();
+		String id = ((MapMeta) gameItem.getItemMeta()).getMapView().getId() + "";
+		File file = new File(instance.getDataFolder(), "saved_games/game_" + id + ".txt");
+
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+				Bukkit.getLogger().severe("[ChessBoards] Created game file for gameId: " + id);
+			} catch (IOException e1) {
+				Bukkit.getLogger().severe("Error creating game file for gameId: " + id);
+				e1.printStackTrace();
+			}
+		}
+
+		try {
+			Bukkit.getLogger().severe("[ChessBoards] Writing game data to gameId: " + id);
+			Files.write(Paths.get(file.getPath()), mapData.getBytes());
+		} catch (IOException e) {
+			Bukkit.getLogger().severe("Error writing to gameId: " + id);
+			e.printStackTrace();
+		}
+	}
+
+	public int getGameId() {
+		return this.gameId;
 	}
 }

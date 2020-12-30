@@ -270,6 +270,38 @@ public enum ChessPiece {
 		// checks concluded
 		return true;
 	}
+	
+	public static ChessPiece getPieceByNotationCharacter(char c) {
+		
+		switch (c) {
+		case 'P':
+			return ChessPiece.WHITE_PAWN;
+		case 'p':
+			return ChessPiece.BLACK_PAWN;
+		case 'B':
+			return ChessPiece.WHITE_BISHOP;
+		case 'b':
+			return ChessPiece.BLACK_BISHOP;
+		case 'R':
+			return ChessPiece.WHITE_ROOK;
+		case 'r':
+			return ChessPiece.BLACK_ROOK;
+		case 'N':
+			return ChessPiece.WHITE_KNIGHT;
+		case 'n':
+			return ChessPiece.BLACK_KNIGHT;
+		case 'K':
+			return ChessPiece.WHITE_KING;
+		case 'k':
+			return ChessPiece.BLACK_KING;
+		case 'Q':
+			return ChessPiece.WHITE_QUEEN;
+		case 'q':
+			return ChessPiece.BLACK_QUEEN;
+		}
+		return null;
+		
+	}
 
 	public String getNotationCharacter() {
 		switch (this) {

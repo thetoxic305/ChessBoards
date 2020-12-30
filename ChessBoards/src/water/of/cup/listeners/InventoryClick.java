@@ -62,7 +62,7 @@ public class InventoryClick implements Listener {
                 // Sets game settings
                 chessCreateGameInventory.getChessGame().setRanked(chessCreateGameInventory.isRanked());
                 chessCreateGameInventory.getChessGame().setClocks(chessCreateGameInventory.getGameTimeString());
-                chessCreateGameInventory.getChessGame().setWager(chessCreateGameInventory.getWager());
+//                chessCreateGameInventory.getChessGame().setWager(chessCreateGameInventory.getWager());
 
                 chessCreateGameInventory.getChessGame().openWaitingPlayerInventory();
                 return;

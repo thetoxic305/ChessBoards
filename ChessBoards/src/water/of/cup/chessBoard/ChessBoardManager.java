@@ -67,4 +67,16 @@ public class ChessBoardManager {
 
 		return null;
 	}
+
+	public ChessGame getGameByGameId(int id) {
+		for(ChessGame game : games) {
+			if(game.getGameId() == id) return game;
+		}
+
+		return null;
+	}
+
+	public ArrayList<ChessGame> getGames() {
+		return this.games;
+	}
 }

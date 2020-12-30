@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -48,15 +50,26 @@ public class BoardInteract implements Listener {
 						
 						if (itemFrame.getAttachedFace().getOppositeFace() != result.getHitBlockFace())
 							return;
-						
-						if (chessBoardManager.hasGame(itemFrame.getItem())) {
+
+						ItemStack gameFrame = itemFrame.getItem();
+
+						if(gameFrame.getItemMeta() == null || !(gameFrame.getItemMeta() instanceof MapMeta)) return;
+
+						MapMeta mapMeta = (MapMeta) gameFrame.getItemMeta();
+
+						if(mapMeta.getMapView() == null) return;
+
+
+						int gameId = mapMeta.getMapView().getId();
+
+						if (chessBoardManager.getGameByGameId(gameId) != null) {
 							// chess game found
 							if(e.getHand().equals(EquipmentSlot.HAND)) {
 								e.setCancelled(true);
 								return;
 							}
 							
-							ChessGame game = chessBoardManager.getGame(itemFrame.getItem());
+							ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
 							player.sendMessage("Game found! Status: " + game.getGameState().toString());
 

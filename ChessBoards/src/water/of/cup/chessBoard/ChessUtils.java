@@ -182,7 +182,7 @@ public class ChessUtils {
 				
 				String pieceChar = piece.getNotationCharacter();
 				
-				if (pieceChar.equals(" "))
+				if (piece.toString().contains("PAWN"))
 					pieceChar = "P";
 				
 				if (piece.getColor().equals("BLACK"))
@@ -191,9 +191,18 @@ public class ChessUtils {
 				stringBoard += pieceChar;
 
 			}
-			stringBoard += "|";
 		}
 
 		return stringBoard;
+	}
+	
+	public static ChessPiece[][] boardFromString(String boardString) {
+		ChessPiece[][] board = new ChessPiece[8][8];
+		
+		for (int i = 0; i < 63; i++) {
+			board[i / 8][i % 8] = ChessPiece.getPieceByNotationCharacter(boardString.charAt(i));
+		} 
+		
+		return board;
 	}
 }

@@ -42,11 +42,10 @@ public class BlockPlace implements Listener {
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(pluginInstance, () -> {
                 ItemStack chessBoardItem = new ItemStack(Material.FILLED_MAP, 1);
-
-                ChessGame game = new ChessGame(chessBoardItem);
-
                 MapMeta mapMeta = (MapMeta) chessBoardItem.getItemMeta();
                 MapView mapView = Bukkit.createMap(player.getWorld());
+
+                ChessGame game = new ChessGame(chessBoardItem, mapView.getId());
 
                 mapView.setTrackingPosition(false);
 
