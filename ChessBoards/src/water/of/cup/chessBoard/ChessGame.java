@@ -80,8 +80,8 @@ public class ChessGame {
 
 			if (key.equals("Turn")) {
 				gameState = ChessGameState.INGAME;
-				clock = new Clock(0, this);
 				turn = result;
+				clock = new Clock(0, this);
 				continue;
 			}
 
@@ -91,11 +91,13 @@ public class ChessGame {
 					boardStates.add(state);
 					lastState = state;
 				}
-				board = ChessUtils.boardFromString(lastState.replace("|", ""));
+				Bukkit.getLogger().info(lastState);
+				board = ChessUtils.boardFromString(lastState);
 			}
 
 			if (key.equals("Record")) {
-				record = (ArrayList<String>) Arrays.asList(result.split(","));
+				for (String line : result.split(","))
+					record.add(line);
 			}
 
 			if (key.equals("BlackPlayer")) {
@@ -105,33 +107,35 @@ public class ChessGame {
 			if (key.equals("WhitePlayer")) {
 				whitePlayer = Bukkit.getPlayer(UUID.fromString(result));
 			}
-			
+
 			if (key.equals("Ranked")) {
-				ranked =  Boolean.parseBoolean(result);
+				ranked = Boolean.parseBoolean(result);
 			}
-			
+
 			if (key.equals("PawnPromotion")) {
 				pawnPromotion = result;
 			}
-			
+
 			if (key.equals("FiftyMoveDrawCount")) {
 				fiftyMoveDrawCount = Integer.parseInt(result);
 			}
-			
+
 			if (key.equals("ClockIncrement")) {
 				clockIncrement = Integer.parseInt(result);
 			}
-			
+
 			if (key.equals("WhiteTime")) {
-				clock.incementTime("WHITE", Integer.parseInt(result));
+				clock.incementTime("WHITE", Double.parseDouble(result));
 			}
-			
+
 			if (key.equals("BlackTime")) {
-				clock.incementTime("BLACK", Integer.parseInt(result));
+				clock.incementTime("BLACK", Double.parseDouble(result));
 			}
 
 		}
-
+		
+		if (gameState == ChessGameState.INGAME)
+			renderBoardForPlayers();
 	}
 
 	public void resetBoard(boolean renderBoard) {
@@ -624,8 +628,8 @@ public class ChessGame {
 			gameString = gameString.substring(0, gameString.length() - 1);
 			gameString += ";";
 
-			gameString += "BlackPlayer:" + blackPlayer.getUniqueId() + ";";
-			gameString += "WhitePlayer:" + whitePlayer.getUniqueId() + ";";
+			gameString += "BlackPlayer:" + blackPlayer.getUniqueId().toString() + ";";
+			gameString += "WhitePlayer:" + whitePlayer.getUniqueId().toString() + ";";
 
 			gameString += "Ranked:" + ranked + ";";
 			gameString += "PawnPromotion:" + pawnPromotion + ";";
@@ -646,7 +650,7 @@ public class ChessGame {
 		String id = ((MapMeta) gameItem.getItemMeta()).getMapView().getId() + "";
 		File file = new File(instance.getDataFolder(), "saved_games/game_" + id + ".txt");
 
-		if(!file.exists()) {
+		if (!file.exists()) {
 			try {
 				file.createNewFile();
 				Bukkit.getLogger().severe("[ChessBoards] Created game file for gameId: " + id);

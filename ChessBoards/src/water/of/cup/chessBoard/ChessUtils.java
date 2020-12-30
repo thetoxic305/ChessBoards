@@ -182,7 +182,7 @@ public class ChessUtils {
 				
 				String pieceChar = piece.getNotationCharacter();
 				
-				if (pieceChar.equals(" "))
+				if (piece.toString().contains("PAWN"))
 					pieceChar = "P";
 				
 				if (piece.getColor().equals("BLACK"))
@@ -191,7 +191,6 @@ public class ChessUtils {
 				stringBoard += pieceChar;
 
 			}
-			stringBoard += "|";
 		}
 
 		return stringBoard;
