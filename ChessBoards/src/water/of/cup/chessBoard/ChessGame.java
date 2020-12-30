@@ -134,8 +134,11 @@ public class ChessGame {
 
 		}
 		
-		if (gameState == ChessGameState.INGAME)
+		if (gameState == ChessGameState.INGAME) {
 			renderBoardForPlayers();
+			clock.runTaskTimer(instance, 1, 1);
+		}
+
 	}
 
 	public void resetBoard(boolean renderBoard) {
@@ -210,7 +213,7 @@ public class ChessGame {
 			color = "BLACK";
 
 		// Make sure player is ingame and correct turn
-		if (this.turn != color)
+		if (!this.turn.equals(color))
 			return;
 
 		// pawn promotion
