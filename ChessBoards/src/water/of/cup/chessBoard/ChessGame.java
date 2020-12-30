@@ -1,5 +1,9 @@
 package water.of.cup.chessBoard;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,13 +45,16 @@ public class ChessGame {
 	private ArrayList<String> boardStates;
 	private int fiftyMoveDrawCount;
 	private String gameTimeString;
+	private int gameId;
 
 	private Clock clock;
 	private int clockTime;
 	private int clockIncrement;
 
-	public ChessGame(ItemStack item) {
+	public ChessGame(ItemStack item, int gameId) {
 		this.gameItem = item;
+		this.gameId = gameId; // gameId is equal to the mapId
+
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
@@ -56,8 +63,10 @@ public class ChessGame {
 		resetBoard(false);
 	}
 
-	public ChessGame(ItemStack item, String gameString) {
+	public ChessGame(ItemStack item, String gameString, int gameId) {
 		this.gameItem = item;
+		this.gameId = gameId;
+
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
@@ -70,6 +79,7 @@ public class ChessGame {
 			String result = arg.substring(arg.indexOf(":") + 1);
 
 			if (key.equals("Turn")) {
+				gameState = ChessGameState.INGAME;
 				clock = new Clock(0, this);
 				turn = result;
 				continue;
@@ -629,5 +639,33 @@ public class ChessGame {
 		}
 
 		return gameString;
+	}
+
+	public void storeGame() {
+		String mapData = this.toString();
+		String id = ((MapMeta) gameItem.getItemMeta()).getMapView().getId() + "";
+		File file = new File(instance.getDataFolder(), "saved_games/game_" + id + ".txt");
+
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+				Bukkit.getLogger().severe("[ChessBoards] Created game file for gameId: " + id);
+			} catch (IOException e1) {
+				Bukkit.getLogger().severe("Error creating game file for gameId: " + id);
+				e1.printStackTrace();
+			}
+		}
+
+		try {
+			Bukkit.getLogger().severe("[ChessBoards] Writing game data to gameId: " + id);
+			Files.write(Paths.get(file.getPath()), mapData.getBytes());
+		} catch (IOException e) {
+			Bukkit.getLogger().severe("Error writing to gameId: " + id);
+			e.printStackTrace();
+		}
+	}
+
+	public int getGameId() {
+		return this.gameId;
 	}
 }

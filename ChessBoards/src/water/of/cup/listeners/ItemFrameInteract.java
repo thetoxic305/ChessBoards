@@ -46,9 +46,18 @@ public class ItemFrameInteract implements Listener {
 		RayTraceResult result = player.getWorld().rayTraceBlocks(player.getEyeLocation(),
 				direction, 4);
 		if (result != null) {
-			if (chessBoardManager.hasGame(itemFrame.getItem())) {
+			ItemStack gameFrame = itemFrame.getItem();
+
+			if(gameFrame.getItemMeta() == null || !(gameFrame.getItemMeta() instanceof MapMeta)) return;
+
+			MapMeta mapMeta = (MapMeta) gameFrame.getItemMeta();
+
+			if(mapMeta.getMapView() == null) return;
+
+			int gameId = mapMeta.getMapView().getId();
+			if (chessBoardManager.getGameByGameId(gameId) != null) {
 				// chess game found
-				ChessGame game = chessBoardManager.getGame(itemFrame.getItem());
+				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
 				player.sendMessage("Game found! Status: " + game.getGameState().toString());
 

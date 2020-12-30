@@ -89,7 +89,9 @@ public class GUIUtils {
         
         ItemStack gameTimeItem = GUIUtils.createItemStack(ChatColor.GREEN + "Game Time: " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK, timeLore);
 
-        ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + chessGame.getWager(), Material.GOLD_INGOT);
+//		int wager = chessGame.getWager();
+        int wagerNum = 0;
+        ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + "" + wagerNum, Material.GOLD_INGOT);
 
         inventory.setItem(11, playerHead);
         inventory.setItem(20, ranked);
