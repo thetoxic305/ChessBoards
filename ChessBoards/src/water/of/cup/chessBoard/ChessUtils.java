@@ -196,4 +196,14 @@ public class ChessUtils {
 
 		return stringBoard;
 	}
+	
+	public static ChessPiece[][] boardFromString(String boardString) {
+		ChessPiece[][] board = new ChessPiece[8][8];
+		
+		for (int i = 0; i < 64; i++) {
+			board[i / 8][i % 8] = ChessPiece.getPieceByNotationCharacter(boardString.charAt(i));
+		} 
+		
+		return board;
+	}
 }
