@@ -9,11 +9,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+
+import com.mojang.datafixers.FunctionType.Instance;
+
 import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
-import water.of.cup.inventories.ChessConfirmGameInventory;
+import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
@@ -218,12 +221,12 @@ public class InventoryClick implements Listener {
 
         }
 
-        if (event.getView().getTitle().contains(ChessConfirmGameInventory.INVENTORY_NAME)
+        if (event.getView().getTitle().contains(ChessInGameInventory.INVENTORY_NAME)
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
 
-            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByPlayer(player);
-
+           ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByPlayer(player);
+        	
             if(chessGame == null) return;
 
             event.setCancelled(true);

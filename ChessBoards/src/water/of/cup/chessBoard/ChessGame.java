@@ -21,7 +21,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import water.of.cup.ChessBoards;
-import water.of.cup.inventories.ChessConfirmGameInventory;
+import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
@@ -39,7 +39,7 @@ public class ChessGame {
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
-	private ChessConfirmGameInventory chessConfirmGameInventory;
+	private ChessInGameInventory chessConfirmGameInventory;
 	private boolean ranked;
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
@@ -520,12 +520,12 @@ public class ChessGame {
 	}
 
 	public void openConfirmGameInventory() {
-		this.chessConfirmGameInventory = new ChessConfirmGameInventory(this);
+		this.chessConfirmGameInventory = new ChessInGameInventory(this);
 		this.chessConfirmGameInventory.display(this.whitePlayer, true);
 		this.chessConfirmGameInventory.display(this.blackPlayer, true);
 	}
 
-	public ChessConfirmGameInventory getChessConfirmGameInventory() {
+	public ChessInGameInventory getChessConfirmGameInventory() {
 		return this.chessConfirmGameInventory;
 	}
 
