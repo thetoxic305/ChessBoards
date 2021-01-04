@@ -21,8 +21,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.milkbowl.vault.economy.Economy;
 import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessUtils;
@@ -39,6 +41,7 @@ public class ChessBoards extends JavaPlugin {
 	List<Integer> mapIDsNotToRender = new ArrayList<>();
 	private File configFile;
 	private FileConfiguration config;
+	private static Economy economy = null;
 
 	@Override
 	public void onEnable() {
@@ -56,6 +59,11 @@ public class ChessBoards extends JavaPlugin {
 
 		File folder = new File(getDataFolder() + "/saved_games");
 		File[] listOfFiles = folder.listFiles();
+		
+		boolean hasEconomy = setupEconomy();
+		if (!hasEconomy) {
+			Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
+		}
 
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
@@ -80,6 +88,8 @@ public class ChessBoards extends JavaPlugin {
 			}
 		}
 	}
+	
+	
 
 	@Override
 	public void onDisable() {
@@ -97,6 +107,18 @@ public class ChessBoards extends JavaPlugin {
 	public static ChessBoards getInstance() {
 		return instance;
 	}
+	
+	private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        economy = rsp.getProvider();
+        return economy != null;
+    }
 	
 	public void addChessBoardRecipe() {
 		ItemStack chessboard = ChessUtils.getChessBoardItem();
@@ -195,4 +217,8 @@ public class ChessBoards extends JavaPlugin {
 	public HashMap<Player, ChessCreateGameInventory> getCreateGameManager() {
 		return createGameManager;
 	}
+	
+	public Economy getEconomy() {
+        return economy;
+    }
 }
