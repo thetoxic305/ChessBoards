@@ -1,5 +1,7 @@
 package water.of.cup.inventories;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,15 +14,15 @@ import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
 
-public class ChessConfirmGameInventory implements InventoryHolder {
+public class ChessInGameInventory implements InventoryHolder {
 
     private Inventory inv;
     private ChessGame chessGame;
     private boolean whitePlayerReady;
     private boolean blackPlayerReady;
-    public static final String INVENTORY_NAME = "Chess | Confirm Game";
+    public static final String INVENTORY_NAME = "Chess | Ingame";
 
-    public ChessConfirmGameInventory(ChessGame chessGame) {
+    public ChessInGameInventory(ChessGame chessGame) {
         inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
         this.chessGame = chessGame;
     }
@@ -36,8 +38,26 @@ public class ChessConfirmGameInventory implements InventoryHolder {
         GUIUtils.fillRect(this.inv, new int[] { 5, 1 }, new int[] { 7, 4 },
                 GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE));
 
-
-        this.renderForfeitButton();
+        ArrayList<String> buttons = new ArrayList<String>();
+        if (chessGame.hasPlayer(player)) {
+        	buttons.add("forfeit");
+        } else {
+        	buttons.add("wagers");
+        }
+        int c = 0;
+        for (String button : buttons) {
+        	int place = 24 + c * 9;
+        	switch (button) {
+        	case "forfeit": 
+        		this.renderForfeitButton(place);
+        		break;
+        	case "wagers":
+        		this.renderWagerButton(place);
+        		break;
+        	}
+        	c++;
+        }
+        
 
         this.renderPlayerReady(player, 10);
         this.renderPlayerReady(otherPlayer, 12);
@@ -74,9 +94,14 @@ public class ChessConfirmGameInventory implements InventoryHolder {
         this.display(this.chessGame.getBlackPlayer(), false);
     }
 
-    private void renderForfeitButton() {
-        ItemStack item = GUIUtils.createItemStack(ChatColor.RED + "Forfeit.", Material.RED_STAINED_GLASS_PANE);
-        this.inv.setItem(24, item);
+    private void renderForfeitButton(int slot) {
+        ItemStack item = GUIUtils.createItemStack(ChatColor.RED + "Forfeit", Material.RED_STAINED_GLASS_PANE);
+        this.inv.setItem(slot, item);
+    }
+    
+    private void renderWagerButton(int slot) {
+        ItemStack item = GUIUtils.createItemStack(ChatColor.BLUE + "Wagers", Material.BOOK);
+        this.inv.setItem(slot, item);
     }
 
     private void renderPlayerReady(Player player, int startPos) {
