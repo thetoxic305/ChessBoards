@@ -1,7 +1,9 @@
 package water.of.cup.Utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,6 +12,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import water.of.cup.chessBoard.ChessGame;
 
 public class GUIUtils {
@@ -31,6 +37,26 @@ public class GUIUtils {
             }
         }
     }
+    
+    public static ItemStack getCustomTextureHead(String value, String name, int count) {
+		ItemStack head = new ItemStack(Material.PLAYER_HEAD, count, (short) 3);
+		SkullMeta meta = (SkullMeta) head.getItemMeta();
+		GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+		profile.getProperties().put("textures", new Property("textures", value));
+		Field profileField = null;
+		try {
+			profileField = meta.getClass().getDeclaredField("profile");
+			profileField.setAccessible(true);
+			profileField.set(meta, profile);
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		}
+
+		meta.setDisplayName(" ");
+		meta.setDisplayName(name);
+		head.setItemMeta(meta);
+		return head;
+	}
 
     public static ItemStack createItemStack(String displayName, Material material) {
         ItemStack itemStack = new ItemStack(material, 1);
