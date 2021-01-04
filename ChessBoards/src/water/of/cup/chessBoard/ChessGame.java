@@ -393,6 +393,7 @@ public class ChessGame {
 
 	public void gameOver(String winningColor) {
 		gameOver(winningColor, "won");
+		this.clock.cancel();
 	}
 
 	public void gameOver(String winningColor, String winMessage) {
