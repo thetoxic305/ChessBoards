@@ -28,7 +28,7 @@ public class ChessWaitingPlayerInventory implements InventoryHolder {
         GUIUtils.fillRect(this.inv, new int[]{1, 1}, new int[]{3, 4}, whiteTile);
         GUIUtils.fillRect(this.inv, new int[]{5, 1}, new int[]{7, 4}, whiteTile);
 
-        GUIUtils.renderGameData(this.inv, this.chessGame);
+        GUIUtils.renderGameData(this.inv, this.chessGame, 11, true);
         this.renderQueue();
 
         this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
