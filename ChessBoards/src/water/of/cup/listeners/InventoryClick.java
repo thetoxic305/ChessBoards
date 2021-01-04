@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import com.mojang.datafixers.FunctionType.Instance;
 
@@ -19,6 +20,7 @@ import water.of.cup.chessBoard.ChessGameState;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
+import water.of.cup.inventories.ChessWagerViewInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
 
 public class InventoryClick implements Listener {
@@ -225,11 +227,16 @@ public class InventoryClick implements Listener {
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
 
-           ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByPlayer(player);
-        	
+           int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
+        	ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
             if(chessGame == null) return;
 
             event.setCancelled(true);
+            
+            if (event.getCurrentItem().getType().equals(Material.BOOK)) {
+            	ChessWagerViewInventory chessWagerViewInventory = new ChessWagerViewInventory(chessGame, player);
+            	chessWagerViewInventory.display(true);
+            }
 
             if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
                     event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)) {

@@ -8,12 +8,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.RequestWager;
 
 public class ChessWagerViewInventory implements InventoryHolder {
-
+	
 	private Inventory inv;
 	private ChessGame chessGame;
 	private Player player;

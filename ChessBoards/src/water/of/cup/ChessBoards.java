@@ -33,7 +33,8 @@ import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.listeners.*;
 
 public class ChessBoards extends JavaPlugin {
-
+	
+	private static NamespacedKey key;
 	private static ChessBoards instance;
 	private static ChessBoardManager chessBoardManager = new ChessBoardManager();
 	private static ImageManager imageManager = new ImageManager();
@@ -46,6 +47,8 @@ public class ChessBoards extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
+		
+		key = new NamespacedKey(this, "chess_game_item");
 
 		loadConfig();
 		chessBoardManager.loadGames();
@@ -221,4 +224,8 @@ public class ChessBoards extends JavaPlugin {
 	public Economy getEconomy() {
         return economy;
     }
+
+	public static NamespacedKey getKey() {
+		return key;
+	}
 }
