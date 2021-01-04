@@ -31,9 +31,10 @@ public class InventoryClose implements Listener {
         // Player closing waiting menu
         if(chessBoardManager.getGameByPlayer(player) != null
                 && chessBoardManager.getGameByPlayer(player).getGameState().equals(ChessGameState.WAITING_PLAYER)) {
+            ChessGame chessGame = chessBoardManager.getGameByPlayer(player);
+
             player.sendMessage("Leaving waiting player menu");
 
-            ChessGame chessGame = chessBoardManager.getGameByPlayer(player);
             chessGame.setWhitePlayer(null);
             chessGame.setGameState(ChessGameState.IDLE);
 
@@ -50,6 +51,21 @@ public class InventoryClose implements Listener {
             chessGame.getPlayerQueue().clear();
             chessGame.getPlayerDecideQueue().clear();
             return;
+        }
+
+        // Player closing confirm game menu
+        if(chessBoardManager.getGameByPlayer(player) != null
+                && chessBoardManager.getGameByPlayer(player).getGameState().equals(ChessGameState.CONFIRM_GAME)) {
+
+            player.sendMessage("closing confirm game");
+            ChessGame chessGame = chessBoardManager.getGameByPlayer(player);
+            Player otherPlayer = player.equals(chessGame.getBlackPlayer()) ? chessGame.getWhitePlayer() : chessGame.getBlackPlayer();
+
+            chessGame.setBlackPlayer(null);
+            chessGame.setWhitePlayer(null);
+            chessGame.setGameState(ChessGameState.IDLE);
+
+            otherPlayer.closeInventory();
         }
 
         // Player is leaving decision screen

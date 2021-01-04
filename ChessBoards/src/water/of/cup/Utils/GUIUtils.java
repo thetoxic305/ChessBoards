@@ -62,7 +62,7 @@ public class GUIUtils {
         return item;
     }
 
-    public static void renderGameData(Inventory inventory, ChessGame chessGame) {
+    public static void renderGameData(Inventory inventory, ChessGame chessGame, int startPos, boolean playerHeadEnabled) {
         if(chessGame.getWhitePlayer() == null) return;
 
         ItemStack playerHead = GUIUtils.createGuiPlayerItem(chessGame.getWhitePlayer());
@@ -93,9 +93,13 @@ public class GUIUtils {
         int wagerNum = 0;
         ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + "" + wagerNum, Material.GOLD_INGOT);
 
-        inventory.setItem(11, playerHead);
-        inventory.setItem(20, ranked);
-        inventory.setItem(29, gameTimeItem);
-        inventory.setItem(38, wager);
+        if(playerHeadEnabled) {
+            inventory.setItem(startPos, playerHead);
+            startPos += 9;
+        }
+
+        inventory.setItem(startPos, ranked);
+        inventory.setItem(startPos + 9, gameTimeItem);
+        inventory.setItem(startPos + 18, wager);
     }
 }

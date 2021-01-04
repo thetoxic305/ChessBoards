@@ -13,6 +13,7 @@ import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
+import water.of.cup.inventories.ChessConfirmGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
@@ -136,12 +137,39 @@ public class InventoryClick implements Listener {
                     String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 18).getItemMeta().getDisplayName());
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
 
-                    chessGame.setGameState(ChessGameState.INGAME);
-                    chessGame.startClocks();
-                    chessGame.setBlackPlayer(clickedPlayer);
+                    if(clickedPlayer == null) {
+                        Bukkit.getLogger().warning("[ChessBoards] Could not find clicked player " + playerName);
+                        return;
+                    }
 
-                    clickedPlayer.closeInventory();
                     player.closeInventory();
+
+                    chessGame.setGameState(ChessGameState.CONFIRM_GAME);
+
+                    if(chessGame.getPlayerQueue().contains(clickedPlayer)) {
+                        chessGame.getPlayerQueue().remove(clickedPlayer);
+                        clickedPlayer.closeInventory();
+                    }
+
+                    // Remove everyone else in GUI
+                    for(Player player1 : chessGame.getPlayerQueue()) {
+                        player1.sendMessage("Game owner has started the game.");
+                        player1.closeInventory();
+                    }
+
+                    for(Player player1 : chessGame.getPlayerDecideQueue()) {
+                        player1.sendMessage("Game owner has started the game.");
+                        player1.closeInventory();
+                    }
+
+                    chessGame.getPlayerQueue().clear();
+                    chessGame.getPlayerDecideQueue().clear();
+
+                    chessGame.setBlackPlayer(clickedPlayer);
+                    chessGame.setWhitePlayer(player);
+
+                    chessGame.openConfirmGameInventory();
+
                 } else  {
                     String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 27).getItemMeta().getDisplayName());
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
@@ -188,6 +216,37 @@ public class InventoryClick implements Listener {
                 return;
             }
 
+        }
+
+        if (event.getView().getTitle().contains(ChessConfirmGameInventory.INVENTORY_NAME)
+                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
+                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+
+            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByPlayer(player);
+
+            if(chessGame == null) return;
+
+            event.setCancelled(true);
+
+            if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
+                    event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)) {
+                String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 27).getItemMeta().getDisplayName());
+                Player clickedPlayer = Bukkit.getPlayer(playerName);
+
+                if(clickedPlayer == null) {
+                    Bukkit.getLogger().warning("[ChessBoards] Could not find clicked player " + playerName);
+                    return;
+                }
+
+                if(clickedPlayer.equals(player)) {
+                    chessGame.getChessConfirmGameInventory().togglePlayerReady(player);
+                    return;
+                }
+                return;
+            }
+
+
+            return;
         }
     }
 
