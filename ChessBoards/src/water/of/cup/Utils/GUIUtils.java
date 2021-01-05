@@ -12,10 +12,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import water.of.cup.ChessBoards;
 import water.of.cup.chessBoard.ChessGame;
 
 public class GUIUtils {
@@ -128,4 +130,13 @@ public class GUIUtils {
         inventory.setItem(startPos + 9, gameTimeItem);
         inventory.setItem(startPos + 18, wager);
     }
+
+	public static void setGameIDItem(Inventory inv, ChessGame chessGame) {
+		ItemStack gameIDItem = inv.getItem(0);
+        ItemMeta gameIDItemMeta = gameIDItem.getItemMeta();
+ 
+        gameIDItemMeta.getPersistentDataContainer().set(ChessBoards.getKey(), PersistentDataType.INTEGER, chessGame.getGameId());
+        gameIDItem.setItemMeta(gameIDItemMeta);
+        inv.setItem(0, gameIDItem);
+	}
 }

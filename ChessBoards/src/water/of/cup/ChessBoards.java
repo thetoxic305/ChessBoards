@@ -33,7 +33,8 @@ import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.listeners.*;
 
 public class ChessBoards extends JavaPlugin {
-
+	
+	private static NamespacedKey key;
 	private static ChessBoards instance;
 	private static ChessBoardManager chessBoardManager = new ChessBoardManager();
 	private static ImageManager imageManager = new ImageManager();
@@ -46,13 +47,15 @@ public class ChessBoards extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
+		
+		key = new NamespacedKey(this, "chess_game_item");
 
 		loadConfig();
 		chessBoardManager.loadGames();
 		imageManager.loadImages();
 		
 		getCommand("newChessBoard").setExecutor(new ChessBoardCommands());
-		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick());
+		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
@@ -221,4 +224,8 @@ public class ChessBoards extends JavaPlugin {
 	public Economy getEconomy() {
         return economy;
     }
+
+	public static NamespacedKey getKey() {
+		return key;
+	}
 }

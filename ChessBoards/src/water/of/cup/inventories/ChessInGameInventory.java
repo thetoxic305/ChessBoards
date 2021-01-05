@@ -5,17 +5,24 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+
+import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
 
 public class ChessInGameInventory implements InventoryHolder {
-
+	
+	private ChessBoards instance = ChessBoards.getInstance();
+	
     private Inventory inv;
     private ChessGame chessGame;
     private boolean whitePlayerReady;
@@ -37,7 +44,9 @@ public class ChessInGameInventory implements InventoryHolder {
 
         GUIUtils.fillRect(this.inv, new int[] { 5, 1 }, new int[] { 7, 4 },
                 GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE));
-
+        
+        GUIUtils.setGameIDItem(inv, chessGame);
+        
         ArrayList<String> buttons = new ArrayList<String>();
         if (chessGame.hasPlayer(player)) {
         	buttons.add("forfeit");

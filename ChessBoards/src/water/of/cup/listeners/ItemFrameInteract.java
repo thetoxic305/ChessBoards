@@ -56,6 +56,8 @@ public class ItemFrameInteract implements Listener {
 
 			int gameId = mapMeta.getMapView().getId();
 			if (chessBoardManager.getGameByGameId(gameId) != null) {
+				e.setCancelled(true);
+
 				// chess game found
 				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
@@ -89,8 +91,6 @@ public class ItemFrameInteract implements Listener {
 
 				player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
 				game.click(loc, player);
-
-				e.setCancelled(true);
 			}
 		}
 	}

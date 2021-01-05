@@ -61,8 +61,9 @@ public class BlockPlace implements Listener {
                 ItemFrame frame = player.getWorld().spawn(event.getBlockPlaced().getLocation(), ItemFrame.class);
                 frame.setItem(chessBoardItem);
                 frame.setFacingDirection(BlockFace.UP, true);
-                frame.setInvulnerable(true);
-                frame.setFixed(true);
+
+//                frame.setInvulnerable(true);
+//                frame.setFixed(true);
 
                 chessBoardManager.addGame(game);
             });
