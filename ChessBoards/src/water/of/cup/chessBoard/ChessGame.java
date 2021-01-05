@@ -39,7 +39,7 @@ public class ChessGame {
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
-	private ChessInGameInventory chessConfirmGameInventory;
+	private ChessInGameInventory chessConfirmGameInventory = new ChessInGameInventory(this);;
 	private boolean ranked;
 	private Set<Player> playerQueue = new HashSet<>();
 	private Set<Player> playerDecideQueue = new HashSet<>();
@@ -76,6 +76,7 @@ public class ChessGame {
 		resetBoard(false);
 
 		for (String arg : gameString.split(";")) {
+			if(!arg.contains(":")) break;
 
 			String key = arg.substring(0, arg.indexOf(":"));
 			String result = arg.substring(arg.indexOf(":") + 1);
@@ -135,7 +136,7 @@ public class ChessGame {
 			}
 
 		}
-		
+
 		if (gameState == ChessGameState.INGAME) {
 			renderBoardForPlayers();
 			clock.runTaskTimer(instance, 1, 1);
