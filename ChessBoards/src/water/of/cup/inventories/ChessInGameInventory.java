@@ -35,7 +35,13 @@ public class ChessInGameInventory implements InventoryHolder {
     }
 
     public void display(Player player, boolean openInv) {
-        Player otherPlayer = player.equals(this.chessGame.getBlackPlayer()) ? this.chessGame.getWhitePlayer() : this.chessGame.getBlackPlayer();
+        Player whitePlayer = this.chessGame.getWhitePlayer();
+        Player blackPlayer = this.chessGame.getBlackPlayer();
+
+        if(whitePlayer == null || blackPlayer == null) {
+            Bukkit.getLogger().warning("[ChessBoards] Error displaying in game inventory, players not set.");
+            return;
+        }
 
         GUIUtils.fillBackground(this.inv, GUIUtils.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE));
 
@@ -68,8 +74,8 @@ public class ChessInGameInventory implements InventoryHolder {
         }
         
 
-        this.renderPlayerReady(player, 10);
-        this.renderPlayerReady(otherPlayer, 12);
+        this.renderPlayerReady(true, 10);
+        this.renderPlayerReady(false, 12);
 
         GUIUtils.renderGameData(this.inv, this.chessGame, 11, false);
 
@@ -113,8 +119,8 @@ public class ChessInGameInventory implements InventoryHolder {
         this.inv.setItem(slot, item);
     }
 
-    private void renderPlayerReady(Player player, int startPos) {
-        boolean isWhite = player.equals(this.chessGame.getWhitePlayer());
+    private void renderPlayerReady(boolean isWhite, int startPos) {
+        Player player = isWhite ? this.chessGame.getWhitePlayer() : this.chessGame.getBlackPlayer();
         boolean playerReady = isWhite ? whitePlayerReady : blackPlayerReady;
 
         Material woolColor = isWhite ? Material.WHITE_WOOL : Material.BLACK_WOOL;
