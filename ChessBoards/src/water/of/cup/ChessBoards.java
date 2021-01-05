@@ -55,7 +55,7 @@ public class ChessBoards extends JavaPlugin {
 		imageManager.loadImages();
 		
 		getCommand("newChessBoard").setExecutor(new ChessBoardCommands());
-		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick());
+		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();

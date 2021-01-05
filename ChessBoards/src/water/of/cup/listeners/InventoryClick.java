@@ -240,6 +240,9 @@ public class InventoryClick implements Listener {
 
             if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
                     event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)) {
+
+                if(!(chessGame.getGameState().equals(ChessGameState.CONFIRM_GAME))) return;
+
                 String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 27).getItemMeta().getDisplayName());
                 Player clickedPlayer = Bukkit.getPlayer(playerName);
 
