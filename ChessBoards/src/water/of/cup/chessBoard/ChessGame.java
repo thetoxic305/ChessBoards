@@ -718,13 +718,15 @@ public class ChessGame {
 	}
 
 	public boolean delete() {
-		if(instance.getChessBoardManager().removeGame(this)) {
+		if (instance.getChessBoardManager().removeGame(this)) {
 			File file = new File(instance.getDataFolder(), "saved_games/game_" + this.gameId + ".txt");
 			if (!file.exists()) return false;
 
 			return file.delete();
 		}
 		return false;
+	}
+
 	public void addRequestWager(RequestWager wager) {
 		requestWagers.add(wager);
 	}
