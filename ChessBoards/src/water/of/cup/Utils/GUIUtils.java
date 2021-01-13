@@ -143,7 +143,7 @@ public class GUIUtils {
 	}
 
 	public static void addEnchants(ItemStack itemStack) {
-        itemStack.addEnchantment(Enchantment.LURE, 1);
+        itemStack.addUnsafeEnchantment(Enchantment.LURE, 1);
         final ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemStack.setItemMeta(itemMeta);
