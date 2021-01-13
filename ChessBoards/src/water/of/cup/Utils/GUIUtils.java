@@ -7,8 +7,10 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -139,4 +141,11 @@ public class GUIUtils {
         gameIDItem.setItemMeta(gameIDItemMeta);
         inv.setItem(0, gameIDItem);
 	}
+
+	public static void addEnchants(ItemStack itemStack) {
+        itemStack.addEnchantment(Enchantment.LURE, 1);
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemStack.setItemMeta(itemMeta);
+    }
 }

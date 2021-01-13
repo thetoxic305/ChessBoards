@@ -738,6 +738,16 @@ public class ChessGame {
 	public RequestWager getRequestWager(int index) {
 		return requestWagers.get(index);
 	}
+
+	public RequestWager getRequestWagerByPlayer(Player player) {
+		for(RequestWager requestWager : this.requestWagers) {
+			if(requestWager.getOwner().equals(player)) {
+				return requestWager;
+			}
+		}
+
+		return null;
+	}
 	
 	public ArrayList<RequestWager> getRequestWagers() {
 		return requestWagers;

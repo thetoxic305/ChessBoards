@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,7 @@ import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
+import water.of.cup.chessBoard.RequestWager;
 import water.of.cup.chessBoard.Wager;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
@@ -228,8 +230,10 @@ public class InventoryClick implements Listener {
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
 
-           int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
-        	ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
+
+            int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
+
+            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
             if(chessGame == null) return;
 
             event.setCancelled(true);
@@ -263,13 +267,109 @@ public class InventoryClick implements Listener {
 
             return;
         }
+
 		if (event.getView().getTitle().contains(ChessWagerViewInventory.INVENTORY_NAME)
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
-        	event.setCancelled(true);
-        	
-        	
-        	
+
+            int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
+
+            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
+            if(chessGame == null) return;
+
+            ChessWagerViewInventory chessWagerViewInventory = chessGame.getWagerViewByPlayer(player);
+            if(chessWagerViewInventory == null) return;
+
+            event.setCancelled(true);
+
+            String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
+
+            Material itemType = event.getCurrentItem().getType();
+
+            RequestWager playerWager = chessGame.getRequestWagerByPlayer(player);
+
+            if(itemType.equals(Material.PLAYER_HEAD)
+                    && (itemName.equals("Decrease") || itemName.equals("Increase")) && playerWager == null) {
+                boolean shifting = event.getClick().equals(ClickType.SHIFT_LEFT);
+
+                switch (itemName) {
+                    case "Increase":
+                        chessWagerViewInventory.incrementWager(shifting);
+                        break;
+                    case "Decrease":
+                        chessWagerViewInventory.decrementWager(shifting);
+                        break;
+                }
+
+                chessWagerViewInventory.display(false);
+                return;
+            }
+
+            // Create wager
+            if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)
+                    && itemName.contains("Create") && playerWager == null) {
+
+                int wager = chessWagerViewInventory.getWagerAmount();
+                if(wager <= 0) return;
+
+                RequestWager requestWager = new RequestWager(player, chessWagerViewInventory.getCreateWagerColor(), wager);
+                chessGame.addRequestWager(requestWager);
+                chessGame.updateRequestWagerInventories();
+                return;
+            }
+
+            // Cancel wager
+            if(itemType.equals(Material.YELLOW_STAINED_GLASS_PANE)
+                    && itemName.contains("Cancel") && playerWager != null) {
+                if(playerWager == null) return;
+
+                chessGame.removeRequestWager(playerWager);
+                chessGame.updateRequestWagerInventories();
+                return;
+            }
+
+            // Switch wager color Only if they have not created a wager yet
+            if(event.getRawSlot() == 25 && playerWager == null) {
+                chessWagerViewInventory.toggleWagerColor();
+                chessWagerViewInventory.display(false);
+                return;
+            }
+
+            if(event.getRawSlot() % 9 < 5 && playerWager == null) {
+                String playerName = null;
+                if(itemType.equals(Material.PLAYER_HEAD)) {
+                    playerName = itemName;
+                } else if((itemType.equals(Material.BLACK_WOOL) || itemType.equals(Material.WHITE_WOOL)) && event.getRawSlot() % 9 > 0) {
+                    playerName = player.getOpenInventory().getItem(event.getRawSlot() - 1).getItemMeta().getDisplayName();
+                    playerName = ChatColor.stripColor(playerName);
+                }
+
+                if(playerName == null) return;
+
+                Player clickedPlayer = Bukkit.getPlayer(playerName);
+
+                if(clickedPlayer == null) return;
+
+                RequestWager requestWager = chessGame.getRequestWagerByPlayer(clickedPlayer);
+
+                if(requestWager == null) {
+                    player.sendMessage("Could not find request wager! This should never happen. Please contact plugin authors.");
+                    return;
+                }
+
+                // If the player re-selects a wager, deselect it
+                if(chessWagerViewInventory.getSelectedWager() != null) {
+                    if(chessWagerViewInventory.getSelectedWager().equals(requestWager)) {
+                        chessWagerViewInventory.setSelectedWager(null);
+                        chessWagerViewInventory.display(false);
+                        return;
+                    }
+                }
+
+                chessWagerViewInventory.setSelectedWager(requestWager);
+                chessWagerViewInventory.display(false);
+            }
+        	return;
         }
     }
 
