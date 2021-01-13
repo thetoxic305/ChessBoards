@@ -756,7 +756,6 @@ public class ChessGame {
 
 	public void addWagerViewInventory(ChessWagerViewInventory chessWagerViewInventory) {
 		wagerViewInventories.add(chessWagerViewInventory);
-		
 	}
 
 	public double getStartingWagerAmount() {
@@ -765,5 +764,13 @@ public class ChessGame {
 
 	public void setStartingWagerAmount(double startingWagerAmount) {
 		this.startingWagerAmount = startingWagerAmount;
+	}
+
+	public ChessWagerViewInventory getWagerViewByPlayer(Player player) {
+		for(ChessWagerViewInventory chessWagerViewInventory : this.wagerViewInventories) {
+			if(chessWagerViewInventory.getPlayer().equals(player)) return chessWagerViewInventory;
+		}
+
+		return null;
 	}
 }
