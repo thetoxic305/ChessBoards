@@ -14,7 +14,7 @@ import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.RequestWager;
 
 public class ChessWagerViewInventory implements InventoryHolder {
-	
+
 	private Inventory inv;
 	private ChessGame chessGame;
 	private Player player;
@@ -44,7 +44,9 @@ public class ChessWagerViewInventory implements InventoryHolder {
 		ItemStack playerSkull = GUIUtils.createGuiPlayerItem(player);
 		if (selectedWager == null) {
 			inv.setItem(16, playerSkull);
-			inv.setItem(25, GUIUtils.createItemStack(createWagerColor, Material.valueOf(createWagerColor + "_WOOL")));
+			if (createWagerColor != null)
+				inv.setItem(25,
+						GUIUtils.createItemStack(createWagerColor, Material.valueOf(createWagerColor + "_WOOL")));
 			inv.setItem(34, GUIUtils.createItemStack("Wager Amount: " + createWagerAmount, Material.GOLD_INGOT));
 			inv.setItem(33, GUIUtils.getCustomTextureHead(
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmIwZjZlOGFmNDZhYzZmYWY4ODkxNDE5MWFiNjZmMjYxZDY3MjZhNzk5OWM2MzdjZjJlNDE1OWZlMWZjNDc3In19fQ==",
@@ -65,8 +67,10 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			inv.setItem(34, GUIUtils.createItemStack("Accept Wager", Material.GREEN_STAINED_GLASS_PANE));
 		}
 
-		this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
+		inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
 
+		GUIUtils.setGameIDItem(inv, chessGame);
+		
 		if (openInv)
 			player.openInventory(inv);
 	}

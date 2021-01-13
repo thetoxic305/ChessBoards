@@ -24,6 +24,7 @@ import water.of.cup.ChessBoards;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
+import water.of.cup.inventories.ChessWagerViewInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
 
 public class ChessGame {
@@ -53,10 +54,17 @@ public class ChessGame {
 	private int clockTime;
 	private int clockIncrement;
 
+	private double startingWagerAmount = 0;
+	private ArrayList<Wager> wagers;
+	private ArrayList<RequestWager> requestWagers;
+	private ArrayList<ChessWagerViewInventory> wagerViewInventories = new ArrayList<ChessWagerViewInventory>();
+
 	public ChessGame(ItemStack item, int gameId) {
 		this.gameItem = item;
 		this.gameId = gameId; // gameId is equal to the mapId
 
+		wagers = new ArrayList<Wager>();
+		requestWagers = new ArrayList<RequestWager>();
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
@@ -69,6 +77,9 @@ public class ChessGame {
 		this.gameItem = item;
 		this.gameId = gameId;
 
+		wagers = new ArrayList<Wager>();
+		requestWagers = new ArrayList<RequestWager>();
+
 		gameState = ChessGameState.IDLE;
 		whitePlayer = null;
 		blackPlayer = null;
@@ -76,7 +87,8 @@ public class ChessGame {
 		resetBoard(false);
 
 		for (String arg : gameString.split(";")) {
-			if(!arg.contains(":")) break;
+			if (!arg.contains(":"))
+				break;
 
 			String key = arg.substring(0, arg.indexOf(":"));
 			String result = arg.substring(arg.indexOf(":") + 1);
@@ -134,7 +146,10 @@ public class ChessGame {
 			if (key.equals("BlackTime")) {
 				clock.incementTime("BLACK", Double.parseDouble(result));
 			}
-
+			
+			if (key.equals("Wagers")) {
+				wagers.add(new Wager(result));
+			}
 		}
 
 		if (gameState == ChessGameState.INGAME) {
@@ -398,6 +413,12 @@ public class ChessGame {
 
 	public void gameOver(String winningColor, String winMessage) {
 		renderBoardForPlayers();
+		
+		//Fulfill wagers
+		for (Wager wager : wagers) {
+			wager.complete(winningColor);
+		}
+		wagers.clear();
 
 		Player winner = whitePlayer;
 		Player loser = blackPlayer;
@@ -655,6 +676,13 @@ public class ChessGame {
 
 			gameString += "WhiteTime:" + clock.getWhiteTime() + ";";
 			gameString += "BlackTime:" + clock.getBlackTime() + ";";
+			
+			gameString += "Wagers:";
+			for (Wager wager : wagers) {
+				gameString += wager.toString() + ",";
+			}
+			gameString = gameString.substring(0, gameString.length() - 1);
+			gameString += ";";
 
 		}
 
@@ -687,5 +715,45 @@ public class ChessGame {
 
 	public int getGameId() {
 		return this.gameId;
+	}
+
+	public void addRequestWager(RequestWager wager) {
+		requestWagers.add(wager);
+	}
+
+	public void removeRequestWager(RequestWager wager) {
+		requestWagers.remove(wager);
+	}
+	
+	public RequestWager getRequestWager(int index) {
+		return requestWagers.get(index);
+	}
+	
+	public ArrayList<RequestWager> getRequestWagers() {
+		return requestWagers;
+	}
+	
+	public void updateRequestWagerInventories() {
+		for (ChessWagerViewInventory inv : wagerViewInventories) {
+			inv.display(false);
+		}
+	}
+	
+	public void requestWagerToWager(RequestWager requestWager, Player accepter) {
+		wagers.add(new Wager(requestWager, accepter));
+		removeRequestWager(requestWager);
+	}
+
+	public void addWagerViewInventory(ChessWagerViewInventory chessWagerViewInventory) {
+		wagerViewInventories.add(chessWagerViewInventory);
+		
+	}
+
+	public double getStartingWagerAmount() {
+		return startingWagerAmount;
+	}
+
+	public void setStartingWagerAmount(double startingWagerAmount) {
+		this.startingWagerAmount = startingWagerAmount;
 	}
 }
