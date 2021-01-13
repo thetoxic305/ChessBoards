@@ -26,8 +26,17 @@ public class Wager {
 		this.amount = amount;
 	}
 	
+	public Wager(RequestWager requestWager, Player accepter) {
+		player1 = requestWager.getOwner();
+		player2 = accepter;
+		
+		player1Side = requestWager.getOwnerColor();
+		
+		amount = requestWager.getAmount();
+	}
+	
 	public Wager(String wagerString) {
-		for (String arg : wagerString.split(";")) {
+		for (String arg : wagerString.split("-")) {
 
 			String key = arg.substring(0, arg.indexOf(":"));
 			String result = arg.substring(arg.indexOf(":") + 1);
@@ -70,12 +79,12 @@ public class Wager {
 	
 	public String toString() {
 		String wagerString = "";
-		wagerString += "Player1:" + player1.getUniqueId().toString() + ";";
-		wagerString += "Player2:" + player2.getUniqueId().toString() + ";";
+		wagerString += "Player1:" + player1.getUniqueId().toString() + "-";
+		wagerString += "Player2:" + player2.getUniqueId().toString() + "-";
 		
-		wagerString += "Player1Side:" + player1Side + ";";
+		wagerString += "Player1Side:" + player1Side + "-";
 		
-		wagerString += "Amount:" + amount + ";";
+		wagerString += "Amount:" + amount + "-";
 		
 		return wagerString;
 	}

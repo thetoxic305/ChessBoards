@@ -17,6 +17,7 @@ import water.of.cup.ChessBoards;
 import water.of.cup.Utils.GUIUtils;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessGameState;
+import water.of.cup.chessBoard.Wager;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
@@ -236,6 +237,7 @@ public class InventoryClick implements Listener {
             if (event.getCurrentItem().getType().equals(Material.BOOK)) {
             	ChessWagerViewInventory chessWagerViewInventory = new ChessWagerViewInventory(chessGame, player);
             	chessWagerViewInventory.display(true);
+            	chessGame.addWagerViewInventory(chessWagerViewInventory);
             }
 
             if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
@@ -260,6 +262,14 @@ public class InventoryClick implements Listener {
 
 
             return;
+        }
+		if (event.getView().getTitle().contains(ChessWagerViewInventory.INVENTORY_NAME)
+                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
+                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+        	event.setCancelled(true);
+        	
+        	
+        	
         }
     }
 

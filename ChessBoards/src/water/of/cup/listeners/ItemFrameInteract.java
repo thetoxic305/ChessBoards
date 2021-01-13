@@ -1,30 +1,21 @@
 package water.of.cup.listeners;
 
-import java.util.Collection;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.map.MapRenderer;
-import org.bukkit.map.MapView;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import water.of.cup.ChessBoards;
 import water.of.cup.chessBoard.*;
 import water.of.cup.inventories.ChessCreateGameInventory;
-import water.of.cup.inventories.ChessJoinGameInventory;
+import water.of.cup.inventories.ChessInGameInventory;
 
 public class ItemFrameInteract implements Listener {
 
@@ -62,6 +53,11 @@ public class ItemFrameInteract implements Listener {
 				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
 				player.sendMessage("Game found! Status: " + game.getGameState().toString());
+				
+				if (game.getGameState() == ChessGameState.CONFIRM_GAME) {
+					ChessInGameInventory chessInGameInventory = new ChessInGameInventory(game);
+					chessInGameInventory.display(player, true);
+				}
 
 				if(chessBoardManager.getGameByPlayer(player) != null
 						&& chessBoardManager.getGameByPlayer(player) != game) {
