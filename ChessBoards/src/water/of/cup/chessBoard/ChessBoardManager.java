@@ -20,6 +20,15 @@ public class ChessBoardManager {
 		games.add(game);
 		return true;
 	}
+
+	public boolean removeGame(ChessGame game) {
+		if (!games.contains(game)) {
+			return false;
+		}
+
+		games.remove(game);
+		return true;
+	}
 	
 	public boolean hasGame(ItemStack item) {
 		for (ChessGame game : games) {
