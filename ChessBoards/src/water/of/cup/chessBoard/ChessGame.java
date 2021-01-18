@@ -21,6 +21,8 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 import water.of.cup.ChessBoards;
+import water.of.cup.data.ChessPlayer;
+import water.of.cup.data.MySQLDataStore;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
@@ -447,7 +449,33 @@ public class ChessGame {
 			whitePlayer = null;
 			blackPlayer = null;
 
+			// Add stats to database TIE
+			if (instance.getConfig().getBoolean("settings.database.enabled")) {
+				MySQLDataStore dataStore = instance.getDataStore();
+
+				ChessPlayer player1 = dataStore.getChessPlayers().get(winner);
+				ChessPlayer player2 = dataStore.getChessPlayers().get(loser);
+
+				int player1Ties = player1.getTies();
+				int player2Ties = player2.getTies();
+				player1.setTies(player1Ties + 1);
+				player2.setTies(player2Ties + 1);
+			}
+
 			return;
+		}
+
+		// Add stats to database WIN/LOSS
+		if (instance.getConfig().getBoolean("settings.database.enabled")) {
+			MySQLDataStore dataStore = instance.getDataStore();
+
+			ChessPlayer winnerChessPlayer = dataStore.getChessPlayers().get(winner);
+			ChessPlayer loserChessPlayer = dataStore.getChessPlayers().get(loser);
+
+			int wins = winnerChessPlayer.getWins();
+			int losses = loserChessPlayer.getLosses();
+			winnerChessPlayer.setWins(wins + 1);
+			loserChessPlayer.setLosses(losses + 1);
 		}
 
 		whitePlayer = null;

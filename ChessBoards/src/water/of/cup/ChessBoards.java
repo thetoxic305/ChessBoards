@@ -29,6 +29,7 @@ import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.commands.ChessBoardCommands;
+import water.of.cup.data.MySQLDataStore;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.listeners.*;
 
@@ -43,6 +44,7 @@ public class ChessBoards extends JavaPlugin {
 	private File configFile;
 	private FileConfiguration config;
 	private static Economy economy = null;
+	private MySQLDataStore dataStore;
 
 	@Override
 	public void onEnable() {
@@ -55,10 +57,19 @@ public class ChessBoards extends JavaPlugin {
 		imageManager.loadImages();
 		
 		getCommand("newChessBoard").setExecutor(new ChessBoardCommands());
-		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak());
+		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
+
+		if(config.getBoolean("settings.database.enabled")) {
+			this.dataStore = new MySQLDataStore();;
+			this.dataStore.initialize();
+
+			for(Player player : Bukkit.getOnlinePlayers()) {
+				this.dataStore.addChessPlayer(player);
+			}
+		}
 
 		File folder = new File(getDataFolder() + "/saved_games");
 		File[] listOfFiles = folder.listFiles();
@@ -159,6 +170,13 @@ public class ChessBoards extends JavaPlugin {
 
 		defaultConfig.put("settings.chessboard.permissions", true);
 
+        defaultConfig.put("settings.database.host", "localhost");
+        defaultConfig.put("settings.database.port", "3306");
+        defaultConfig.put("settings.database.database", "chessboards");
+        defaultConfig.put("settings.database.username", "root");
+        defaultConfig.put("settings.database.password", " ");
+        defaultConfig.put("settings.database.enabled", true);
+
 		HashMap<String, String> defaultRecipe = new HashMap<>();
 		defaultRecipe.put("I", Material.IRON_INGOT.toString());
 		defaultRecipe.put("G", Material.GLASS_PANE.toString());
@@ -227,5 +245,9 @@ public class ChessBoards extends JavaPlugin {
 
 	public static NamespacedKey getKey() {
 		return key;
+	}
+
+	public MySQLDataStore getDataStore() {
+		return dataStore;
 	}
 }
