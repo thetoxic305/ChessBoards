@@ -97,22 +97,12 @@ public class ChessUtils {
 		int x = (int) ((hitx - Math.floor(hitx)) * 8);
 		int y = (int) ((hity - Math.floor(hity)) * 8);
 
-//		int oldx = x;
-//		switch (rotation) {
-//		case CLOCKWISE:
-//			x = y;
-//			y = 8 - oldx;
-//			break;
-//		case FLIPPED:
-//			x = 8 - x;
-//			y = 8 - y;
-//			break;
-//		case COUNTER_CLOCKWISE:
-//			x = 8 - y;
-//			break;
-//		default:
-//			break;
-//		}
+		if (rotation == Rotation.CLOCKWISE_45) {
+			int save = y;
+			y = 7 -  x;
+			x = save;
+		}
+		
 		int[] loc = new int[] { x, y };
 		return loc;
 	}

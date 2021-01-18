@@ -1,6 +1,7 @@
 package water.of.cup.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Rotation;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;

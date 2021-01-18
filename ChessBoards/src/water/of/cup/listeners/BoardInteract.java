@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Rotation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -96,6 +97,7 @@ public class BoardInteract implements Listener {
 
 							double hitx = result.getHitPosition().getX();
 							double hity = result.getHitPosition().getZ();
+								
 
 							int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, itemFrame.getRotation(), direction);
 

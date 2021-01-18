@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -61,6 +62,14 @@ public class BlockPlace implements Listener {
                 ItemFrame frame = player.getWorld().spawn(event.getBlockPlaced().getLocation(), ItemFrame.class);
                 frame.setItem(chessBoardItem);
                 frame.setFacingDirection(BlockFace.UP, true);
+                
+                //set Chessboard rotation
+                double yaw = player.getEyeLocation().getYaw();
+                if ((yaw > 45 && yaw < 135) || (yaw < 315 && yaw > 225))
+                	frame.setRotation(Rotation.CLOCKWISE_45);
+                	
+                
+            
                 
 
 //                frame.setInvulnerable(true);
