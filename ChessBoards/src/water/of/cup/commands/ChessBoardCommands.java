@@ -1,5 +1,6 @@
 package water.of.cup.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,16 +20,31 @@ public class ChessBoardCommands implements CommandExecutor {
 		}
 		Player p = (Player) sender;
 
-		if (cmd.getName().equalsIgnoreCase("newChessBoard")) {
+		if (cmd.getName().equalsIgnoreCase("chessboards")) {
 			if (instance.getConfig().getBoolean("settings.chessboard.permissions")) {
 				if (!p.hasPermission("chessboard.command"))
 					return false;
 			}
-			boolean chessBoardGiven = ChessUtils.giveChessBoard(p);
-			
-			if (!chessBoardGiven)
-				p.sendMessage("You need room in your inventory for this command to work");
-			return chessBoardGiven;	
+
+			if(args.length == 0) {
+				// Send help message
+				p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.BLACK + "" + ChatColor.BOLD + "Boards");
+				p.sendMessage("/chessboards give" + ChatColor.GRAY + ": Gives you chessboard");
+				return false;
+			}
+
+			if(args.length > 0) {
+				if(args[0].equalsIgnoreCase("give")) {
+					boolean chessBoardGiven = ChessUtils.giveChessBoard(p);
+
+					if (!chessBoardGiven)
+						p.sendMessage("You need room in your inventory for this command to work");
+					return chessBoardGiven;
+				}
+
+
+			}
+
 		}
 		return false;
 	}

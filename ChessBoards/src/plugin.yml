@@ -5,5 +5,6 @@ description: Adds chess boards to Minecraft.
 author: Nicholas Kopiwoda
 api-version: 1.14
 commands:
-  newChessBoard:
-    description: Gives the player a chess board item.
+  chessboards:
+    description: All commands for the ChessBoards plugin.
+    aliases: [cb]
