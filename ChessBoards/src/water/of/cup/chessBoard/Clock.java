@@ -27,7 +27,8 @@ public class Clock extends BukkitRunnable {
 	public void run() {
 
 		// check if runnable needs to stop
-		if (game.getGameState() != ChessGameState.INGAME)
+		if (game.getGameState() != ChessGameState.INGAME
+				|| game.getBlackPlayer() == null || game.getWhitePlayer() == null)
 			this.cancel();
 
 		// change color timers
