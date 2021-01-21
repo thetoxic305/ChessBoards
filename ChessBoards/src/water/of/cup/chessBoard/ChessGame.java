@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -60,6 +61,7 @@ public class ChessGame {
 	private ArrayList<Wager> wagers;
 	private ArrayList<RequestWager> requestWagers;
 	private ArrayList<ChessWagerViewInventory> wagerViewInventories = new ArrayList<ChessWagerViewInventory>();
+	private int gameWager;
 
 	public ChessGame(ItemStack item, int gameId) {
 		this.gameItem = item;
@@ -174,6 +176,9 @@ public class ChessGame {
 		clockTime = 1;
 		clockIncrement = 0;
 		gameTimeString = null;
+		gameWager = 0;
+		wagers.clear();
+		requestWagers.clear();
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -755,6 +760,10 @@ public class ChessGame {
 		return false;
 	}
 
+	public void addWager(Wager wager) {
+		wagers.add(wager);
+	}
+
 	public void addRequestWager(RequestWager wager) {
 		requestWagers.add(wager);
 	}
@@ -787,13 +796,27 @@ public class ChessGame {
 		}
 	}
 	
-	public void requestWagerToWager(RequestWager requestWager, Player accepter) {
+	public boolean requestWagerToWager(RequestWager requestWager, Player accepter) {
+		if (instance.getEconomy().getBalance(accepter) < requestWager.getAmount()) {
+			accepter.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+			return false;
+		}
+
+		// Send messages to players
+		requestWager.getOwner().sendMessage(accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
+		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of " + requestWager.getAmount() + ".");
+
 		wagers.add(new Wager(requestWager, accepter));
 		removeRequestWager(requestWager);
+		return true;
 	}
 
 	public void addWagerViewInventory(ChessWagerViewInventory chessWagerViewInventory) {
 		wagerViewInventories.add(chessWagerViewInventory);
+	}
+
+	public void clearWagerViewInventories() {
+		this.wagerViewInventories.clear();
 	}
 
 	public double getStartingWagerAmount() {
@@ -810,5 +833,13 @@ public class ChessGame {
 		}
 
 		return null;
+	}
+
+	public void setGameWager(int wager) {
+		this.gameWager = wager;
+	}
+
+	public int getGameWager() {
+		return this.gameWager;
 	}
 }

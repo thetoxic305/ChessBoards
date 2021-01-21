@@ -71,6 +71,7 @@ public class InventoryClick implements Listener {
                 // Sets game settings
                 chessCreateGameInventory.getChessGame().setRanked(chessCreateGameInventory.isRanked());
                 chessCreateGameInventory.getChessGame().setClocks(chessCreateGameInventory.getGameTimeString());
+                chessCreateGameInventory.getChessGame().setGameWager(chessCreateGameInventory.getWager());
 //                chessCreateGameInventory.getChessGame().setWager(chessCreateGameInventory.getWager());
 
                 chessCreateGameInventory.getChessGame().openWaitingPlayerInventory();
@@ -175,6 +176,10 @@ public class InventoryClick implements Listener {
 
                     chessGame.setBlackPlayer(clickedPlayer);
                     chessGame.setWhitePlayer(player);
+
+                    // Adds game wager to chess game
+                    Wager wager = new Wager(chessGame.getWhitePlayer(), chessGame.getBlackPlayer(), "WHITE", chessGame.getGameWager());
+                    chessGame.addWager(wager);
 
                     chessGame.openConfirmGameInventory();
 
@@ -321,9 +326,20 @@ public class InventoryClick implements Listener {
             // Cancel wager
             if(itemType.equals(Material.YELLOW_STAINED_GLASS_PANE)
                     && itemName.contains("Cancel") && playerWager != null) {
-                if(playerWager == null) return;
 
                 chessGame.removeRequestWager(playerWager);
+                chessGame.updateRequestWagerInventories();
+                return;
+            }
+
+            // Accept wager
+            if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)
+                    && itemName.contains("Accept Wager") && playerWager != null) {
+
+               boolean didCreateWager = chessGame.requestWagerToWager(playerWager, player);
+
+                if(!didCreateWager) return;
+
                 chessGame.updateRequestWagerInventories();
                 return;
             }
