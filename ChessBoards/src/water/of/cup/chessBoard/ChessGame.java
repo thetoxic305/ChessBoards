@@ -306,6 +306,9 @@ public class ChessGame {
 						board[loc[1]][loc[0]] = null;
 						notation = "0-0";
 					}
+					
+					movedPieces[loc[1]][loc[0]] = true;
+					movedPieces[selectedPiece[1]][selectedPiece[0]] = true;
 				} else {
 					// check if pawn reached end
 					if ((piece == ChessPiece.BLACK_PAWN && loc[1] == 7)
