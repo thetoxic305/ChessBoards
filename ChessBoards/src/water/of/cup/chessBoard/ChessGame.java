@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +24,10 @@ import org.bukkit.map.MapView;
 import water.of.cup.ChessBoards;
 import water.of.cup.data.ChessPlayer;
 import water.of.cup.data.MySQLDataStore;
+import water.of.cup.glicko2.Rating;
+import water.of.cup.glicko2.RatingCalculator;
+import water.of.cup.glicko2.RatingPeriodResults;
+import water.of.cup.glicko2.Result;
 import water.of.cup.inventories.ChessInGameInventory;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
@@ -424,6 +429,10 @@ public class ChessGame {
 			wager.complete(winningColor);
 		}
 		wagers.clear();
+		
+		//	Update Ratings
+		if (instance.getConfig().getBoolean("settings.database.enabled")) 
+			updateRatings(winningColor, whitePlayer, blackPlayer);
 
 		Player winner = whitePlayer;
 		Player loser = blackPlayer;
@@ -454,6 +463,7 @@ public class ChessGame {
 
 			// Add stats to database TIE
 			if (instance.getConfig().getBoolean("settings.database.enabled")) {
+				
 				MySQLDataStore dataStore = instance.getDataStore();
 
 				ChessPlayer player1 = dataStore.getChessPlayers().get(winner);
@@ -491,6 +501,65 @@ public class ChessGame {
 		loser.sendMessage(endMessage);
 
 		setGameState(ChessGameState.IDLE);
+	}
+	
+	private void updateRatings(String winningColor, Player white, Player black) {
+		
+		//get winner / loser
+		String winner = white.getUniqueId().toString();
+		String loser = black.getUniqueId().toString();
+		if (winningColor.equals("BLACK")) {
+			loser = white.getUniqueId().toString();
+			winner = black.getUniqueId().toString();
+		}
+		
+		MySQLDataStore dataStore = instance.getDataStore();
+
+		
+		ChessPlayer winnerChessPlayer = dataStore.getChessPlayerByUUID(winner);
+		ChessPlayer loserChessPlayer = dataStore.getChessPlayerByUUID(loser);
+		
+		RatingCalculator rc = new RatingCalculator();
+		
+		Rating ratingWinner;
+		Rating ratingLoser;
+		
+		if (winnerChessPlayer.getRating() == 0) {
+			ratingWinner = new Rating(winner, rc);
+		} else {
+			ratingWinner = new Rating(winner, rc, winnerChessPlayer.getRating(), winnerChessPlayer.getRatingDeviation(), winnerChessPlayer.getVolatility());
+		}
+		
+		if (loserChessPlayer.getRating() == 0) {
+			ratingLoser = new Rating(loser, rc);
+		} else {
+			ratingLoser = new Rating(loser, rc, loserChessPlayer.getRating(), loserChessPlayer.getRatingDeviation(), loserChessPlayer.getVolatility());
+		}
+		
+		
+		
+		
+		RatingPeriodResults rpr = new RatingPeriodResults();
+		
+		if (!(winningColor.equals("WHITE") || winningColor.equals("BLACK"))) {
+			//Tied game
+			rpr.addDraw(ratingWinner, ratingLoser);
+		} else {
+			//Won game
+			rpr.addResult(ratingWinner, ratingLoser);
+		}
+		rc.updateRatings(rpr);
+		
+		winnerChessPlayer.setRating(ratingWinner.getRating());
+		winnerChessPlayer.setRatingDeviation(ratingWinner.getRatingDeviation());
+		winnerChessPlayer.setVolatility(ratingWinner.getVolatility());
+		
+		loserChessPlayer.setRating(ratingLoser.getRating());
+		loserChessPlayer.setRatingDeviation(ratingLoser.getRatingDeviation());
+		loserChessPlayer.setVolatility(ratingLoser.getVolatility());
+		
+		
+		
 	}
 
 	private int getBoardRepeats(String boardString) {

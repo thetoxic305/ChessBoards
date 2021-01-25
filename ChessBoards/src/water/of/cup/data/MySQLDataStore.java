@@ -7,6 +7,8 @@ import water.of.cup.ChessBoards;
 import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MySQLDataStore {
 
@@ -193,4 +195,12 @@ public class MySQLDataStore {
     public HashMap<Player, ChessPlayer> getChessPlayers() {
         return chessPlayers;
     }
+
+	public ChessPlayer getChessPlayerByUUID(String uuid) {
+		 for (ChessPlayer chessPlayer : chessPlayers.values()) {
+			 if (chessPlayer.getUuid().equals(uuid))
+				 return chessPlayer;
+		 }
+		 return null;
+	}
 }
