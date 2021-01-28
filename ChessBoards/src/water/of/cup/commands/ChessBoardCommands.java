@@ -28,7 +28,7 @@ public class ChessBoardCommands implements CommandExecutor {
 
 			if(args.length == 0) {
 				// Send help message
-				p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.BLACK + "" + ChatColor.BOLD + "Boards");
+				p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards");
 				p.sendMessage("/chessboards give" + ChatColor.GRAY + ": Gives you chessboard");
 				return false;
 			}
@@ -41,12 +41,8 @@ public class ChessBoardCommands implements CommandExecutor {
 						p.sendMessage("You need room in your inventory for this command to work");
 					return chessBoardGiven;
 				}
-
-
 			}
-
 		}
 		return false;
 	}
-
 }

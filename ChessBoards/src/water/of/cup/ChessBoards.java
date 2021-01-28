@@ -32,6 +32,7 @@ import water.of.cup.commands.ChessBoardCommands;
 import water.of.cup.data.MySQLDataStore;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.listeners.*;
+import water.of.cup.metrics.Metrics;
 
 public class ChessBoards extends JavaPlugin {
 	
@@ -101,6 +102,12 @@ public class ChessBoards extends JavaPlugin {
 				}
 			}
 		}
+
+		// Add bStats
+		Metrics metrics = new Metrics(this, 10153);
+		Bukkit.getLogger().info("[ChessBoards] bStats: " + metrics.isEnabled() + " plugin ver: " + getDescription().getVersion());
+
+		metrics.addCustomChart(new Metrics.SimplePie("plugin_version", () -> getDescription().getVersion()));
 	}
 	
 	
@@ -168,6 +175,7 @@ public class ChessBoards extends JavaPlugin {
 
 		HashMap<String, Object> defaultConfig = new HashMap<>();
 
+		// Perms: chessboard.destroy chessboard.command
 		defaultConfig.put("settings.chessboard.permissions", true);
 
         defaultConfig.put("settings.database.host", "localhost");

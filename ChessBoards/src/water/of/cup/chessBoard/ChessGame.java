@@ -827,6 +827,7 @@ public class ChessGame {
 		String color = this.whitePlayer.equals(player) ? "BLACK" : "WHITE";
 		this.gameOver(color, "won by forfeit");
 
+		// TODO: Check if player is inside the ingame inventory
 		player.closeInventory();
 		otherPlayer.closeInventory();
 		return true;
