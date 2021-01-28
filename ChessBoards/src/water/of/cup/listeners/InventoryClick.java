@@ -143,6 +143,7 @@ public class InventoryClick implements Listener {
 
                 if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
                     String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 18).getItemMeta().getDisplayName());
+                    
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
 
                     if(clickedPlayer == null) {
@@ -175,7 +176,7 @@ public class InventoryClick implements Listener {
 
                     chessGame.setBlackPlayer(clickedPlayer);
                     chessGame.setWhitePlayer(player);
-
+                  
                     chessGame.openConfirmGameInventory();
 
                 } else  {

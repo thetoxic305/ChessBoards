@@ -5,17 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
@@ -27,9 +22,7 @@ import water.of.cup.data.MySQLDataStore;
 import water.of.cup.glicko2.Rating;
 import water.of.cup.glicko2.RatingCalculator;
 import water.of.cup.glicko2.RatingPeriodResults;
-import water.of.cup.glicko2.Result;
 import water.of.cup.inventories.ChessInGameInventory;
-import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.inventories.ChessJoinGameInventory;
 import water.of.cup.inventories.ChessWagerViewInventory;
 import water.of.cup.inventories.ChessWaitingPlayerInventory;
@@ -431,7 +424,7 @@ public class ChessGame {
 		wagers.clear();
 		
 		//	Update Ratings
-		if (instance.getConfig().getBoolean("settings.database.enabled")) 
+		if (instance.getConfig().getBoolean("settings.database.enabled") && ranked) 
 			updateRatings(winningColor, whitePlayer, blackPlayer);
 
 		Player winner = whitePlayer;

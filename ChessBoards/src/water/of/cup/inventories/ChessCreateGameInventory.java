@@ -16,7 +16,7 @@ import water.of.cup.chessBoard.ChessGame;
 public class ChessCreateGameInventory implements InventoryHolder {
 
 	private Inventory inv;
-	private boolean ranked;
+	private boolean ranked = true;
 	private int gameTime = 5;
 	private String[] gameTimes = new String[] { "1 min", "1 | 1", "2 | 1", "3 min", "3 | 2", "5 min", "10 min",
 			"30 min", "60 min"};
