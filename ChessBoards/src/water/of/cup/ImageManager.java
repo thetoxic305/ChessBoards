@@ -25,7 +25,8 @@ public class ImageManager {
 		// Make sure all images are places inside /ChessBoards/images on the server
 		for (ChessPiece piece : ChessPiece.values()) {
 			try {
-				if(customImages) {
+				if(!customImages) {
+					// TODO: FIX
 					InputStream is = getClass().getClassLoader().getResourceAsStream("water/of/cup/images/" + piece.toString() + ".png");
 					BufferedImage image = ImageIO.read(is);
 					images.put(piece, image);

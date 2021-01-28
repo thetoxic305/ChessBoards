@@ -39,10 +39,11 @@ public class ChessCreateGameInventory implements InventoryHolder {
 		this.createGameTimeToggle();
 		this.createWagerToggle();
 
-		for (int i = 0; i < 2; i++) {
-			this.inv.setItem(47 + i, GUIUtils.createItemStack(ChatColor.YELLOW + "Create Casual Game (disabled)",
-					Material.YELLOW_STAINED_GLASS_PANE));
-		}
+		// Create casual game disabled
+//		for (int i = 0; i < 2; i++) {
+//			this.inv.setItem(47 + i, GUIUtils.createItemStack(ChatColor.YELLOW + "Create Casual Game (disabled)",
+//					Material.YELLOW_STAINED_GLASS_PANE));
+//		}
 
 		String rankGameString = ranked ? "Ranked" : "Unranked";
 		for (int i = 0; i < 2; i++) {
