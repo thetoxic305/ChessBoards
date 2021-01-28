@@ -85,7 +85,7 @@ public class ChessBoardCommands implements CommandExecutor {
 						return false;
 					}
 
-					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (1/" + numOfPages + ")");
+					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (" + (page + 1) + "/" + numOfPages + ")");
 					int num = 1;
 					for(ChessPlayer chessPlayer : topPlayers) {
 						UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());

@@ -29,6 +29,7 @@ import water.of.cup.chessBoard.ChessBoardManager;
 import water.of.cup.chessBoard.ChessGame;
 import water.of.cup.chessBoard.ChessUtils;
 import water.of.cup.commands.ChessBoardCommands;
+import water.of.cup.commands.ChessBoardCommandsTabCompleter;
 import water.of.cup.data.MySQLDataStore;
 import water.of.cup.inventories.ChessCreateGameInventory;
 import water.of.cup.listeners.*;
@@ -58,6 +59,8 @@ public class ChessBoards extends JavaPlugin {
 		imageManager.loadImages();
 		
 		getCommand("chessboards").setExecutor(new ChessBoardCommands());
+		getCommand("chessboards").setTabCompleter(new ChessBoardCommandsTabCompleter());
+
 		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
@@ -109,8 +112,6 @@ public class ChessBoards extends JavaPlugin {
 
 		metrics.addCustomChart(new Metrics.SimplePie("plugin_version", () -> getDescription().getVersion()));
 	}
-	
-	
 
 	@Override
 	public void onDisable() {
