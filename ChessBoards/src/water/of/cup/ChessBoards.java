@@ -183,7 +183,7 @@ public class ChessBoards extends JavaPlugin {
         defaultConfig.put("settings.database.database", "chessboards");
         defaultConfig.put("settings.database.username", "root");
         defaultConfig.put("settings.database.password", " ");
-        defaultConfig.put("settings.database.enabled", true);
+        defaultConfig.put("settings.database.enabled", false); // Database disabled by default
 
 		HashMap<String, String> defaultRecipe = new HashMap<>();
 		defaultRecipe.put("I", Material.IRON_INGOT.toString());
