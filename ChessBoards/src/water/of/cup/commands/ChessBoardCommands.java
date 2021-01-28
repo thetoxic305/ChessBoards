@@ -73,8 +73,7 @@ public class ChessBoardCommands implements CommandExecutor {
 
 					if(page < 0) page = 0;
 
-					int numOfPages = 1;
-					if(numChessPlayers > 10) numOfPages = (numChessPlayers / 10) + 1;
+					int numOfPages = (numChessPlayers / 10) + 1;
 
 					if(page > numOfPages - 1) page = numOfPages - 1;
 
@@ -86,11 +85,11 @@ public class ChessBoardCommands implements CommandExecutor {
 					}
 
 					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (" + (page + 1) + "/" + numOfPages + ")");
-					int num = 1;
+					int num = 1 + (page * 10);
 					for(ChessPlayer chessPlayer : topPlayers) {
 						UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
 						OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
-						if(player == null || player.hasPlayedBefore()) continue;
+						if(player == null) continue;
 
 						double ratingRounded = (double) Math.round(chessPlayer.getRating() * 100) / 100;
 						p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getName() + " - " + ratingRounded);
