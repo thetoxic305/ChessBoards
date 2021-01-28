@@ -2,6 +2,7 @@ package water.of.cup.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -66,13 +67,16 @@ public class ChessBoardCommands implements CommandExecutor {
 					int page = 0;
 					if(args.length > 1) {
 						try {
-							page = Integer.parseInt(args[1]);
+							page = Integer.parseInt(args[1]) - 1;
 						} catch (NumberFormatException e) {}
 					}
 
 					if(page < 0) page = 0;
 
-					if(page > numChessPlayers / 10) page = numChessPlayers / 10;
+					int numOfPages = 1;
+					if(numChessPlayers > 10) numOfPages = (numChessPlayers / 10) + 1;
+
+					if(page > numOfPages - 1) page = numOfPages - 1;
 
 					ArrayList<ChessPlayer> topPlayers = instance.getDataStore().getTopPlayers(page);
 
@@ -81,15 +85,15 @@ public class ChessBoardCommands implements CommandExecutor {
 						return false;
 					}
 
-					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (1/" + ((numChessPlayers / 10) + 1) + ")");
+					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (1/" + numOfPages + ")");
 					int num = 1;
 					for(ChessPlayer chessPlayer : topPlayers) {
 						UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
-						Player player = Bukkit.getPlayer(chessPlayerUUID);
+						OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
 						if(player == null) continue;
 
 						double ratingRounded = (double) Math.round(chessPlayer.getRating() * 100) / 100;
-						p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getDisplayName() + " - " + ratingRounded);
+						p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getName() + " - " + ratingRounded);
 						num++;
 					}
 					return true;
