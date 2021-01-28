@@ -237,11 +237,14 @@ public class InventoryClick implements Listener {
             if(chessGame == null) return;
 
             event.setCancelled(true);
+
+            String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
             
             if (event.getCurrentItem().getType().equals(Material.BOOK)) {
             	ChessWagerViewInventory chessWagerViewInventory = new ChessWagerViewInventory(chessGame, player);
             	chessWagerViewInventory.display(true);
             	chessGame.addWagerViewInventory(chessWagerViewInventory);
+            	return;
             }
 
             if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
@@ -264,7 +267,11 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-
+            if(event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)
+                    && itemName.contains("Forfeit")) {
+                boolean didForfeit = chessGame.forfeitGame(player);
+                if(!didForfeit) Bukkit.getLogger().warning("[ChessBoards] Could not forfeit game " + chessGame.getGameId());
+            }
             return;
         }
 

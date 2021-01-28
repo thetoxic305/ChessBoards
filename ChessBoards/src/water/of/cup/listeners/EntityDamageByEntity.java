@@ -1,5 +1,7 @@
 package water.of.cup.listeners;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import water.of.cup.ChessBoards;
 import water.of.cup.chessBoard.ChessGame;
+import water.of.cup.chessBoard.ChessGameState;
+import water.of.cup.chessBoard.ChessUtils;
 
 public class EntityDamageByEntity implements Listener {
 
@@ -19,6 +23,8 @@ public class EntityDamageByEntity implements Listener {
         if(!(event.getDamager() instanceof Player)) return;
 
         if(!(event.getEntity() instanceof ItemFrame)) return;
+
+        if(event.isCancelled()) return;
 
         Player player = (Player) event.getDamager();
 
@@ -38,6 +44,18 @@ public class EntityDamageByEntity implements Listener {
         if(chessGame == null) return;
 
         event.setCancelled(true);
+
+        if(chessGame.getGameState().equals(ChessGameState.IDLE)) {
+            if(instance.getConfig().getBoolean("settings.chessboard.permissions")
+                    && !player.hasPermission("chessboard.destroy")) return;
+
+            chessGame.delete();
+            Location frameLoc = itemFrame.getLocation();
+            itemFrame.remove();
+
+            player.getWorld().dropItem(frameLoc, ChessUtils.getChessBoardItem());
+            return;
+        }
 
         if(chessGame.hasPlayer(player)) {
             chessGame.getChessConfirmGameInventory().display(player, true);
