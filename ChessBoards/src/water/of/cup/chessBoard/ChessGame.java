@@ -827,6 +827,18 @@ public class ChessGame {
 		return false;
 	}
 
+	public boolean forfeitGame(Player player) {
+		if(!this.hasPlayer(player)) return false;
+
+		Player otherPlayer = this.whitePlayer.equals(player) ? this.blackPlayer : this.whitePlayer;
+		String color = this.whitePlayer.equals(player) ? "BLACK" : "WHITE";
+		this.gameOver(color, "won by forfeit");
+
+		player.closeInventory();
+		otherPlayer.closeInventory();
+		return true;
+	}
+
 	public void addRequestWager(RequestWager wager) {
 		requestWagers.add(wager);
 	}
