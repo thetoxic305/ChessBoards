@@ -90,7 +90,7 @@ public class ChessBoardCommands implements CommandExecutor {
 					for(ChessPlayer chessPlayer : topPlayers) {
 						UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
 						OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
-						if(player == null) continue;
+						if(player == null || player.hasPlayedBefore()) continue;
 
 						double ratingRounded = (double) Math.round(chessPlayer.getRating() * 100) / 100;
 						p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getName() + " - " + ratingRounded);
