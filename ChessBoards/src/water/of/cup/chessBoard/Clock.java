@@ -27,9 +27,11 @@ public class Clock extends BukkitRunnable {
 	public void run() {
 
 		// check if runnable needs to stop
-		if (game.getGameState() != ChessGameState.INGAME
-				|| game.getBlackPlayer() == null || game.getWhitePlayer() == null)
+		if (game.getGameState() != ChessGameState.INGAME || game.getBlackPlayer() == null
+				|| game.getWhitePlayer() == null) {
 			this.cancel();
+			return;
+		}
 
 		// change color timers
 		double timeDifference = System.currentTimeMillis() / 1000 - lastTimeChange;
@@ -40,12 +42,18 @@ public class Clock extends BukkitRunnable {
 
 		if (turn.equals("BLACK"))
 			blackTime -= timeDifference;
-		
+
 		// check if game is over
-		if (blackTime < 0) 
+		if (blackTime < 0) {
 			game.gameOver("WHITE", "won on time");
-		if (whiteTime < 0)
+			this.cancel();
+			return;
+		}
+		if (whiteTime < 0) {
 			game.gameOver("BLACK", "won on time");
+			this.cancel();
+			return;
+		}
 
 		// send players clock times
 		String blackTimeText = "BLACK: " + (int) blackTime / 60 + ":" + (int) (blackTime % 60);
