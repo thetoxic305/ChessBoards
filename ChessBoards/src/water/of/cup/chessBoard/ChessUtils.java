@@ -55,7 +55,7 @@ public class ChessUtils {
 		}
 
 		for (int x = 0; x < 8; x++) {
-			if (board[y][x].equals(pieceType))
+			if (board[y][x] != null && board[y][x].equals(pieceType))
 				return new int[] { x, y };
 		}
 
