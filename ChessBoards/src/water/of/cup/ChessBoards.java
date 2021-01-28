@@ -178,6 +178,7 @@ public class ChessBoards extends JavaPlugin {
 
 		// Perms: chessboard.destroy chessboard.command
 		defaultConfig.put("settings.chessboard.permissions", true);
+		defaultConfig.put("settings.chessboard.customImages", false); // Default false
 
         defaultConfig.put("settings.database.host", "localhost");
         defaultConfig.put("settings.database.port", "3306");

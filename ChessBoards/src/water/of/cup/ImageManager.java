@@ -15,18 +15,26 @@ import org.bukkit.Bukkit;
 import water.of.cup.chessBoard.ChessPiece;
 
 public class ImageManager {
-	HashMap<ChessPiece, BufferedImage> images;
+
+	private HashMap<ChessPiece, BufferedImage> images;
 
 	public void loadImages() {
+		boolean customImages = ChessBoards.getInstance().getConfig().getBoolean("settings.chessboard.customImages");
 		images = new HashMap<ChessPiece, BufferedImage>();
 
 		// Make sure all images are places inside /ChessBoards/images on the server
 		for (ChessPiece piece : ChessPiece.values()) {
 			try {
-				File file = new File(
-						ChessBoards.getInstance().getDataFolder() + "/images/" + piece.toString() + ".png");
-				BufferedImage image = ImageIO.read(file);
-				images.put(piece, image);
+				if(customImages) {
+					InputStream is = getClass().getClassLoader().getResourceAsStream("water/of/cup/images/" + piece.toString() + ".png");
+					BufferedImage image = ImageIO.read(is);
+					images.put(piece, image);
+				} else {
+					File file = new File(
+							ChessBoards.getInstance().getDataFolder() + "/images/" + piece.toString() + ".png");
+					BufferedImage image = ImageIO.read(file);
+					images.put(piece, image);
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
