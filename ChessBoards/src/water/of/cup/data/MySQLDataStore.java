@@ -6,6 +6,7 @@ import water.of.cup.ChessBoards;
 
 import javax.annotation.Nullable;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -203,4 +204,46 @@ public class MySQLDataStore {
 		 }
 		 return null;
 	}
+
+	public ArrayList<ChessPlayer> getTopPlayers(int page) {
+        try {
+            ArrayList<ChessPlayer> topPlayers = new ArrayList<>();
+            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
+            ResultSet playerData = sql.executeQuery();
+            while(playerData.next()) {
+                int id = playerData.getInt(1);
+                String uuid = playerData.getString(2);
+                int wins = playerData.getInt(3);
+                int losses = playerData.getInt(4);
+                int ties = playerData.getInt(5);
+                double rating = playerData.getDouble(6);
+                double ratingDeviation = playerData.getDouble(7);
+                double volatility = playerData.getDouble(8);
+                int numberOfResults = playerData.getInt(9);
+
+                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                topPlayers.add(newPlayer);
+            }
+
+            return topPlayers;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getChessPlayerTotal() {
+        try {
+            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players");
+            ResultSet playerData = sql.executeQuery();
+            int num = 0;
+            while(playerData.next()) {
+                num++;
+            }
+            return num;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return 0;
+        }
+    }
 }
