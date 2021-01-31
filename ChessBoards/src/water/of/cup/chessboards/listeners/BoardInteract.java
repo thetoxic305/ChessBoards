@@ -63,6 +63,9 @@ public class BoardInteract implements Listener {
 							return;
 						}
 
+						if(instance.getConfig().getBoolean("settings.chessboard.permissions")
+								&& !player.hasPermission("chessboard.interact")) return;
+
 						ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
 						player.sendMessage("Game found! Status: " + game.getGameState().toString());
@@ -82,7 +85,7 @@ public class BoardInteract implements Listener {
 									chessCreateGameInventory.displayCreateGame(player, true);
 									instance.getCreateGameManager().put(player, chessCreateGameInventory);
 								} else {
-									if (game.getPlayerQueue().size() < 3) {
+									if (game.getPlayerQueue().size() <= 3) {
 										game.addPlayerToDecisionQueue(player);
 									} else {
 										player.sendMessage(ChatColor.RED + "Too many players queuing!");
