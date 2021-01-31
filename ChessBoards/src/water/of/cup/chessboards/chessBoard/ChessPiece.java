@@ -123,13 +123,16 @@ public enum ChessPiece {
 					// left rook
 					if (!movedPieces[row][0]) {
 						boolean movesWork = true;
-						for (int i = 1; i < 4; i++) {
-							// check if all the tiles between king and rook are safe
+						for (int i = 2; i < 4; i++) {
+							// check if the two nearest tiles between king and rook are safe
 							if (!checkMovePossible(pieceLoc, board, i, row, false, false, false)) {
 								movesWork = false;
 								break;
 							}
 						}
+						// check if the b column tile is empty
+						if (board[row][1] != null)
+							movesWork = false;
 						if (movesWork)
 							moves[row][0] = true;
 					}
