@@ -85,7 +85,7 @@ public class BoardInteract implements Listener {
 									chessCreateGameInventory.displayCreateGame(player, true);
 									instance.getCreateGameManager().put(player, chessCreateGameInventory);
 								} else {
-									if (game.getPlayerQueue().size() <= 3) {
+									if (game.getPlayerQueue().size() < 3) {
 										game.addPlayerToDecisionQueue(player);
 									} else {
 										player.sendMessage(ChatColor.RED + "Too many players queuing!");
