@@ -52,6 +52,9 @@ public class ItemFrameInteract implements Listener {
 			if (chessBoardManager.getGameByGameId(gameId) != null) {
 				e.setCancelled(true);
 
+				if(instance.getConfig().getBoolean("settings.chessboard.permissions")
+						&& !player.hasPermission("chessboard.interact")) return;
+
 				// chess game found
 				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 

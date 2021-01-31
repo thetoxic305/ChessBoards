@@ -34,6 +34,9 @@ public class BlockPlace implements Listener {
 
         NamespacedKey key = new NamespacedKey(pluginInstance, "chess_board");
         if(itemStack.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.DOUBLE)) {
+            if(pluginInstance.getConfig().getBoolean("settings.chessboard.permissions")
+                    && !player.hasPermission("chessboard.place")) return;
+
             event.setCancelled(true);
 
             // remove 1 chessboard

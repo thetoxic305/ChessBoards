@@ -183,7 +183,14 @@ public class ChessBoards extends JavaPlugin {
 
 		HashMap<String, Object> defaultConfig = new HashMap<>();
 
-		// Perms: chessboard.destroy chessboard.command
+		/* Perms:
+		chessboard.interact - interact with chessboard
+		chessboard.place - place chessboard
+		chessboard.destroy - break chessboard
+		chessboard.command - use chessboard command
+			- chessboard.command.give - use give command
+			- chessboard.command.leaderboard - use leaderboard command
+		 */
 		defaultConfig.put("settings.chessboard.permissions", true);
 		defaultConfig.put("settings.chessboard.customImages", false); // Default false
 
