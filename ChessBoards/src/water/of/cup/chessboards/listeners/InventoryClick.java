@@ -16,6 +16,7 @@ import water.of.cup.chessboards.Utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
 import water.of.cup.chessboards.chessBoard.RequestWager;
+import water.of.cup.chessboards.chessBoard.Wager;
 import water.of.cup.chessboards.inventories.ChessInGameInventory;
 import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.inventories.ChessJoinGameInventory;
