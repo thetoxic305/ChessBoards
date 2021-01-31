@@ -1,4 +1,4 @@
-main: water.of.cup.ChessBoards
+main: water.of.cup.chessboards.ChessBoards
 name: ChessBoards
 version: '0.1'
 description: Adds chess boards to Minecraft.
