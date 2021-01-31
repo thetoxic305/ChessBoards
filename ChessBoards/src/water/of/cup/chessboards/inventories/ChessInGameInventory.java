@@ -95,6 +95,7 @@ public class ChessInGameInventory implements InventoryHolder {
 		if (whitePlayerReady && blackPlayerReady) {
 			this.chessGame.setGameState(ChessGameState.INGAME);
 			this.chessGame.startClocks();
+			this.chessGame.clearWagerViewInventories();
 
 			Player otherPlayer = player.equals(this.chessGame.getBlackPlayer()) ? this.chessGame.getWhitePlayer()
 					: this.chessGame.getBlackPlayer();

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -58,6 +59,7 @@ public class ChessGame {
 	private ArrayList<Wager> wagers;
 	private ArrayList<RequestWager> requestWagers;
 	private ArrayList<ChessWagerViewInventory> wagerViewInventories = new ArrayList<ChessWagerViewInventory>();
+	private int gameWager;
 
 	public ChessGame(ItemStack item, int gameId) {
 		this.gameItem = item;
@@ -146,7 +148,7 @@ public class ChessGame {
 			if (key.equals("BlackTime")) {
 				clock.incementTime("BLACK", Double.parseDouble(result));
 			}
-			
+
 			if (key.equals("Wagers")) {
 				wagers.add(new Wager(result));
 			}
@@ -172,6 +174,9 @@ public class ChessGame {
 		clockTime = 1;
 		clockIncrement = 0;
 		gameTimeString = null;
+		gameWager = 0;
+		wagers.clear();
+		requestWagers.clear();
 
 		// set up chess board
 		board = new ChessPiece[][] {
@@ -304,7 +309,7 @@ public class ChessGame {
 						board[loc[1]][loc[0]] = null;
 						notation = "0-0";
 					}
-					
+
 					movedPieces[loc[1]][loc[0]] = true;
 					movedPieces[selectedPiece[1]][selectedPiece[0]] = true;
 				} else {
@@ -416,15 +421,15 @@ public class ChessGame {
 
 	public void gameOver(String winningColor, String winMessage) {
 		renderBoardForPlayers();
-		
+
 		//Fulfill wagers
 		for (Wager wager : wagers) {
 			wager.complete(winningColor);
 		}
 		wagers.clear();
-		
+
 		//	Update Ratings
-		if (instance.getConfig().getBoolean("settings.database.enabled") && ranked) 
+		if (instance.getConfig().getBoolean("settings.database.enabled") && ranked)
 			updateRatings(winningColor, whitePlayer, blackPlayer);
 
 		Player winner = whitePlayer;
@@ -456,7 +461,7 @@ public class ChessGame {
 
 			// Add stats to database TIE
 			if (instance.getConfig().getBoolean("settings.database.enabled")) {
-				
+
 				MySQLDataStore dataStore = instance.getDataStore();
 
 				ChessPlayer player1 = dataStore.getChessPlayers().get(winner);
@@ -495,9 +500,9 @@ public class ChessGame {
 
 		setGameState(ChessGameState.IDLE);
 	}
-	
+
 	private void updateRatings(String winningColor, Player white, Player black) {
-		
+
 		//get winner / loser
 		String winner = white.getUniqueId().toString();
 		String loser = black.getUniqueId().toString();
@@ -505,35 +510,35 @@ public class ChessGame {
 			loser = white.getUniqueId().toString();
 			winner = black.getUniqueId().toString();
 		}
-		
+
 		MySQLDataStore dataStore = instance.getDataStore();
 
-		
+
 		ChessPlayer winnerChessPlayer = dataStore.getChessPlayerByUUID(winner);
 		ChessPlayer loserChessPlayer = dataStore.getChessPlayerByUUID(loser);
-		
+
 		RatingCalculator rc = new RatingCalculator();
-		
+
 		Rating ratingWinner;
 		Rating ratingLoser;
-		
+
 		if (winnerChessPlayer.getRating() == 0) {
 			ratingWinner = new Rating(winner, rc);
 		} else {
 			ratingWinner = new Rating(winner, rc, winnerChessPlayer.getRating(), winnerChessPlayer.getRatingDeviation(), winnerChessPlayer.getVolatility());
 		}
-		
+
 		if (loserChessPlayer.getRating() == 0) {
 			ratingLoser = new Rating(loser, rc);
 		} else {
 			ratingLoser = new Rating(loser, rc, loserChessPlayer.getRating(), loserChessPlayer.getRatingDeviation(), loserChessPlayer.getVolatility());
 		}
-		
-		
-		
-		
+
+
+
+
 		RatingPeriodResults rpr = new RatingPeriodResults();
-		
+
 		if (!(winningColor.equals("WHITE") || winningColor.equals("BLACK"))) {
 			//Tied game
 			rpr.addDraw(ratingWinner, ratingLoser);
@@ -542,17 +547,17 @@ public class ChessGame {
 			rpr.addResult(ratingWinner, ratingLoser);
 		}
 		rc.updateRatings(rpr);
-		
+
 		winnerChessPlayer.setRating(ratingWinner.getRating());
 		winnerChessPlayer.setRatingDeviation(ratingWinner.getRatingDeviation());
 		winnerChessPlayer.setVolatility(ratingWinner.getVolatility());
-		
+
 		loserChessPlayer.setRating(ratingLoser.getRating());
 		loserChessPlayer.setRatingDeviation(ratingLoser.getRatingDeviation());
 		loserChessPlayer.setVolatility(ratingLoser.getVolatility());
-		
-		
-		
+
+
+
 	}
 
 	private int getBoardRepeats(String boardString) {
@@ -769,7 +774,7 @@ public class ChessGame {
 
 			gameString += "WhiteTime:" + clock.getWhiteTime() + ";";
 			gameString += "BlackTime:" + clock.getBlackTime() + ";";
-			
+
 			gameString += "Wagers:";
 			for (Wager wager : wagers) {
 				gameString += wager.toString() + ",";
@@ -832,6 +837,10 @@ public class ChessGame {
 		otherPlayer.closeInventory();
 		return true;
 	}
+	
+	public void addWager(Wager wager) {
+		wagers.add(wager);
+	}
 
 	public void addRequestWager(RequestWager wager) {
 		requestWagers.add(wager);
@@ -840,7 +849,7 @@ public class ChessGame {
 	public void removeRequestWager(RequestWager wager) {
 		requestWagers.remove(wager);
 	}
-	
+
 	public RequestWager getRequestWager(int index) {
 		return requestWagers.get(index);
 	}
@@ -854,24 +863,38 @@ public class ChessGame {
 
 		return null;
 	}
-	
+
 	public ArrayList<RequestWager> getRequestWagers() {
 		return requestWagers;
 	}
-	
+
 	public void updateRequestWagerInventories() {
 		for (ChessWagerViewInventory inv : wagerViewInventories) {
 			inv.display(false);
 		}
 	}
-	
-	public void requestWagerToWager(RequestWager requestWager, Player accepter) {
+
+	public boolean requestWagerToWager(RequestWager requestWager, Player accepter) {
+		if (instance.getEconomy().getBalance(accepter) < requestWager.getAmount()) {
+			accepter.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+			return false;
+		}
+
+		// Send messages to players
+		requestWager.getOwner().sendMessage(accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
+		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of " + requestWager.getAmount() + ".");
+
 		wagers.add(new Wager(requestWager, accepter));
 		removeRequestWager(requestWager);
+		return true;
 	}
 
 	public void addWagerViewInventory(ChessWagerViewInventory chessWagerViewInventory) {
 		wagerViewInventories.add(chessWagerViewInventory);
+	}
+
+	public void clearWagerViewInventories() {
+		this.wagerViewInventories.clear();
 	}
 
 	public double getStartingWagerAmount() {
@@ -888,5 +911,13 @@ public class ChessGame {
 		}
 
 		return null;
+	}
+
+	public void setGameWager(int wager) {
+		this.gameWager = wager;
+	}
+
+	public int getGameWager() {
+		return this.gameWager;
 	}
 }
