@@ -59,7 +59,6 @@ public class BoardInteract implements Listener {
 					if (chessBoardManager.getGameByGameId(gameId) != null) {
 						// chess game found
 						if (e.getHand().equals(EquipmentSlot.HAND)) {
-							e.setCancelled(true);
 							return;
 						}
 
