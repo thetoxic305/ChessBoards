@@ -2,8 +2,15 @@ package water.of.cup.chessboards.chessBoard;
 
 import java.util.ArrayList;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.util.Vector;
 
 public class ChessBoardManager {
 	private ArrayList<ChessGame> games;
@@ -79,6 +86,22 @@ public class ChessBoardManager {
 		}
 
 		return null;
+	}
+	
+	public ArrayList<ChessGame> getGamesInRegion(World world, Vector p1, Vector p2) {
+		ArrayList<ChessGame> games = new ArrayList<ChessGame>();
+		for (Entity entity : world.getEntities()) {
+			if (!(entity instanceof ItemFrame))
+				continue;
+			ItemFrame frame = (ItemFrame) entity;
+			ItemStack item = frame.getItem();
+			if (item != null && item.getType() == Material.FILLED_MAP && ((MapMeta) item.getItemMeta()).hasMapId()) {
+				ChessGame game = getGameByGameId(((MapMeta) item.getItemMeta()).getMapId());
+				if (game != null && entity.getLocation().toVector().isInAABB(p1, p2))
+					games.add(game);
+			}
+		}
+		return games;
 	}
 
 	public ArrayList<ChessGame> getGames() {
