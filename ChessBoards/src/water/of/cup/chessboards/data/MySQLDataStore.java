@@ -37,7 +37,7 @@ public class MySQLDataStore {
 
             this.createDatabaseIfNotExists(connectionString);
 
-            connection = DriverManager.getConnection(connectionString + database + "?autoReconnect=true&useSSL=false",
+            connection = DriverManager.getConnection(connectionString + database + "?allowReconnect=true&autoReconnect=true&useSSL=false",
                     username, password);
 
             this.checkSchema();
