@@ -36,7 +36,7 @@ public class Wager {
 	}
 	
 	public Wager(String wagerString) {
-		for (String arg : wagerString.split("-")) {
+		for (String arg : wagerString.split("&")) {
 
 			String key = arg.substring(0, arg.indexOf(":"));
 			String result = arg.substring(arg.indexOf(":") + 1);
@@ -61,6 +61,8 @@ public class Wager {
 	}
 
 	public void complete(String winningColor) {
+		if(instance.getEconomy() == null) return;
+
 		if (!(winningColor.equals("WHITE") || winningColor.equals("BLACK"))) {
 			//give players their money back
 			instance.getEconomy().depositPlayer(player1, amount);
@@ -79,12 +81,12 @@ public class Wager {
 	
 	public String toString() {
 		String wagerString = "";
-		wagerString += "Player1:" + player1.getUniqueId().toString() + "-";
-		wagerString += "Player2:" + player2.getUniqueId().toString() + "-";
+		wagerString += "Player1:" + player1.getUniqueId().toString() + "&";
+		wagerString += "Player2:" + player2.getUniqueId().toString() + "&";
 		
-		wagerString += "Player1Side:" + player1Side + "-";
+		wagerString += "Player1Side:" + player1Side + "&";
 		
-		wagerString += "Amount:" + amount + "-";
+		wagerString += "Amount:" + amount + "&";
 		
 		return wagerString;
 	}
