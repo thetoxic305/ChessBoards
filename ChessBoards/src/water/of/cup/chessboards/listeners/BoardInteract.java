@@ -3,16 +3,19 @@ package water.of.cup.chessboards.listeners;
 import java.util.Collection;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -34,81 +37,107 @@ public class BoardInteract implements Listener {
 
 		// attempt to find a chess game
 		Vector direction = player.getEyeLocation().getDirection();
-		RayTraceResult result = player.getWorld().rayTraceBlocks(player.getEyeLocation(),
-				direction, 3.5);
-		if (result != null) {
-			Collection<Entity> nearbyEntites = result.getHitBlock().getLocation().getWorld()
-					.getNearbyEntities(result.getHitBlock().getLocation(), 2, 2, 2);
-			for (Entity entity : nearbyEntites) {
-				if (entity instanceof ItemFrame) {
-					ItemFrame itemFrame = (ItemFrame) entity;
 
-					if (itemFrame.getAttachedFace().getOppositeFace() != result.getHitBlockFace())
-						return;
+//		RayTraceResult result = player.getWorld().rayTraceBlocks(player.getEyeLocation(),
+//				direction, 3.5);
 
-					ItemStack gameFrame = itemFrame.getItem();
+		// get nearby chessgames
+		Collection<Entity> nearbyEntities = player.getWorld().getNearbyEntities(player.getLocation(), 4, 4, 4);
 
-					if(gameFrame.getItemMeta() == null || !(gameFrame.getItemMeta() instanceof MapMeta)) return;
+		RayTraceResult result = null;
+		ItemFrame gameFrame = null;
 
-					MapMeta mapMeta = (MapMeta) gameFrame.getItemMeta();
+		for (Entity entity : nearbyEntities) {
 
-					if(mapMeta.getMapView() == null) return;
-
-					int gameId = mapMeta.getMapView().getId();
-
-					if (chessBoardManager.getGameByGameId(gameId) != null) {
-						// chess game found
-						if (e.getHand().equals(EquipmentSlot.HAND)) {
-							return;
-						}
-
-						if(instance.getConfig().getBoolean("settings.chessboard.permissions")
-								&& !player.hasPermission("chessboard.interact")) return;
-
-						ChessGame game = chessBoardManager.getGameByGameId(gameId);
-
-						player.sendMessage("Game found! Status: " + game.getGameState().toString());
-
-						if (e.getAction().equals(Action.RIGHT_CLICK_AIR) ||
-								e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-
-							if (chessBoardManager.getGameByPlayer(player) != null
-									&& chessBoardManager.getGameByPlayer(player) != game) {
-								player.sendMessage("You must finish your game before joining another.");
-								return;
-							}
-
-							if (game.getGameState().equals(ChessGameState.IDLE) || game.getGameState().equals(ChessGameState.WAITING_PLAYER)) {
-								if (game.getGameState().equals(ChessGameState.IDLE)) {
-									ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory(game);
-									chessCreateGameInventory.displayCreateGame(player, true);
-									instance.getCreateGameManager().put(player, chessCreateGameInventory);
-								} else {
-									if (game.getPlayerQueue().size() < 3) {
-										game.addPlayerToDecisionQueue(player);
-									} else {
-										player.sendMessage(ChatColor.RED + "Too many players queuing!");
-									}
-								}
-								return;
-							}
-
-							double hitx = result.getHitPosition().getX();
-							double hity = result.getHitPosition().getZ();
-								
-
-							int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, itemFrame.getRotation(), direction);
-
-							player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
-							game.click(loc, player);
-
-							e.setCancelled(true);
-						}
+			if (!(entity instanceof ItemFrame))
+				continue;
+			ItemFrame frame = (ItemFrame) entity;
+			ItemStack item = frame.getItem();
+			if (item != null && item.getType() == Material.FILLED_MAP && ((MapMeta) item.getItemMeta()).hasMapId()) {
+				ChessGame tempGame = chessBoardManager.getGameByGameId(((MapMeta) item.getItemMeta()).getMapId());
+				if (tempGame != null) {
+					Vector pos = frame.getLocation().toVector();
+					double x = pos.getX();
+					double y = pos.getY();
+					double z = pos.getZ();
+					BoundingBox box = new BoundingBox(x - 0.5, y - .0313, z - 0.5, x + 0.5, y + 0.0313, z + 0.5);
+					RayTraceResult tempResult = box.rayTrace(player.getEyeLocation().toVector(), direction, 5);
+					player.sendMessage("Height: " + box.getHeight() + ", width" + box.getWidthX());
+					if (tempResult != null) {
+						result = tempResult;
+						gameFrame = frame;
+						break;
 					}
 				}
 			}
 		}
 
-	}
+		if (result != null) {
+//			if (gameFrame.getAttachedFace().getOppositeFace() != result.getHitBlockFace())
+//				return;
 
+			ItemStack gameItem = gameFrame.getItem();
+
+			if (gameItem.getItemMeta() == null || !(gameItem.getItemMeta() instanceof MapMeta))
+				return;
+
+			MapMeta mapMeta = (MapMeta) gameItem.getItemMeta();
+
+			if (mapMeta.getMapView() == null)
+				return;
+
+			int gameId = mapMeta.getMapView().getId();
+
+			if (chessBoardManager.getGameByGameId(gameId) != null) {
+				// chess game found
+				if (e.getHand().equals(EquipmentSlot.HAND)) {
+					return;
+				}
+
+				if (instance.getConfig().getBoolean("settings.chessboard.permissions")
+						&& !player.hasPermission("chessboard.interact"))
+					return;
+
+				ChessGame game = chessBoardManager.getGameByGameId(gameId);
+
+				player.sendMessage("Game found! Status: " + game.getGameState().toString());
+
+				if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+
+					if (chessBoardManager.getGameByPlayer(player) != null
+							&& chessBoardManager.getGameByPlayer(player) != game) {
+						player.sendMessage("You must finish your game before joining another.");
+						return;
+					}
+
+					if (game.getGameState().equals(ChessGameState.IDLE)
+							|| game.getGameState().equals(ChessGameState.WAITING_PLAYER)) {
+						if (game.getGameState().equals(ChessGameState.IDLE)) {
+							ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory(game);
+							chessCreateGameInventory.displayCreateGame(player, true);
+							instance.getCreateGameManager().put(player, chessCreateGameInventory);
+						} else {
+							if (game.getPlayerQueue().size() < 3) {
+								game.addPlayerToDecisionQueue(player);
+							} else {
+								player.sendMessage(ChatColor.RED + "Too many players queuing!");
+							}
+						}
+						return;
+					}
+
+					double hitx = result.getHitPosition().getX();
+					double hity = result.getHitPosition().getZ();
+
+					int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, gameFrame.getRotation(), direction);
+
+					player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
+					game.click(loc, player);
+
+					e.setCancelled(true);
+				}
+
+			}
+		}
+	}
 }

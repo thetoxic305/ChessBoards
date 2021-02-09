@@ -68,7 +68,7 @@ public class ChessBoards extends JavaPlugin {
 		getCommand("chessboards").setExecutor(new ChessBoardCommands());
 		getCommand("chessboards").setTabCompleter(new ChessBoardCommandsTabCompleter());
 
-		registerListeners(new ItemFrameInteract(), new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin());
+		registerListeners(new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();

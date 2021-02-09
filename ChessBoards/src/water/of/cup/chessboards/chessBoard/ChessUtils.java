@@ -83,15 +83,15 @@ public class ChessUtils {
 
 	public static int[] getChessBoardClickLocation(double hitx, double hity, Rotation rotation, Vector direction) {
 		// move back 1/16th block y
-		direction = direction.normalize();
+//		direction = direction.normalize();
+//
+//		double vX = direction.getX();
+//		double vY = direction.getY();
+//		double vZ = direction.getZ();
 
-		double vX = direction.getX();
-		double vY = direction.getY();
-		double vZ = direction.getZ();
-
-		double multiplier = 1.0 / 16 / vY;
-		hitx += vX * multiplier;
-		hity += vZ * multiplier;
+//		double multiplier = 1.0 / 16 / vY;
+//		hitx += vX * multiplier;
+//		hity += vZ * multiplier;
 
 		// get square selected
 		int x = (int) ((hitx - Math.floor(hitx)) * 8);
