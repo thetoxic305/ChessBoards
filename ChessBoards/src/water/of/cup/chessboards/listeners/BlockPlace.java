@@ -64,18 +64,17 @@ public class BlockPlace implements Listener {
                 ItemFrame frame = player.getWorld().spawn(event.getBlockPlaced().getLocation(), ItemFrame.class);
                 frame.setItem(chessBoardItem);
                 frame.setFacingDirection(BlockFace.UP, true);
+
+                // Place barrier block
+                event.getBlockPlaced().getLocation().getBlock().setType(Material.BARRIER);
                 
                 //set Chessboard rotation
                 double yaw = player.getEyeLocation().getYaw();
                 if ((yaw > 45 && yaw < 135) || (yaw < 315 && yaw > 225))
                 	frame.setRotation(Rotation.CLOCKWISE_45);
-                	
-                
-            
-                
 
-//                frame.setInvulnerable(true);
-//                frame.setFixed(true);
+                frame.setInvulnerable(true);
+                frame.setFixed(true);
 
                 chessBoardManager.addGame(game);
             });
