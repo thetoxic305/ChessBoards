@@ -13,7 +13,6 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import jdk.internal.util.xml.impl.Input;
 import org.bukkit.Bukkit;
 import water.of.cup.chessboards.chessBoard.ChessPiece;
 
