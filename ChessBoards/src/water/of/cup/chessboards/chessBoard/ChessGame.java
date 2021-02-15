@@ -232,6 +232,7 @@ public class ChessGame {
 			return;
 
 		String color = "WHITE";
+
 		if (blackPlayer.equals(player))
 			color = "BLACK";
 
@@ -256,14 +257,16 @@ public class ChessGame {
 
 			switchTurn();
 
-			// Check if move creates check
+			// Check if move creates check for notation
 			if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 				record.set(record.size() - 1, record.get(record.size() - 1) + "+");
-				// check if move creates checkmate
-				if (!ChessUtils.colorHasMoves(board, turn)) {
+				// check if move creates checkmate for notation
+				if (!ChessUtils.colorHasMoves(board, turn, record)) {
 					record.set(record.size() - 1, record.get(record.size() - 1) + "+");
 				}
 			}
+
+			checkGameOver();
 
 			pawnPromotion = "NONE";
 			selectedPiece = new int[] { -1, -1 };
@@ -357,7 +360,7 @@ public class ChessGame {
 					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 						notation += "+";
 						// check if move creates checkmate
-						if (!ChessUtils.colorHasMoves(board, turn)) {
+						if (!ChessUtils.colorHasMoves(board, turn, record)) {
 							notation += "+";
 						}
 					}
@@ -368,22 +371,7 @@ public class ChessGame {
 				record.add(notation);
 				Bukkit.getLogger().info(notation);
 
-				// CheckIfGameOver
-				if (!ChessUtils.colorHasMoves(board, turn)) {
-					// Check if winner
-					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
-						// Other side won
-						if (turn.equals("WHITE")) {
-							gameOver("BLACK");
-						} else {
-							gameOver("WHITE");
-						}
-					} else {
-						// tied game
-						gameOver("DRAW");
-					}
-					return;
-				}
+				checkGameOver();
 
 				// check if draw from position repeat three times
 				String boardString = ChessUtils.boardToString(board);
@@ -415,6 +403,25 @@ public class ChessGame {
 		renderBoardForPlayers();
 	}
 
+	public void checkGameOver() {
+		// CheckIfGameOver
+		if (!ChessUtils.colorHasMoves(board, turn, record)) {
+			// Check if winner
+			if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
+				// Other side won
+				if (turn.equals("WHITE")) {
+					gameOver("BLACK");
+				} else {
+					gameOver("WHITE");
+				}
+			} else {
+				// tied game
+				gameOver("DRAW");
+			}
+			return;
+		}
+	}
+
 	public void gameOver(String winningColor) {
 		gameOver(winningColor, "won");
 	}
@@ -422,13 +429,13 @@ public class ChessGame {
 	public void gameOver(String winningColor, String winMessage) {
 		renderBoardForPlayers();
 
-		//Fulfill wagers
+		// Fulfill wagers
 		for (Wager wager : wagers) {
 			wager.complete(winningColor);
 		}
 		wagers.clear();
 
-		//	Update Ratings
+		// Update Ratings
 		if (instance.getConfig().getBoolean("settings.database.enabled") && ranked)
 			updateRatings(winningColor, whitePlayer, blackPlayer);
 
@@ -503,7 +510,7 @@ public class ChessGame {
 
 	private void updateRatings(String winningColor, Player white, Player black) {
 
-		//get winner / loser
+		// get winner / loser
 		String winner = white.getUniqueId().toString();
 		String loser = black.getUniqueId().toString();
 		if (winningColor.equals("BLACK")) {
@@ -512,7 +519,6 @@ public class ChessGame {
 		}
 
 		MySQLDataStore dataStore = instance.getDataStore();
-
 
 		ChessPlayer winnerChessPlayer = dataStore.getChessPlayerByUUID(winner);
 		ChessPlayer loserChessPlayer = dataStore.getChessPlayerByUUID(loser);
@@ -525,25 +531,24 @@ public class ChessGame {
 		if (winnerChessPlayer.getRating() == 0) {
 			ratingWinner = new Rating(winner, rc);
 		} else {
-			ratingWinner = new Rating(winner, rc, winnerChessPlayer.getRating(), winnerChessPlayer.getRatingDeviation(), winnerChessPlayer.getVolatility());
+			ratingWinner = new Rating(winner, rc, winnerChessPlayer.getRating(), winnerChessPlayer.getRatingDeviation(),
+					winnerChessPlayer.getVolatility());
 		}
 
 		if (loserChessPlayer.getRating() == 0) {
 			ratingLoser = new Rating(loser, rc);
 		} else {
-			ratingLoser = new Rating(loser, rc, loserChessPlayer.getRating(), loserChessPlayer.getRatingDeviation(), loserChessPlayer.getVolatility());
+			ratingLoser = new Rating(loser, rc, loserChessPlayer.getRating(), loserChessPlayer.getRatingDeviation(),
+					loserChessPlayer.getVolatility());
 		}
-
-
-
 
 		RatingPeriodResults rpr = new RatingPeriodResults();
 
 		if (!(winningColor.equals("WHITE") || winningColor.equals("BLACK"))) {
-			//Tied game
+			// Tied game
 			rpr.addDraw(ratingWinner, ratingLoser);
 		} else {
-			//Won game
+			// Won game
 			rpr.addResult(ratingWinner, ratingLoser);
 		}
 		rc.updateRatings(rpr);
@@ -555,8 +560,6 @@ public class ChessGame {
 		loserChessPlayer.setRating(ratingLoser.getRating());
 		loserChessPlayer.setRatingDeviation(ratingLoser.getRatingDeviation());
 		loserChessPlayer.setVolatility(ratingLoser.getVolatility());
-
-
 
 	}
 
@@ -818,7 +821,8 @@ public class ChessGame {
 	public boolean delete() {
 		if (instance.getChessBoardManager().removeGame(this)) {
 			File file = new File(instance.getDataFolder(), "saved_games/game_" + this.gameId + ".txt");
-			if (!file.exists()) return false;
+			if (!file.exists())
+				return false;
 
 			return file.delete();
 		}
@@ -826,7 +830,8 @@ public class ChessGame {
 	}
 
 	public boolean forfeitGame(Player player) {
-		if(!this.hasPlayer(player)) return false;
+		if (!this.hasPlayer(player))
+			return false;
 
 		Player otherPlayer = this.whitePlayer.equals(player) ? this.blackPlayer : this.whitePlayer;
 		String color = this.whitePlayer.equals(player) ? "BLACK" : "WHITE";
@@ -837,7 +842,7 @@ public class ChessGame {
 		otherPlayer.closeInventory();
 		return true;
 	}
-	
+
 	public void addWager(Wager wager) {
 		wagers.add(wager);
 	}
@@ -855,8 +860,8 @@ public class ChessGame {
 	}
 
 	public RequestWager getRequestWagerByPlayer(Player player) {
-		for(RequestWager requestWager : this.requestWagers) {
-			if(requestWager.getOwner().equals(player)) {
+		for (RequestWager requestWager : this.requestWagers) {
+			if (requestWager.getOwner().equals(player)) {
 				return requestWager;
 			}
 		}
@@ -881,8 +886,10 @@ public class ChessGame {
 		}
 
 		// Send messages to players
-		requestWager.getOwner().sendMessage(accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
-		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of " + requestWager.getAmount() + ".");
+		requestWager.getOwner().sendMessage(
+				accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
+		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of "
+				+ requestWager.getAmount() + ".");
 
 		wagers.add(new Wager(requestWager, accepter));
 		removeRequestWager(requestWager);
@@ -906,8 +913,9 @@ public class ChessGame {
 	}
 
 	public ChessWagerViewInventory getWagerViewByPlayer(Player player) {
-		for(ChessWagerViewInventory chessWagerViewInventory : this.wagerViewInventories) {
-			if(chessWagerViewInventory.getPlayer().equals(player)) return chessWagerViewInventory;
+		for (ChessWagerViewInventory chessWagerViewInventory : this.wagerViewInventories) {
+			if (chessWagerViewInventory.getPlayer().equals(player))
+				return chessWagerViewInventory;
 		}
 
 		return null;

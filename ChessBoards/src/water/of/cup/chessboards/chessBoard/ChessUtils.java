@@ -99,10 +99,10 @@ public class ChessUtils {
 
 		if (rotation == Rotation.CLOCKWISE_45) {
 			int save = y;
-			y = 7 -  x;
+			y = 7 - x;
 			x = save;
 		}
-		
+
 		int[] loc = new int[] { x, y };
 		return loc;
 	}
@@ -119,7 +119,8 @@ public class ChessUtils {
 		return board;
 	}
 
-	public static boolean[][] allMovesForColor(ChessPiece[][] board, String color, boolean[][] movedPieces) {
+	public static boolean[][] allMovesForColor(ChessPiece[][] board, String color, boolean[][] movedPieces,
+			ArrayList<String> record) {
 		boolean[][] moves = new boolean[board.length][board[0].length];
 
 		for (int y = 0; y < board.length; y++) {
@@ -127,11 +128,14 @@ public class ChessUtils {
 				ChessPiece attackingPiece = board[y][x];
 				if (attackingPiece != null && attackingPiece.getColor().equals(color)) {
 					moves = combineMoves(moves,
-							attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, new ArrayList<String>()));
-				}
+							attackingPiece.getMoves(board, new int[] { x, y }, movedPieces, record));
+				} // board[selectedLocation[1]][selectedLocation[0]].getMoves(board,
+					// selectedLocation,
+					// game.getMovedPieces(), game.getRecord());
 			}
 		}
 		return moves;
+
 	}
 
 	public static boolean[][] combineMoves(boolean[][] moves1, boolean[][] moves2) {
@@ -146,8 +150,8 @@ public class ChessUtils {
 		return moves;
 	}
 
-	public static boolean colorHasMoves(ChessPiece[][] board, String color) {
-		boolean[][] moves = allMovesForColor(board, color, new boolean[8][8]);
+	public static boolean colorHasMoves(ChessPiece[][] board, String color, ArrayList<String> record) {
+		boolean[][] moves = allMovesForColor(board, color, new boolean[8][8], record);
 		for (boolean[] line : moves) {
 			for (boolean move : line) {
 				if (move)
@@ -169,15 +173,15 @@ public class ChessUtils {
 					stringBoard += " ";
 					continue;
 				}
-				
+
 				String pieceChar = piece.getNotationCharacter();
-				
+
 				if (piece.toString().contains("PAWN"))
 					pieceChar = "P";
-				
+
 				if (piece.getColor().equals("BLACK"))
 					pieceChar = pieceChar.toLowerCase();
-				
+
 				stringBoard += pieceChar;
 
 			}
@@ -185,14 +189,14 @@ public class ChessUtils {
 
 		return stringBoard;
 	}
-	
+
 	public static ChessPiece[][] boardFromString(String boardString) {
 		ChessPiece[][] board = new ChessPiece[8][8];
-		
+
 		for (int i = 0; i < 63; i++) {
 			board[i / 8][i % 8] = ChessPiece.getPieceByNotationCharacter(boardString.charAt(i));
-		} 
-		
+		}
+
 		return board;
 	}
 }
