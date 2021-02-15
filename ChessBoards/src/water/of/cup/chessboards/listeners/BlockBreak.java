@@ -24,7 +24,7 @@ public class BlockBreak implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         if(block.getType().equals(Material.BARRIER)) {
-            Collection<Entity> nearbyEntities = event.getPlayer().getWorld().getNearbyEntities(block.getLocation(), 1, 1, 1);
+            Collection<Entity> nearbyEntities = event.getPlayer().getWorld().getNearbyEntities(block.getBoundingBox());
             for (Entity entity : nearbyEntities) {
                 if (!(entity instanceof ItemFrame))
                     continue;
