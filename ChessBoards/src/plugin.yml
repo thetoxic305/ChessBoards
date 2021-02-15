@@ -4,6 +4,7 @@ version: '0.1'
 description: Adds chess boards to Minecraft.
 author: Nicholas Kopiwoda
 api-version: 1.14
+softdepends: [Vault]
 commands:
   chessboards:
     description: All commands for the ChessBoards plugin.
