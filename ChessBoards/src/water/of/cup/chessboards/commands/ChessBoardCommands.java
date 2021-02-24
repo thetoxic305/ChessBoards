@@ -32,14 +32,6 @@ public class ChessBoardCommands implements CommandExecutor {
 			if (permissionsEnabled && !p.hasPermission("chessboard.command"))
 				return false;
 
-			if(args.length == 0) {
-				// Send help message
-				p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards");
-				p.sendMessage("/chessboards give" + ChatColor.GRAY + ": Gives you chessboard");
-				p.sendMessage("/chessboards leaderboard" + ChatColor.GRAY + ": Lists top chess players");
-				return false;
-			}
-
 			if(args.length > 0) {
 				if(args[0].equalsIgnoreCase("give")) {
 					if (permissionsEnabled && !p.hasPermission("chessboard.command.give"))
@@ -97,6 +89,12 @@ public class ChessBoardCommands implements CommandExecutor {
 					return true;
 				}
 			}
+			// Send help message
+			p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Boards");
+			p.sendMessage("/chessboards give" + ChatColor.GRAY + ": Gives you chessboard");
+			p.sendMessage("/chessboards leaderboard" + ChatColor.GRAY + ": Lists top chess players");
+			return false;
+			
 		}
 		return false;
 	}
