@@ -63,7 +63,6 @@ public class BoardInteract implements Listener {
 					double z = pos.getZ();
 					BoundingBox box = new BoundingBox(x - 0.5, y - .0313, z - 0.5, x + 0.5, y + 0.0313, z + 0.5);
 					RayTraceResult tempResult = box.rayTrace(player.getEyeLocation().toVector(), direction, 5);
-					player.sendMessage("Height: " + box.getHeight() + ", width" + box.getWidthX());
 					if (tempResult != null) {
 						result = tempResult;
 						gameFrame = frame;
@@ -156,7 +155,6 @@ public class BoardInteract implements Listener {
 
 					int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, gameFrame.getRotation(), direction);
 
-					player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
 					game.click(loc, player);
 
 					e.setCancelled(true);

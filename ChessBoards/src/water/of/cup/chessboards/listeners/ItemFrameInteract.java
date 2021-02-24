@@ -91,7 +91,7 @@ public class ItemFrameInteract implements Listener {
 
 				int loc[] = ChessUtils.getChessBoardClickLocation(hitx, hity, itemFrame.getRotation(), direction);
 
-				player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
+				//player.sendMessage("x:" + loc[0] + ", y:" + loc[1]);
 				game.click(loc, player);
 			}
 		}
