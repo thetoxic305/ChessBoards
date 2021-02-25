@@ -121,9 +121,11 @@ public class ChessBoardCommands implements CommandExecutor {
 							if (player.getName().equals(name)) {
 								// player found, send stats message
 								p.sendMessage(ChatColor.DARK_BLUE + "--" + ChatColor.BLUE + name + "'s chess stats" + ChatColor.DARK_BLUE + "--");
-								p.sendMessage(ChatColor.BLUE + "Rating: " + (double) Math.round(chessPlayer.getRating() * 100) / 100);
-								//p.sendMessage(ChatColor.BLUE + "Games: " + chessPlayer.getNumberOfResults());
 								p.sendMessage(ChatColor.BLUE + "W/L/D: " + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
+								p.sendMessage(ChatColor.BLUE + "Rating: " + (double) Math.round(chessPlayer.getRating() * 100) / 100);
+								p.sendMessage(ChatColor.BLUE + "Rating Deviation: " + chessPlayer.getRatingDeviation());
+								p.sendMessage(ChatColor.BLUE + "Volatility: " + chessPlayer.getVolatility());
+								
 								return true;
 							}
 						}
