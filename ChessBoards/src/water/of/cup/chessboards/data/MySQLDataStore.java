@@ -229,6 +229,33 @@ public class MySQLDataStore {
             return null;
         }
     }
+	
+	public ArrayList<ChessPlayer> getAllPlayers() {
+        try {
+            ArrayList<ChessPlayer> allPlayers = new ArrayList<>();
+            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players;");
+            ResultSet playerData = sql.executeQuery();
+            while(playerData.next()) {
+                int id = playerData.getInt(1);
+                String uuid = playerData.getString(2);
+                int wins = playerData.getInt(3);
+                int losses = playerData.getInt(4);
+                int ties = playerData.getInt(5);
+                double rating = playerData.getDouble(6);
+                double ratingDeviation = playerData.getDouble(7);
+                double volatility = playerData.getDouble(8);
+                int numberOfResults = playerData.getInt(9);
+
+                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                allPlayers.add(newPlayer);
+            }
+
+            return allPlayers;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
 
     public int getChessPlayerTotal() {
         try {

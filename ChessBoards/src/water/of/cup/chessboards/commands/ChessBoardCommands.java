@@ -112,7 +112,7 @@ public class ChessBoardCommands implements CommandExecutor {
 						// next arg is playername
 						String name = args[1];
 
-						for (ChessPlayer chessPlayer : instance.getDataStore().getChessPlayers().values()) {
+						for (ChessPlayer chessPlayer : instance.getDataStore().getAllPlayers()) {
 							UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
 							OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
 							if (player == null)
