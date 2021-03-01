@@ -18,7 +18,7 @@ public class ChessPlayer {
     private int numberOfResults;
     private int id;
     private ChessBoards instance = ChessBoards.getInstance();
-    private MySQLDataStore dataStore = instance.getDataStore();
+    private DataSource dataStore = instance.getDataStore();
 
     public ChessPlayer(Player player, int id, String uuid, int wins, int losses, int ties, double rating, double ratingDeviation, double volatility, int numberOfResults) {
         this.player = player;

@@ -29,7 +29,7 @@ import water.of.cup.chessboards.chessBoard.ChessBoardManager;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessUtils;
 import water.of.cup.chessboards.commands.ChessBoardCommandsTabCompleter;
-import water.of.cup.chessboards.data.MySQLDataStore;
+import water.of.cup.chessboards.data.DataSource;
 import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.listeners.*;
 import water.of.cup.chessboards.commands.ChessBoardCommands;
@@ -46,7 +46,7 @@ public class ChessBoards extends JavaPlugin {
 	private File configFile;
 	private FileConfiguration config;
 	private static Economy economy = null;
-	private MySQLDataStore dataStore;
+	private DataSource dataStore;
 
 	@Override
 	public void onEnable() {
@@ -74,7 +74,7 @@ public class ChessBoards extends JavaPlugin {
 			addChessBoardRecipe();
 
 		if(config.getBoolean("settings.database.enabled")) {
-			this.dataStore = new MySQLDataStore();;
+			this.dataStore = new DataSource();;
 			this.dataStore.initialize();
 
 			for(Player player : Bukkit.getOnlinePlayers()) {
@@ -271,7 +271,7 @@ public class ChessBoards extends JavaPlugin {
 		return key;
 	}
 
-	public MySQLDataStore getDataStore() {
+	public DataSource getDataStore() {
 		return dataStore;
 	}
 }

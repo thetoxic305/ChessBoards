@@ -19,7 +19,7 @@ import org.bukkit.map.MapView;
 
 import water.of.cup.chessboards.ChessBoards;
 import water.of.cup.chessboards.data.ChessPlayer;
-import water.of.cup.chessboards.data.MySQLDataStore;
+import water.of.cup.chessboards.data.DataSource;
 import water.of.cup.chessboards.glicko2.Rating;
 import water.of.cup.chessboards.inventories.ChessInGameInventory;
 import water.of.cup.chessboards.inventories.ChessJoinGameInventory;
@@ -469,7 +469,7 @@ public class ChessGame {
 			// Add stats to database TIE
 			if (instance.getConfig().getBoolean("settings.database.enabled")) {
 
-				MySQLDataStore dataStore = instance.getDataStore();
+				DataSource dataStore = instance.getDataStore();
 
 				ChessPlayer player1 = dataStore.getChessPlayers().get(winner);
 				ChessPlayer player2 = dataStore.getChessPlayers().get(loser);
@@ -485,7 +485,7 @@ public class ChessGame {
 
 		// Add stats to database WIN/LOSS
 		if (instance.getConfig().getBoolean("settings.database.enabled")) {
-			MySQLDataStore dataStore = instance.getDataStore();
+			DataSource dataStore = instance.getDataStore();
 
 			ChessPlayer winnerChessPlayer = dataStore.getChessPlayers().get(winner);
 			ChessPlayer loserChessPlayer = dataStore.getChessPlayers().get(loser);
@@ -518,7 +518,7 @@ public class ChessGame {
 			winner = black.getUniqueId().toString();
 		}
 
-		MySQLDataStore dataStore = instance.getDataStore();
+		DataSource dataStore = instance.getDataStore();
 
 		ChessPlayer winnerChessPlayer = dataStore.getChessPlayerByUUID(winner);
 		ChessPlayer loserChessPlayer = dataStore.getChessPlayerByUUID(loser);

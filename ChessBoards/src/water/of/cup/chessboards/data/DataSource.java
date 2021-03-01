@@ -1,6 +1,7 @@
 package water.of.cup.chessboards.data;
 
-import org.bukkit.Bukkit;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.entity.Player;
 import water.of.cup.chessboards.ChessBoards;
 
@@ -9,61 +10,60 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MySQLDataStore {
+public class DataSource {
 
-    private Connection connection;
     private ChessBoards instance = ChessBoards.getInstance();
-    private String username;
-    private String password;
-    private String database;
+    private static HikariConfig config = new HikariConfig();
+    private static HikariDataSource ds;
     private HashMap<Player, ChessPlayer> chessPlayers = new HashMap<>();
 
     public void initialize() {
-        String host = instance.getConfig().getString("settings.database.host");
-        String port = instance.getConfig().getString("settings.database.port");
-        this.database = instance.getConfig().getString("settings.database.database");
-        this.username = instance.getConfig().getString("settings.database.username");
-        this.password = instance.getConfig().getString("settings.database.password");
-
-        try {
-            if (connection != null && !connection.isClosed()) {
-                return;
-            }
-
-            Class.forName("com.mysql.jdbc.Driver");
+        if(ds == null) {
+            String host = instance.getConfig().getString("settings.database.host");
+            String port = instance.getConfig().getString("settings.database.port");
+            String database = instance.getConfig().getString("settings.database.database");
+            String username = instance.getConfig().getString("settings.database.username");
+            String password = instance.getConfig().getString("settings.database.password");
 
             String connectionString = "jdbc:mysql://"
                     + host + ":" + port + "/";
 
-            this.createDatabaseIfNotExists(connectionString);
+            createDatabaseIfNotExists(connectionString, username, password, database);
 
-            connection = DriverManager.getConnection(connectionString + database + "?allowReconnect=true&autoReconnect=true&useSSL=false",
-                    username, password);
+            config.setJdbcUrl(connectionString + database);
+            config.setUsername(username);
+            config.setPassword(password);
+            config.addDataSourceProperty("cachePrepStmts", "true");
+            config.addDataSourceProperty("prepStmtCacheSize", "250");
+            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+            config.addDataSourceProperty("useSSL", "false");
 
-            this.checkSchema();
+            ds = new HikariDataSource(config);
 
-            Bukkit.getLogger().info("[ChessBoards] Connected to database.");
-        } catch (SQLException | ClassNotFoundException throwables) {
-            Bukkit.getLogger().warning("[ChessBoards] Error while connecting to database.");
-            throwables.printStackTrace();
+            try {
+                checkSchema();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
         }
     }
 
-    private void createDatabaseIfNotExists(String connString) {
+    private void createDatabaseIfNotExists(String connString, String username, String password, String database) {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(connString + "?autoReconnect=true&useSSL=false", this.username, this.password);
+            HikariConfig checkConfig = new HikariConfig();
+            checkConfig.setJdbcUrl(connString);
+            checkConfig.setUsername(username);
+            checkConfig.setPassword(password);
+            checkConfig.addDataSourceProperty("useSSL", "false");
 
-            Statement createSql = conn.createStatement();
-            createSql.execute("CREATE DATABASE IF NOT EXISTS " + this.database);
+            HikariDataSource checkDs = new HikariDataSource(checkConfig);
+            Statement createSql = checkDs.getConnection().createStatement();
+            createSql.execute("CREATE DATABASE IF NOT EXISTS " + database);
 
-            if(createSql != null)
-                createSql.close();
-
-            if(conn != null)
-                conn.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            checkDs.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
@@ -85,14 +85,10 @@ public class MySQLDataStore {
 
     public void addChessPlayer(Player player) {
         try {
-            if (connection == null || connection.isClosed()) {
-                return;
-            }
-
             if(!playerExistsInDatabase(player)) createChessPlayer(player);
 
             String playerUUID = player.getUniqueId().toString();
-            PreparedStatement sql = connection.prepareStatement("SELECT * FROM `chess_players` WHERE "
+            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM `chess_players` WHERE "
                     + "uuid='" + playerUUID + "'");
             ResultSet playerData = sql.executeQuery();
             playerData.next();
@@ -124,7 +120,7 @@ public class MySQLDataStore {
     public boolean playerExistsInDatabase(Player player) throws SQLException {
         String playerUUID = player.getUniqueId().toString();
         String sql = "SELECT uuid FROM `chess_players` WHERE uuid='" + playerUUID + "'";
-        PreparedStatement playerQuery = connection.prepareStatement(sql);
+        PreparedStatement playerQuery = getConnection().prepareStatement(sql);
         ResultSet playerResults = playerQuery.executeQuery();
 
         boolean found = false;
@@ -138,7 +134,7 @@ public class MySQLDataStore {
     }
 
     public void execute(String query) throws SQLException {
-        Statement statement = connection.createStatement();
+        Statement statement = getConnection().createStatement();
         try {
             statement.execute(query);
         } finally {
@@ -152,7 +148,7 @@ public class MySQLDataStore {
                 + column + " = ? "
                 + "WHERE uuid='" + playerUUID + "'";
 
-        PreparedStatement updateQuery = connection.prepareStatement(updateSql);
+        PreparedStatement updateQuery = getConnection().prepareStatement(updateSql);
         updateQuery.setString(1, updated);
         updateQuery.execute();
     }
@@ -161,7 +157,7 @@ public class MySQLDataStore {
         ResultSet tableData = null;
         boolean exists = false;
         try {
-            tableData = connection.getMetaData().getTables(null, null, table, null);
+            tableData = getConnection().getMetaData().getTables(null, null, table, null);
             exists = tableData.next();
         } finally {
             close(tableData);
@@ -173,7 +169,7 @@ public class MySQLDataStore {
         ResultSet columnData = null;
         boolean exists = false;
         try {
-            columnData = connection.getMetaData().getColumns(null, null, table, column);
+            columnData = getConnection().getMetaData().getColumns(null, null, table, column);
             exists = columnData.next();
         } finally {
             close(columnData);
@@ -195,18 +191,18 @@ public class MySQLDataStore {
         return chessPlayers;
     }
 
-	public ChessPlayer getChessPlayerByUUID(String uuid) {
-		 for (ChessPlayer chessPlayer : chessPlayers.values()) {
-			 if (chessPlayer.getUuid().equals(uuid))
-				 return chessPlayer;
-		 }
-		 return null;
-	}
+    public ChessPlayer getChessPlayerByUUID(String uuid) {
+        for (ChessPlayer chessPlayer : chessPlayers.values()) {
+            if (chessPlayer.getUuid().equals(uuid))
+                return chessPlayer;
+        }
+        return null;
+    }
 
-	public ArrayList<ChessPlayer> getTopPlayers(int page) {
+    public ArrayList<ChessPlayer> getTopPlayers(int page) {
         try {
             ArrayList<ChessPlayer> topPlayers = new ArrayList<>();
-            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
+            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
             ResultSet playerData = sql.executeQuery();
             while(playerData.next()) {
                 int id = playerData.getInt(1);
@@ -229,11 +225,11 @@ public class MySQLDataStore {
             return null;
         }
     }
-	
-	public ArrayList<ChessPlayer> getAllPlayers() {
+
+    public ArrayList<ChessPlayer> getAllPlayers() {
         try {
             ArrayList<ChessPlayer> allPlayers = new ArrayList<>();
-            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players;");
+            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players;");
             ResultSet playerData = sql.executeQuery();
             while(playerData.next()) {
                 int id = playerData.getInt(1);
@@ -259,7 +255,7 @@ public class MySQLDataStore {
 
     public int getChessPlayerTotal() {
         try {
-            PreparedStatement sql = connection.prepareStatement("SELECT * FROM chess_players");
+            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players");
             ResultSet playerData = sql.executeQuery();
             int num = 0;
             while(playerData.next()) {
@@ -271,4 +267,9 @@ public class MySQLDataStore {
             return 0;
         }
     }
+
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
+
 }
