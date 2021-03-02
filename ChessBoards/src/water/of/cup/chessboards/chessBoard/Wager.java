@@ -37,6 +37,9 @@ public class Wager {
 		player1Side = requestWager.getOwnerColor();
 		
 		amount = requestWager.getAmount();
+		
+		instance.getEconomy().withdrawPlayer(player2, amount);
+		instance.getEconomy().withdrawPlayer(player1, amount);
 	}
 	
 	public Wager(String wagerString) {

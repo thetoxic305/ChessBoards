@@ -353,9 +353,9 @@ public class InventoryClick implements Listener {
 
             // Accept wager
             if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)
-                    && itemName.contains("Accept Wager") && playerWager != null) {
-
-               boolean didCreateWager = chessGame.requestWagerToWager(playerWager, player);
+                    && itemName.contains("Accept Wager") && playerWager != chessWagerViewInventory.getSelectedWager()) {
+            		
+               boolean didCreateWager = chessGame.requestWagerToWager(chessWagerViewInventory.getSelectedWager(), player);
 
                 if(!didCreateWager) return;
 
