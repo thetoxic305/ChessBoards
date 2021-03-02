@@ -112,26 +112,21 @@ public class ChessBoardCommands implements CommandExecutor {
 						// next arg is playername
 						String name = args[1];
 
-						for (ChessPlayer chessPlayer : instance.getDataStore().getAllPlayers()) {
-							UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
-							OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
-							if (player == null)
-								continue;
+						OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+						ChessPlayer chessPlayer = instance.getDataStore().getOfflineChessPlayer(offlinePlayer);
 
-							if (player.getName().equals(name)) {
-								// player found, send stats message
-								p.sendMessage(ChatColor.DARK_BLUE + "--" + ChatColor.BLUE + name + "'s chess stats" + ChatColor.DARK_BLUE + "--");
-								p.sendMessage(ChatColor.BLUE + "W/L/D: " + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
-								p.sendMessage(ChatColor.BLUE + "Rating: " + (double) Math.round(chessPlayer.getRating() * 100) / 100);
-								p.sendMessage(ChatColor.BLUE + "Rating Deviation: " + chessPlayer.getRatingDeviation());
-								p.sendMessage(ChatColor.BLUE + "Volatility: " + chessPlayer.getVolatility());
-								
-								return true;
-							}
+						if(chessPlayer == null) {
+							p.sendMessage("Player not found in chess database");
+							return false;
 						}
 
-						p.sendMessage("player not found in chess database");
-						return false;
+						p.sendMessage(ChatColor.DARK_BLUE + "--" + ChatColor.BLUE + name + "'s chess stats" + ChatColor.DARK_BLUE + "--");
+						p.sendMessage(ChatColor.BLUE + "W/L/D: " + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
+						p.sendMessage(ChatColor.BLUE + "Rating: " + (double) Math.round(chessPlayer.getRating() * 100) / 100);
+						p.sendMessage(ChatColor.BLUE + "Rating Deviation: " + chessPlayer.getRatingDeviation());
+						p.sendMessage(ChatColor.BLUE + "Volatility: " + chessPlayer.getVolatility());
+
+						return true;
 					}
 					// missing arg
 

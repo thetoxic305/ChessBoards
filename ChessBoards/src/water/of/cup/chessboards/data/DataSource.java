@@ -2,6 +2,7 @@ package water.of.cup.chessboards.data;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import water.of.cup.chessboards.ChessBoards;
 
@@ -126,7 +127,10 @@ public class DataSource {
     }
 
     public boolean playerExistsInDatabase(Player player) throws SQLException {
-        String playerUUID = player.getUniqueId().toString();
+        return playerExistsInDatabase(player.getUniqueId().toString());
+    }
+
+    public boolean playerExistsInDatabase(String playerUUID) throws SQLException {
         String sql = "SELECT uuid FROM `chess_players` WHERE uuid='" + playerUUID + "'";
         boolean found = false;
         try(Connection con = getConnection();
@@ -246,6 +250,40 @@ public class DataSource {
                 }
             }
             return allPlayers;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    public ChessPlayer getOfflineChessPlayer(OfflinePlayer player) {
+        return getOfflineChessPlayer(player.getUniqueId().toString());
+    }
+
+    public ChessPlayer getOfflineChessPlayer(String playerUUID) {
+        try {
+            if(!playerExistsInDatabase(playerUUID)) return null;
+
+            try (Connection con = getConnection();
+                 PreparedStatement sql = con.prepareStatement("SELECT * FROM `chess_players` WHERE "
+                         + "uuid='" + playerUUID + "'");
+                 ResultSet playerData = sql.executeQuery();
+            ) {
+                playerData.next();
+
+                int id = playerData.getInt(1);
+                String uuid = playerData.getString(2);
+                int wins = playerData.getInt(3);
+                int losses = playerData.getInt(4);
+                int ties = playerData.getInt(5);
+                double rating = playerData.getDouble(6);
+                double ratingDeviation = playerData.getDouble(7);
+                double volatility = playerData.getDouble(8);
+                int numberOfResults = playerData.getInt(9);
+
+                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                return newPlayer;
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return null;
