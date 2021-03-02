@@ -18,6 +18,10 @@ public class Wager {
 	double amount;
 	
 	public Wager(Player player1, Player player2, String player1Side, double amount) {
+		
+		instance.getEconomy().withdrawPlayer(player2, amount);
+		instance.getEconomy().withdrawPlayer(player1, amount);
+		
 		this.player1 = player1;
 		this.player2 = player2;
 		

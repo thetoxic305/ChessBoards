@@ -43,8 +43,8 @@ public class ChessGame {
 	private ChessWaitingPlayerInventory chessWaitingPlayerInventory;
 	private ChessInGameInventory chessConfirmGameInventory = new ChessInGameInventory(this);;
 	private boolean ranked;
-	private Set<Player> playerQueue = new HashSet<>();
-	private Set<Player> playerDecideQueue = new HashSet<>();
+	private Set<Player> playerQueue = new HashSet<>(); //players requesting to join chess game
+	private Set<Player> playerDecideQueue = new HashSet<>(); //players viewing chessgame
 	private String pawnPromotion = "NONE"; // "NONE" if no pawn promotion; ChessPiece.getColor() if pawn promotion
 	private ArrayList<String> boardStates;
 	private int fiftyMoveDrawCount;
@@ -667,10 +667,10 @@ public class ChessGame {
 	public void addPlayerToQueue(Player player) {
 		if (this.playerQueue.size() >= 3)
 			return;
-
+		
 		if (this.playerDecideQueue.contains(player))
 			this.playerDecideQueue.remove(player);
-
+		
 		this.playerQueue.add(player);
 
 		// Re-render for the player waiting for match

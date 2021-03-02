@@ -57,6 +57,10 @@ public class InventoryClick implements Listener {
                     player.sendMessage(ChatColor.RED + "A game has already been created for this board.");
                     return;
                 }
+                if (pluginInstance.getEconomy().getBalance(player) < chessCreateGameInventory.getWager()) {
+        			player.sendMessage(ChatColor.RED + "You do not have enough money to create the wager for this game.");
+        			return;
+        		}
 
                 player.closeInventory();
 
@@ -214,6 +218,11 @@ public class InventoryClick implements Listener {
 
             // Join game button
             if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
+            	if (pluginInstance.getEconomy().getBalance(player) < chessGame.getGameWager()) {
+        			player.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+        			return;
+        		}
+            	
                 chessGame.addPlayerToQueue(player);
 
                 event.getClickedInventory().setItem(33, GUIUtils.createItemStack(ChatColor.GREEN + "Waiting for game creator...", Material.CLOCK));
@@ -321,7 +330,12 @@ public class InventoryClick implements Listener {
 
                 int wager = chessWagerViewInventory.getWagerAmount();
                 if(wager <= 0) return;
-
+                
+                if (pluginInstance.getEconomy().getBalance(player) < wager) {
+        			player.sendMessage(ChatColor.RED + "You do not have enough money to create this wager.");
+        			return;
+        		}
+                
                 RequestWager requestWager = new RequestWager(player, chessWagerViewInventory.getCreateWagerColor(), wager);
                 chessGame.addRequestWager(requestWager);
                 chessGame.updateRequestWagerInventories();
