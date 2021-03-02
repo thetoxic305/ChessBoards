@@ -90,7 +90,7 @@ public class BoardInteract implements Listener {
 
 			if (chessBoardManager.getGameByGameId(gameId) != null) {
 				// chess game found
-				if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+				if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					if (e.getHand().equals(EquipmentSlot.HAND)) {
 						return;
 					}
@@ -104,12 +104,13 @@ public class BoardInteract implements Listener {
 
 				player.sendMessage("Game found! Status: " + game.getGameState().toString());
 
-				if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) {
+				if (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) {
 					e.setCancelled(true);
 
-					if(game.getGameState().equals(ChessGameState.IDLE)) {
-						if(instance.getConfig().getBoolean("settings.chessboard.permissions")
-								&& !player.hasPermission("chessboard.destroy")) return;
+					if (game.getGameState().equals(ChessGameState.IDLE)) {
+						if (instance.getConfig().getBoolean("settings.chessboard.permissions")
+								&& !player.hasPermission("chessboard.destroy"))
+							return;
 
 						game.delete();
 						Location frameLoc = gameFrame.getLocation();
@@ -121,9 +122,8 @@ public class BoardInteract implements Listener {
 						return;
 					}
 
-					if(game.hasPlayer(player)) {
-						game.getChessConfirmGameInventory().display(player, true);
-					}
+					game.getChessConfirmGameInventory().display(player, true);
+
 					return;
 				}
 
