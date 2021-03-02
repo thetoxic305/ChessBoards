@@ -58,8 +58,12 @@ public class DataSource {
             checkConfig.addDataSourceProperty("useSSL", "false");
 
             HikariDataSource checkDs = new HikariDataSource(checkConfig);
-            Statement createSql = checkDs.getConnection().createStatement();
-            createSql.execute("CREATE DATABASE IF NOT EXISTS " + database);
+
+            try(Connection con = checkDs.getConnection();
+                Statement createSql = con.createStatement();
+            ) {
+                createSql.execute("CREATE DATABASE IF NOT EXISTS " + database);
+            }
 
             checkDs.close();
         } catch (SQLException throwables) {
@@ -88,23 +92,27 @@ public class DataSource {
             if(!playerExistsInDatabase(player)) createChessPlayer(player);
 
             String playerUUID = player.getUniqueId().toString();
-            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM `chess_players` WHERE "
-                    + "uuid='" + playerUUID + "'");
-            ResultSet playerData = sql.executeQuery();
-            playerData.next();
 
-            int id = playerData.getInt(1);
-            String uuid = playerData.getString(2);
-            int wins = playerData.getInt(3);
-            int losses = playerData.getInt(4);
-            int ties = playerData.getInt(5);
-            double rating = playerData.getDouble(6);
-            double ratingDeviation = playerData.getDouble(7);
-            double volatility = playerData.getDouble(8);
-            int numberOfResults = playerData.getInt(9);
+            try (Connection con = getConnection();
+                 PreparedStatement sql = con.prepareStatement("SELECT * FROM `chess_players` WHERE "
+                         + "uuid='" + playerUUID + "'");
+                 ResultSet playerData = sql.executeQuery();
+            ) {
+                playerData.next();
 
-            ChessPlayer newPlayer = new ChessPlayer(player, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-            this.chessPlayers.put(player, newPlayer);
+                int id = playerData.getInt(1);
+                String uuid = playerData.getString(2);
+                int wins = playerData.getInt(3);
+                int losses = playerData.getInt(4);
+                int ties = playerData.getInt(5);
+                double rating = playerData.getDouble(6);
+                double ratingDeviation = playerData.getDouble(7);
+                double volatility = playerData.getDouble(8);
+                int numberOfResults = playerData.getInt(9);
+
+                ChessPlayer newPlayer = new ChessPlayer(player, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                this.chessPlayers.put(player, newPlayer);
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -120,25 +128,24 @@ public class DataSource {
     public boolean playerExistsInDatabase(Player player) throws SQLException {
         String playerUUID = player.getUniqueId().toString();
         String sql = "SELECT uuid FROM `chess_players` WHERE uuid='" + playerUUID + "'";
-        PreparedStatement playerQuery = getConnection().prepareStatement(sql);
-        ResultSet playerResults = playerQuery.executeQuery();
-
         boolean found = false;
-        while (playerResults.next() && !found) {
-            if(playerResults.getString(1).equals(playerUUID)) {
-                found = true;
-            }
-        }
+        try(Connection con = getConnection();
+            PreparedStatement playerQuery = con.prepareStatement(sql);
+            ResultSet playerResults = playerQuery.executeQuery();) {
+           while (playerResults.next() && !found) {
+               if(playerResults.getString(1).equals(playerUUID)) {
+                   found = true;
+               }
+           }
+       }
 
         return found;
     }
 
     public void execute(String query) throws SQLException {
-        Statement statement = getConnection().createStatement();
-        try {
+        try (Connection con = getConnection();
+             Statement statement = con.createStatement();) {
             statement.execute(query);
-        } finally {
-            statement.close();
         }
     }
 
@@ -148,31 +155,19 @@ public class DataSource {
                 + column + " = ? "
                 + "WHERE uuid='" + playerUUID + "'";
 
-        PreparedStatement updateQuery = getConnection().prepareStatement(updateSql);
-        updateQuery.setString(1, updated);
-        updateQuery.execute();
+        try (Connection con = getConnection();
+             PreparedStatement updateQuery = con.prepareStatement(updateSql);) {
+            updateQuery.setString(1, updated);
+            updateQuery.execute();
+        }
     }
 
     public boolean tableExists(String table) throws SQLException {
-        ResultSet tableData = null;
         boolean exists = false;
-        try {
-            tableData = getConnection().getMetaData().getTables(null, null, table, null);
+        try (Connection con = getConnection();
+             ResultSet tableData = con.getMetaData().getTables(null, null, table, null);
+        ) {
             exists = tableData.next();
-        } finally {
-            close(tableData);
-        }
-        return exists;
-    }
-
-    public boolean columnExists(String table, String column) throws SQLException {
-        ResultSet columnData = null;
-        boolean exists = false;
-        try {
-            columnData = getConnection().getMetaData().getColumns(null, null, table, column);
-            exists = columnData.next();
-        } finally {
-            close(columnData);
         }
         return exists;
     }
@@ -202,21 +197,24 @@ public class DataSource {
     public ArrayList<ChessPlayer> getTopPlayers(int page) {
         try {
             ArrayList<ChessPlayer> topPlayers = new ArrayList<>();
-            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
-            ResultSet playerData = sql.executeQuery();
-            while(playerData.next()) {
-                int id = playerData.getInt(1);
-                String uuid = playerData.getString(2);
-                int wins = playerData.getInt(3);
-                int losses = playerData.getInt(4);
-                int ties = playerData.getInt(5);
-                double rating = playerData.getDouble(6);
-                double ratingDeviation = playerData.getDouble(7);
-                double volatility = playerData.getDouble(8);
-                int numberOfResults = playerData.getInt(9);
+            try (Connection con = getConnection();
+                 PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
+                 ResultSet playerData = sql.executeQuery();
+            ) {
+                while(playerData.next()) {
+                    int id = playerData.getInt(1);
+                    String uuid = playerData.getString(2);
+                    int wins = playerData.getInt(3);
+                    int losses = playerData.getInt(4);
+                    int ties = playerData.getInt(5);
+                    double rating = playerData.getDouble(6);
+                    double ratingDeviation = playerData.getDouble(7);
+                    double volatility = playerData.getDouble(8);
+                    int numberOfResults = playerData.getInt(9);
 
-                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                topPlayers.add(newPlayer);
+                    ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                    topPlayers.add(newPlayer);
+                }
             }
 
             return topPlayers;
@@ -229,23 +227,24 @@ public class DataSource {
     public ArrayList<ChessPlayer> getAllPlayers() {
         try {
             ArrayList<ChessPlayer> allPlayers = new ArrayList<>();
-            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players;");
-            ResultSet playerData = sql.executeQuery();
-            while(playerData.next()) {
-                int id = playerData.getInt(1);
-                String uuid = playerData.getString(2);
-                int wins = playerData.getInt(3);
-                int losses = playerData.getInt(4);
-                int ties = playerData.getInt(5);
-                double rating = playerData.getDouble(6);
-                double ratingDeviation = playerData.getDouble(7);
-                double volatility = playerData.getDouble(8);
-                int numberOfResults = playerData.getInt(9);
+            try(Connection con = getConnection();
+                PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players;");
+                ResultSet playerData = sql.executeQuery();) {
+                while(playerData.next()) {
+                    int id = playerData.getInt(1);
+                    String uuid = playerData.getString(2);
+                    int wins = playerData.getInt(3);
+                    int losses = playerData.getInt(4);
+                    int ties = playerData.getInt(5);
+                    double rating = playerData.getDouble(6);
+                    double ratingDeviation = playerData.getDouble(7);
+                    double volatility = playerData.getDouble(8);
+                    int numberOfResults = playerData.getInt(9);
 
-                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                allPlayers.add(newPlayer);
+                    ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
+                    allPlayers.add(newPlayer);
+                }
             }
-
             return allPlayers;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -255,12 +254,15 @@ public class DataSource {
 
     public int getChessPlayerTotal() {
         try {
-            PreparedStatement sql = getConnection().prepareStatement("SELECT * FROM chess_players");
-            ResultSet playerData = sql.executeQuery();
             int num = 0;
-            while(playerData.next()) {
-                num++;
+            try(Connection con = getConnection();
+                PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players");
+                ResultSet playerData = sql.executeQuery();) {
+                while(playerData.next()) {
+                    num++;
+                }
             }
+
             return num;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
