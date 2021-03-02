@@ -312,4 +312,8 @@ public class DataSource {
         return ds.getConnection();
     }
 
+    public void closeConnection() {
+        if(ds != null)
+            ds.close();
+    }
 }

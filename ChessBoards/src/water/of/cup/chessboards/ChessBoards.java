@@ -122,6 +122,8 @@ public class ChessBoards extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		this.dataStore.closeConnection();
+
 		for(ChessGame chessGame : chessBoardManager.getGames()) {
 			chessGame.storeGame();
 		}
