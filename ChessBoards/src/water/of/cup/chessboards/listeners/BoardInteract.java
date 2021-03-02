@@ -26,6 +26,7 @@ import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
 import water.of.cup.chessboards.chessBoard.ChessUtils;
 import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
+import water.of.cup.chessboards.inventories.ChessInGameInventory;
 
 public class BoardInteract implements Listener {
 
@@ -122,7 +123,11 @@ public class BoardInteract implements Listener {
 						return;
 					}
 
-					game.getChessConfirmGameInventory().display(player, true);
+					if(game.hasPlayer(player)) {
+						game.getChessConfirmGameInventory().display(player, true);
+					} else {
+						new ChessInGameInventory(game).display(player, true);
+					}
 
 					return;
 				}

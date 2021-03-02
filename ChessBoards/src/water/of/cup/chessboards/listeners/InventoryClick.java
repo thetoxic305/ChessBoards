@@ -307,6 +307,11 @@ public class InventoryClick implements Listener {
 
             RequestWager playerWager = chessGame.getRequestWagerByPlayer(player);
 
+            if(itemType.equals(Material.BARRIER)) {
+                player.closeInventory();
+                return;
+            }
+
             if(itemType.equals(Material.PLAYER_HEAD)
                     && (itemName.equals("Decrease") || itemName.equals("Increase")) && playerWager == null) {
                 boolean shifting = event.getClick().equals(ClickType.SHIFT_LEFT);
