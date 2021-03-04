@@ -901,6 +901,15 @@ public class ChessGame {
 	}
 
 	public void clearWagerViewInventories() {
+		for (ChessWagerViewInventory chessWagerViewInventory : this.wagerViewInventories) {
+			Player player = chessWagerViewInventory.getPlayer();
+			if (player != null) {
+				if(player.getOpenInventory().getTopInventory().equals(chessWagerViewInventory.getInventory())) {
+					player.closeInventory();
+				}
+			}
+		}
+
 		this.wagerViewInventories.clear();
 	}
 
