@@ -204,17 +204,17 @@ public class ChessBoards extends JavaPlugin {
         defaultConfig.put("settings.database.enabled", false); // Database disabled by default
 
 		HashMap<String, String> defaultRecipe = new HashMap<>();
-		defaultRecipe.put("I", Material.IRON_INGOT.toString());
-		defaultRecipe.put("G", Material.GLASS_PANE.toString());
-		defaultRecipe.put("T", Material.GLOWSTONE_DUST.toString());
-		defaultRecipe.put("R", Material.REDSTONE.toString());
+		defaultRecipe.put("B", Material.BLACK_DYE.toString());
+		defaultRecipe.put("W", Material.WHITE_DYE.toString());
+		defaultRecipe.put("L", Material.LEATHER.toString());
+		defaultRecipe.put("Q", Material.QUARTZ.toString());
 
 		defaultConfig.put("settings.chessboard.recipe.enabled", true);
 		defaultConfig.put("settings.chessboard.recipe.shape", new ArrayList<String>() {
 			{
-				add("IGI");
-				add("ITI");
-				add("IRI");
+				add("BW");
+				add("QQ");
+				add("LL");
 			}
 		});
 
