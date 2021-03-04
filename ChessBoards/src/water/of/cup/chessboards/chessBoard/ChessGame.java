@@ -954,6 +954,10 @@ public class ChessGame {
 		return null;
 	}
 
+	public ArrayList<ChessWagerViewInventory> getWagerViewInventories() {
+		return this.wagerViewInventories;
+	}
+
 	public void setGameWager(int wager) {
 		this.gameWager = wager;
 	}

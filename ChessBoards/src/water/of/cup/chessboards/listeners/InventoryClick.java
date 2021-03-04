@@ -269,9 +269,13 @@ public class InventoryClick implements Listener {
             String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
 
             if (event.getCurrentItem().getType().equals(Material.BOOK)) {
-            	ChessWagerViewInventory chessWagerViewInventory = new ChessWagerViewInventory(chessGame, player);
-            	chessWagerViewInventory.display(true);
-            	chessGame.addWagerViewInventory(chessWagerViewInventory);
+                if(chessGame.getWagerViewByPlayer(player) != null) {
+                    chessGame.getWagerViewByPlayer(player).display(true);
+                } else {
+                    ChessWagerViewInventory chessWagerViewInventory = new ChessWagerViewInventory(chessGame, player);
+                    chessWagerViewInventory.display(true);
+                    chessGame.addWagerViewInventory(chessWagerViewInventory);
+                }
             	return;
             }
 
@@ -368,6 +372,13 @@ public class InventoryClick implements Listener {
                     && itemName.contains("Cancel") && playerWager != null) {
 
                 chessGame.removeRequestWager(playerWager);
+
+                for(ChessWagerViewInventory inv : chessGame.getWagerViewInventories()) {
+                    if(inv.getSelectedWager() != null && inv.getSelectedWager().equals(playerWager)) {
+                        inv.setSelectedWager(null);
+                    }
+                }
+
                 chessGame.updateRequestWagerInventories();
                 return;
             }
@@ -380,6 +391,7 @@ public class InventoryClick implements Listener {
 
                 if(!didCreateWager) return;
 
+                chessWagerViewInventory.setSelectedWager(null);
                 chessGame.updateRequestWagerInventories();
                 return;
             }
