@@ -8,6 +8,7 @@ import water.of.cup.chessboards.ChessBoards;
 import water.of.cup.chessboards.chessBoard.ChessBoardManager;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
+import water.of.cup.chessboards.chessBoard.Wager;
 
 public class InventoryClose implements Listener {
 
@@ -53,16 +54,9 @@ public class InventoryClose implements Listener {
         // Player closing confirm game menu
         if(chessBoardManager.getGameByPlayer(player) != null
                 && chessBoardManager.getGameByPlayer(player).getGameState().equals(ChessGameState.CONFIRM_GAME)) {
-
-            player.sendMessage("closing confirm game");
             ChessGame chessGame = chessBoardManager.getGameByPlayer(player);
-            Player otherPlayer = player.equals(chessGame.getBlackPlayer()) ? chessGame.getWhitePlayer() : chessGame.getBlackPlayer();
 
-            chessGame.setBlackPlayer(null);
-            chessGame.setWhitePlayer(null);
-            chessGame.setGameState(ChessGameState.IDLE);
-
-            otherPlayer.closeInventory();
+            chessGame.forfeitGame(player, false);
         }
 
         // Player is leaving decision screen

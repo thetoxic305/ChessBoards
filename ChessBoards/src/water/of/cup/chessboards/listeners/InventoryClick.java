@@ -297,7 +297,7 @@ public class InventoryClick implements Listener {
 
             if(event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)
                     && itemName.contains("Forfeit")) {
-                boolean didForfeit = chessGame.forfeitGame(player);
+                boolean didForfeit = chessGame.forfeitGame(player, true);
                 if(!didForfeit) Bukkit.getLogger().warning("[ChessBoards] Could not forfeit game " + chessGame.getGameId());
             }
             return;

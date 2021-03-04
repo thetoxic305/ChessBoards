@@ -829,13 +829,37 @@ public class ChessGame {
 		return false;
 	}
 
-	public boolean forfeitGame(Player player) {
+	public boolean forfeitGame(Player player, boolean closePlayerInv) {
 		if (!this.hasPlayer(player))
 			return false;
 
 		Player otherPlayer = this.whitePlayer.equals(player) ? this.blackPlayer : this.whitePlayer;
-		String color = this.whitePlayer.equals(player) ? "BLACK" : "WHITE";
-		this.gameOver(color, "won by forfeit");
+		String winningColor = this.whitePlayer.equals(player) ? "BLACK" : "WHITE";
+		String loserColor = this.whitePlayer.equals(player) ? "WHITE" : "BLACK";
+
+		if(this.gameState.equals(ChessGameState.CONFIRM_GAME)) {
+			for(Wager wager : this.wagers) {
+				wager.complete("");
+			}
+			this.wagers.clear();
+
+			this.clearWagerViewInventories();
+			this.blackPlayer = null;
+			this.whitePlayer = null;
+			this.gameState = ChessGameState.IDLE;
+
+			otherPlayer.closeInventory();
+			if(closePlayerInv) player.closeInventory();
+
+			String endMessage = otherPlayer.getDisplayName() + " won by forfeit as " + winningColor.toLowerCase()
+					+ " against " + player.getDisplayName() + " as " + loserColor.toLowerCase();
+
+			otherPlayer.sendMessage(endMessage);
+			player.sendMessage(endMessage);
+			return true;
+		}
+
+		this.gameOver(winningColor, "won by forfeit");
 
 		// TODO: Check if player is inside the ingame inventory
 		player.closeInventory();
@@ -936,5 +960,9 @@ public class ChessGame {
 
 	public int getGameWager() {
 		return this.gameWager;
+	}
+
+	public ArrayList<Wager> getWagers() {
+		return this.wagers;
 	}
 }
