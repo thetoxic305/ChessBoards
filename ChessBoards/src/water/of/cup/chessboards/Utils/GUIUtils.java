@@ -24,6 +24,8 @@ import water.of.cup.chessboards.chessBoard.ChessGame;
 
 public class GUIUtils {
 
+    private static ChessBoards instance = ChessBoards.getInstance();
+
     public static void fillBackground(Inventory inventory, ItemStack itemStack) {
         for(int i = 0; i < 54; i++) {
             inventory.setItem(i, itemStack);
@@ -130,7 +132,9 @@ public class GUIUtils {
 
         inventory.setItem(startPos, ranked);
         inventory.setItem(startPos + 9, gameTimeItem);
-        inventory.setItem(startPos + 18, wager);
+
+        if(instance.getEconomy() != null)
+            inventory.setItem(startPos + 18, wager);
     }
 
 	public static void setGameIDItem(Inventory inv, ChessGame chessGame) {

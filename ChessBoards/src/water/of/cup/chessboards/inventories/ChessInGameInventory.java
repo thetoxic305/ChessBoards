@@ -52,7 +52,7 @@ public class ChessInGameInventory implements InventoryHolder {
 		ArrayList<String> buttons = new ArrayList<String>();
 		if (chessGame.hasPlayer(player)) {
 			buttons.add("forfeit");
-		} else {
+		} else if (instance.getEconomy() != null){
 			buttons.add("wagers");
 		}
 		int c = 0;

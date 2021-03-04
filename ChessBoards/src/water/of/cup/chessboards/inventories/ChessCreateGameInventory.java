@@ -10,6 +10,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import water.of.cup.chessboards.ChessBoards;
 import water.of.cup.chessboards.Utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 
@@ -23,6 +24,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 	private int wager;
 	private ChessGame chessGame;
 	public static final String INVENTORY_NAME = "Chess | Create Game";
+	private ChessBoards instance = ChessBoards.getInstance();
 
 	public ChessCreateGameInventory(ChessGame chessGame) {
 		inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
@@ -37,7 +39,9 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
 		this.createRankedToggle();
 		this.createGameTimeToggle();
-		this.createWagerToggle();
+
+		if(instance.getEconomy() != null)
+			this.createWagerToggle();
 
 		// Create casual game disabled
 //		for (int i = 0; i < 2; i++) {

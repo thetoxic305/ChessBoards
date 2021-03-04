@@ -57,7 +57,7 @@ public class InventoryClick implements Listener {
                     player.sendMessage(ChatColor.RED + "A game has already been created for this board.");
                     return;
                 }
-                if (pluginInstance.getEconomy().getBalance(player) < chessCreateGameInventory.getWager()) {
+                if (pluginInstance.getEconomy() != null && pluginInstance.getEconomy().getBalance(player) < chessCreateGameInventory.getWager()) {
         			player.sendMessage(ChatColor.RED + "You do not have enough money to create the wager for this game.");
         			return;
         		}
@@ -194,8 +194,10 @@ public class InventoryClick implements Listener {
                     chessGame.setWhitePlayer(player);
 
                     // Adds game wager to chess game
-                    Wager wager = new Wager(chessGame.getWhitePlayer(), chessGame.getBlackPlayer(), "WHITE", chessGame.getGameWager());
-                    chessGame.addWager(wager);
+                    if(pluginInstance.getEconomy() != null) {
+                        Wager wager = new Wager(chessGame.getWhitePlayer(), chessGame.getBlackPlayer(), "WHITE", chessGame.getGameWager());
+                        chessGame.addWager(wager);
+                    }
 
                     chessGame.openConfirmGameInventory();
 
@@ -232,7 +234,7 @@ public class InventoryClick implements Listener {
 
             // Join game button
             if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
-            	if (pluginInstance.getEconomy().getBalance(player) < chessGame.getGameWager()) {
+            	if (pluginInstance.getEconomy() != null && pluginInstance.getEconomy().getBalance(player) < chessGame.getGameWager()) {
         			player.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
         			return;
         		}
