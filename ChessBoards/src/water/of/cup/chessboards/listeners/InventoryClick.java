@@ -76,6 +76,20 @@ public class InventoryClick implements Listener {
 //                chessCreateGameInventory.getChessGame().setWager(chessCreateGameInventory.getWager());
 
                 chessCreateGameInventory.getChessGame().openWaitingPlayerInventory();
+
+                // Close inventories
+                for(Player player1 : pluginInstance.getCreateGameManager().keySet()) {
+                    ChessCreateGameInventory ccInv = pluginInstance.getCreateGameManager().get(player1);
+                    if(ccInv != null && ccInv.getChessGame().equals(chessCreateGameInventory.getChessGame())) {
+                        ChessGame game = ccInv.getChessGame();
+                        player1.closeInventory();
+                        if (game.getPlayerQueue().size() < 3) {
+                            game.addPlayerToDecisionQueue(player1);
+                        } else {
+                            player1.sendMessage(ChatColor.RED + "A game has already been created for this board.");
+                        }
+                    }
+                }
                 return;
             }
 
