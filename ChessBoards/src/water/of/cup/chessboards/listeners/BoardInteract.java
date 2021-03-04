@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -36,6 +37,11 @@ public class BoardInteract implements Listener {
 	@EventHandler
 	public void clickBoard(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
+
+
+		// Only run if interacting with barrier
+		Block block = player.getTargetBlock(null, 5);
+		if(!block.getType().equals(Material.BARRIER)) return;
 
 		// attempt to find a chess game
 		Vector direction = player.getEyeLocation().getDirection();
