@@ -10,6 +10,9 @@ import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
 import water.of.cup.chessboards.chessBoard.Wager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class InventoryClose implements Listener {
 
     private ChessBoards instance = ChessBoards.getInstance();
@@ -36,12 +39,14 @@ public class InventoryClose implements Listener {
             chessGame.setWhitePlayer(null);
             chessGame.setGameState(ChessGameState.IDLE);
 
-            for(Player player1 : chessGame.getPlayerQueue()) {
+            Set<Player> playerQueueCopy = new HashSet<>(chessGame.getPlayerQueue());
+            for(Player player1 : playerQueueCopy) {
                 player1.sendMessage("Game owner has ended the game.");
                 player1.closeInventory();
             }
 
-            for(Player player1 : chessGame.getPlayerDecideQueue()) {
+            Set<Player> playerDecideQueueCopy = new HashSet<>(chessGame.getPlayerDecideQueue());
+            for(Player player1 : playerDecideQueueCopy) {
                 player1.sendMessage("Game owner has ended the game.");
                 player1.closeInventory();
             }
