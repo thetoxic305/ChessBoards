@@ -34,6 +34,10 @@ public class ChessBoardCommandsTabCompleter implements TabCompleter {
 					arguments.add(player.getName());
 				}
 				
+			} else if (strings[0].equalsIgnoreCase("give")) {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					arguments.add(player.getName());
+				}
 			}
 		}
 

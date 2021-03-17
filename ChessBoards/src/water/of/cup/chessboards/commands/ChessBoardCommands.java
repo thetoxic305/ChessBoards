@@ -39,11 +39,20 @@ public class ChessBoardCommands implements CommandExecutor {
 				if (args[0].equalsIgnoreCase("give")) {
 					if (permissionsEnabled && !p.hasPermission("chessboard.command.give"))
 						return false;
-
-					boolean chessBoardGiven = ChessUtils.giveChessBoard(p);
+					
+					Player gets = p;
+					if (args.length == 2) {
+						gets = Bukkit.getPlayer(args[1]);
+						if (gets == null) {
+							p.sendMessage("Could not find specified player");
+							return false;
+						}
+					}
+					
+					boolean chessBoardGiven = ChessUtils.giveChessBoard(gets);
 
 					if (!chessBoardGiven)
-						p.sendMessage("You need room in your inventory for this command to work");
+						p.sendMessage("The recieving player does not have room in their inventory");
 					return chessBoardGiven;
 				}
 
@@ -129,8 +138,7 @@ public class ChessBoardCommands implements CommandExecutor {
 						return true;
 					}
 					// missing arg
-
-					// TODO: Change message
+					
 					p.sendMessage("/chessboards stats [player name]" + ChatColor.GRAY + ": Show stats for a player");
 					return false;
 				}
@@ -138,7 +146,7 @@ public class ChessBoardCommands implements CommandExecutor {
 			// Send help message
 			p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD
 					+ "Boards");
-			p.sendMessage("/chessboards give" + ChatColor.GRAY + ": Gives you chessboard");
+			p.sendMessage("/chessboards give [player name]" + ChatColor.GRAY + ": Give a player a chessboard");
 			p.sendMessage("/chessboards leaderboard" + ChatColor.GRAY + ": Lists top chess players");
 			p.sendMessage("/chessboards stats [player name]" + ChatColor.GRAY + ": Show stats for a player");
 			return false;
