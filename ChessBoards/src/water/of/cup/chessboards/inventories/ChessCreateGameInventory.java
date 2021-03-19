@@ -2,6 +2,7 @@ package water.of.cup.chessboards.inventories;
 
 import java.util.ArrayList;
 
+import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -37,9 +38,14 @@ public class ChessCreateGameInventory implements InventoryHolder {
 		GUIUtils.fillRect(this.inv, new int[] { 1, 1 }, new int[] { 7, 3 },
 				GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE));
 
-		this.createRankedToggle();
 		this.createGameTimeToggle();
 
+		// Only show rank option if database is enabled
+		boolean databaseEnabled = instance.getConfig().getBoolean("settings.database.enabled");
+		if(databaseEnabled)
+			this.createRankedToggle();
+
+		// Only create if economy is enabled
 		if(instance.getEconomy() != null)
 			this.createWagerToggle();
 
@@ -50,9 +56,14 @@ public class ChessCreateGameInventory implements InventoryHolder {
 //		}
 
 		String rankGameString = ranked ? "Ranked" : "Unranked";
+		String fullGameString = ChatColor.GREEN + "Create Game";
+
+		if(databaseEnabled) {
+			fullGameString = ChatColor.GREEN + "Create " + rankGameString + " Game";
+		}
+
 		for (int i = 0; i < 2; i++) {
-			this.inv.setItem(51 + i, GUIUtils.createItemStack(ChatColor.GREEN + "Create " + rankGameString + " Game",
-					Material.LIME_STAINED_GLASS_PANE));
+			this.inv.setItem(51 + i, GUIUtils.createItemStack(fullGameString, Material.LIME_STAINED_GLASS_PANE));
 		}
 
 		this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
@@ -62,18 +73,23 @@ public class ChessCreateGameInventory implements InventoryHolder {
 	}
 
 	private void createRankedToggle() {
-		ItemStack button = GUIUtils.createItemStack(ChatColor.RED + "Ranked", Material.RED_STAINED_GLASS_PANE);
+		String name = ChatColor.RED + "Unranked";
+		ItemStack button = GUIUtils.createItemStack(name, Material.RED_STAINED_GLASS_PANE);
+
 		if (ranked) {
-			button = GUIUtils.createItemStack(ChatColor.GREEN + "Ranked", Material.GREEN_STAINED_GLASS_PANE);
+			name = ChatColor.GREEN + "Ranked";
+			button = GUIUtils.createItemStack(name, Material.GREEN_STAINED_GLASS_PANE);
 		}
 
-		this.inv.setItem(19, GUIUtils.createItemStack(ChatColor.GREEN + "Ranked", Material.EXPERIENCE_BOTTLE));
-		this.inv.setItem(28, button);
+		this.inv.setItem(21, GUIUtils.createItemStack(name, Material.EXPERIENCE_BOTTLE));
+		this.inv.setItem(30, button);
 	}
 
 	private void createGameTimeToggle() {
-		ItemStack increment = GUIUtils.createItemStack(ChatColor.GREEN + "/\\", Material.SKELETON_SKULL);
-		ItemStack decrement = GUIUtils.createItemStack(ChatColor.GREEN + "\\/", Material.SKELETON_SKULL);
+		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
+				ChatColor.GREEN + "/\\", 1);
+		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
+				ChatColor.GREEN + "\\/", 1);
 
 		String gameTimeString = getGameTimeString();
 		ArrayList<String> timeLore = new ArrayList<String>();
@@ -98,14 +114,16 @@ public class ChessCreateGameInventory implements InventoryHolder {
 		item.setItemMeta(itemMeta);
 		
 		
-		this.inv.setItem(12, increment);
-		this.inv.setItem(21, item);
-		this.inv.setItem(30, decrement);
+		this.inv.setItem(10, increment);
+		this.inv.setItem(19, item);
+		this.inv.setItem(28, decrement);
 	}
 
 	private void createWagerToggle() {
-		ItemStack increment = GUIUtils.createItemStack(ChatColor.GREEN + "/\\", Material.SKELETON_SKULL);
-		ItemStack decrement = GUIUtils.createItemStack(ChatColor.GREEN + "\\/", Material.SKELETON_SKULL);
+		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
+				ChatColor.GREEN + "/\\", 1);
+		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
+				ChatColor.GREEN + "\\/", 1);
 
 		ItemStack item = GUIUtils.createItemStack(
 				ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + this.wager, Material.GOLD_INGOT);

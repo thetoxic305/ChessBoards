@@ -97,6 +97,7 @@ public class GUIUtils {
     public static void renderGameData(Inventory inventory, ChessGame chessGame, int startPos, boolean playerHeadEnabled) {
         if(chessGame.getWhitePlayer() == null) return;
 
+        boolean databaseEnabled = instance.getConfig().getBoolean("settings.database.enabled");
         ItemStack playerHead = GUIUtils.createGuiPlayerItem(chessGame.getWhitePlayer());
 
         String rankedString = chessGame.isRanked() ? ChatColor.RED + "Ranked" : ChatColor.GREEN + "Unranked";
@@ -130,11 +131,18 @@ public class GUIUtils {
             startPos += 9;
         }
 
-        inventory.setItem(startPos, ranked);
-        inventory.setItem(startPos + 9, gameTimeItem);
+        if(databaseEnabled) {
+            inventory.setItem(startPos, ranked);
+            inventory.setItem(startPos + 9, gameTimeItem);
 
-        if(instance.getEconomy() != null)
-            inventory.setItem(startPos + 18, wager);
+            if(instance.getEconomy() != null)
+                inventory.setItem(startPos + 18, wager);
+        } else {
+            inventory.setItem(startPos, gameTimeItem);
+
+            if(instance.getEconomy() != null)
+                inventory.setItem(startPos + 9, wager);
+        }
     }
 
 	public static void setGameIDItem(Inventory inv, ChessGame chessGame) {

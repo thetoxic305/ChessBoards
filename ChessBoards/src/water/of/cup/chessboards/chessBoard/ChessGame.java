@@ -108,7 +108,7 @@ public class ChessGame {
 					boardStates.add(state);
 					lastState = state;
 				}
-				Bukkit.getLogger().info(lastState);
+				// Bukkit.getLogger().info(lastState);
 				board = ChessUtils.boardFromString(lastState);
 			}
 
@@ -369,7 +369,7 @@ public class ChessGame {
 
 				// log move
 				record.add(notation);
-				Bukkit.getLogger().info(notation);
+				// Bukkit.getLogger().info(notation);
 
 				checkGameOver();
 

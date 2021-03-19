@@ -109,7 +109,7 @@ public class BoardInteract implements Listener {
 
 				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
-				player.sendMessage("Game found! Status: " + game.getGameState().toString());
+				// player.sendMessage("Game found! Status: " + game.getGameState().toString());
 
 				if (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) {
 					e.setCancelled(true);

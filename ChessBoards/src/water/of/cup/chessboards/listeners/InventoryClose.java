@@ -24,7 +24,7 @@ public class InventoryClose implements Listener {
 
         // Player closing create game menu
         if(instance.getCreateGameManager().containsKey(player)) {
-            player.sendMessage("Leaving create game");
+            // player.sendMessage("Leaving create game");
             instance.getCreateGameManager().remove(player);
             return;
         }
@@ -34,20 +34,20 @@ public class InventoryClose implements Listener {
                 && chessBoardManager.getGameByPlayer(player).getGameState().equals(ChessGameState.WAITING_PLAYER)) {
             ChessGame chessGame = chessBoardManager.getGameByPlayer(player);
 
-            player.sendMessage("Leaving waiting player menu");
+            // player.sendMessage("Leaving waiting player menu");
 
             chessGame.setWhitePlayer(null);
             chessGame.setGameState(ChessGameState.IDLE);
 
             Set<Player> playerQueueCopy = new HashSet<>(chessGame.getPlayerQueue());
             for(Player player1 : playerQueueCopy) {
-                player1.sendMessage("Game owner has ended the game.");
+                // player1.sendMessage("Game owner has ended the game.");
                 player1.closeInventory();
             }
 
             Set<Player> playerDecideQueueCopy = new HashSet<>(chessGame.getPlayerDecideQueue());
             for(Player player1 : playerDecideQueueCopy) {
-                player1.sendMessage("Game owner has ended the game.");
+                // player1.sendMessage("Game owner has ended the game.");
                 player1.closeInventory();
             }
 

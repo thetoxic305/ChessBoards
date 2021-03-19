@@ -74,6 +74,7 @@ public class Wager {
 			//give players their money back
 			instance.getEconomy().depositPlayer(player1, amount);
 			instance.getEconomy().depositPlayer(player2, amount);
+			return;
 		}
 			
 

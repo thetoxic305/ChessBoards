@@ -129,11 +129,12 @@ public class ChessBoardCommands implements CommandExecutor {
 							return false;
 						}
 
-						p.sendMessage(ChatColor.DARK_BLUE + "--" + ChatColor.BLUE + name + "'s chess stats" + ChatColor.DARK_BLUE + "--");
-						p.sendMessage(ChatColor.BLUE + "W/L/D: " + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
-						p.sendMessage(ChatColor.BLUE + "Rating: " + (double) Math.round(chessPlayer.getRating() * 100) / 100);
-						p.sendMessage(ChatColor.BLUE + "Rating Deviation: " + chessPlayer.getRatingDeviation());
-						p.sendMessage(ChatColor.BLUE + "Volatility: " + chessPlayer.getVolatility());
+						p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
+										+ ChatColor.BOLD + "Boards " + ChatColor.GRAY + name + ChatColor.RESET + "'s stats");
+						p.sendMessage(ChatColor.GRAY + "W/L/D: " + ChatColor.RESET + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
+						p.sendMessage(ChatColor.GRAY + "Rating: " + ChatColor.RESET + (double) Math.round(chessPlayer.getRating() * 100) / 100);
+						p.sendMessage(ChatColor.GRAY + "Rating Deviation: " + ChatColor.RESET + chessPlayer.getRatingDeviation());
+						p.sendMessage(ChatColor.GRAY + "Volatility: " + ChatColor.RESET + chessPlayer.getVolatility());
 
 						return true;
 					}

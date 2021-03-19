@@ -122,7 +122,9 @@ public class ChessBoards extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		this.dataStore.closeConnection();
+		boolean databaseEnabled = instance.getConfig().getBoolean("settings.database.enabled");
+		if(databaseEnabled && this.dataStore != null)
+			this.dataStore.closeConnection();
 
 		for(ChessGame chessGame : chessBoardManager.getGames()) {
 			chessGame.storeGame();

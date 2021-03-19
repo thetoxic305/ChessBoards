@@ -58,7 +58,7 @@ public class ItemFrameInteract implements Listener {
 				// chess game found
 				ChessGame game = chessBoardManager.getGameByGameId(gameId);
 
-				player.sendMessage("Game found! Status: " + game.getGameState().toString());
+				// player.sendMessage("Game found! Status: " + game.getGameState().toString());
 				
 				if (game.getGameState() == ChessGameState.CONFIRM_GAME) {
 					ChessInGameInventory chessInGameInventory = new ChessInGameInventory(game);

@@ -93,14 +93,14 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-            if(itemName.equals("Ranked") && (event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE) ||
+            if((itemName.equals("Ranked") || itemName.equals("Unranked")) && (event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE) ||
                     event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE))) {
                 chessCreateGameInventory.toggleRanked();
                 chessCreateGameInventory.displayCreateGame(player, false);
                 return;
             }
 
-            if(event.getCurrentItem().getType().equals(Material.SKELETON_SKULL)) {
+            if(event.getCurrentItem().getType().equals(Material.PLAYER_HEAD)) {
                 // Increment
                 if(itemName.equals("/\\")) {
                     Material materialBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9).getType();
