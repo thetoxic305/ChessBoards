@@ -24,11 +24,12 @@ public class ChessBoardCommandsTabCompleter implements TabCompleter {
 			arguments.add("stats");
 		} else if (strings.length == 2) {
 			if (strings[0].equalsIgnoreCase("leaderboard")) {
-				int numChessPlayers = instance.getDataStore().getChessPlayerTotal();
-				int extraPages = (numChessPlayers / 10);
-				for (int i = 0; i < extraPages; i++) {
-					arguments.add((i + 2) + "");
-				}
+				instance.getDataStore().getChessPlayerTotal(numChessPlayers -> {
+					int extraPages = (numChessPlayers / 10);
+					for (int i = 0; i < extraPages; i++) {
+						arguments.add((i + 2) + "");
+					}
+				});
 			} else if (strings[0].equalsIgnoreCase("stats")) {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					arguments.add(player.getName());

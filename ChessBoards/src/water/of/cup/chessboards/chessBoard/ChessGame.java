@@ -471,8 +471,8 @@ public class ChessGame {
 
 				DataSource dataStore = instance.getDataStore();
 
-				ChessPlayer player1 = dataStore.getChessPlayers().get(winner);
-				ChessPlayer player2 = dataStore.getChessPlayers().get(loser);
+				ChessPlayer player1 = dataStore.getChessPlayer(winner);
+				ChessPlayer player2 = dataStore.getChessPlayer(loser);
 
 				int player1Ties = player1.getTies();
 				int player2Ties = player2.getTies();
@@ -487,8 +487,8 @@ public class ChessGame {
 		if (instance.getConfig().getBoolean("settings.database.enabled")) {
 			DataSource dataStore = instance.getDataStore();
 
-			ChessPlayer winnerChessPlayer = dataStore.getChessPlayers().get(winner);
-			ChessPlayer loserChessPlayer = dataStore.getChessPlayers().get(loser);
+			ChessPlayer winnerChessPlayer = dataStore.getChessPlayer(winner);
+			ChessPlayer loserChessPlayer = dataStore.getChessPlayer(loser);
 
 			int wins = winnerChessPlayer.getWins();
 			int losses = loserChessPlayer.getLosses();
