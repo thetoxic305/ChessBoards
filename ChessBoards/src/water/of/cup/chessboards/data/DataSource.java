@@ -2,6 +2,7 @@ package water.of.cup.chessboards.data;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import water.of.cup.chessboards.ChessBoards;
@@ -10,6 +11,10 @@ import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 
 public class DataSource {
 
@@ -17,6 +22,7 @@ public class DataSource {
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
     private HashMap<Player, ChessPlayer> chessPlayers = new HashMap<>();
+    private final ExecutorService executorService = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 
     public void initialize() {
         if(ds == null) {
@@ -73,121 +79,98 @@ public class DataSource {
     }
 
     private void checkSchema() throws SQLException {
-        if (!tableExists("chess_players")) {
-            String sql = "CREATE TABLE IF NOT EXISTS `chess_players` "
-                    + "(`id` int PRIMARY KEY AUTO_INCREMENT,"
-                    + "`uuid` varchar(255) UNIQUE,"
-                    + "`wins` int default 0,"
-                    + "`losses` int default 0,"
-                    + "`ties` int default 0,"
-                    + "`rating` double default 0,"
-                    + "`ratingDeviation` double default 0,"
-                    + "`volatility` double default 0,"
-                    + "`numberOfResults` int default 0);";
-            execute(sql);
+        String sql = "CREATE TABLE IF NOT EXISTS `chess_players` "
+                + "(`id` int PRIMARY KEY AUTO_INCREMENT,"
+                + "`uuid` varchar(255) UNIQUE,"
+                + "`wins` int default 0,"
+                + "`losses` int default 0,"
+                + "`ties` int default 0,"
+                + "`rating` double default 0,"
+                + "`ratingDeviation` double default 0,"
+                + "`volatility` double default 0,"
+                + "`numberOfResults` int default 0);";
+
+        try (Connection con = getConnection();
+             Statement statement = con.createStatement();) {
+            statement.execute(sql);
         }
     }
 
     public void addChessPlayer(Player player) {
-        try {
-            if(!playerExistsInDatabase(player)) createChessPlayer(player);
+        String uuidString = player.getUniqueId().toString();
+        getOfflineChessPlayerAsync(uuidString, chessPlayer -> {
+            if(chessPlayer == null) {
+                createChessPlayerAsync(player, newChessPlayer -> {
+                    if(newChessPlayer == null) return;
 
-            String playerUUID = player.getUniqueId().toString();
-
-            try (Connection con = getConnection();
-                 PreparedStatement sql = con.prepareStatement("SELECT * FROM `chess_players` WHERE "
-                         + "uuid='" + playerUUID + "'");
-                 ResultSet playerData = sql.executeQuery();
-            ) {
-                playerData.next();
-
-                int id = playerData.getInt(1);
-                String uuid = playerData.getString(2);
-                int wins = playerData.getInt(3);
-                int losses = playerData.getInt(4);
-                int ties = playerData.getInt(5);
-                double rating = playerData.getDouble(6);
-                double ratingDeviation = playerData.getDouble(7);
-                double volatility = playerData.getDouble(8);
-                int numberOfResults = playerData.getInt(9);
-
-                ChessPlayer newPlayer = new ChessPlayer(player, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                this.chessPlayers.put(player, newPlayer);
+                    this.chessPlayers.put(player, newChessPlayer);
+                });
+            } else {
+                this.chessPlayers.put(player, chessPlayer);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        });
     }
 
-    private void createChessPlayer(Player player) throws SQLException {
-        String playerUUID = player.getUniqueId().toString();
-        String createPlayerSql = "INSERT INTO `chess_players` (uuid) VALUES "
-                + "('" + playerUUID + "');";
-        execute(createPlayerSql);
-    }
-
-    public boolean playerExistsInDatabase(Player player) throws SQLException {
-        return playerExistsInDatabase(player.getUniqueId().toString());
-    }
-
-    public boolean playerExistsInDatabase(String playerUUID) throws SQLException {
-        String sql = "SELECT uuid FROM `chess_players` WHERE uuid='" + playerUUID + "'";
-        boolean found = false;
-        try(Connection con = getConnection();
-            PreparedStatement playerQuery = con.prepareStatement(sql);
-            ResultSet playerResults = playerQuery.executeQuery();) {
-           while (playerResults.next() && !found) {
-               if(playerResults.getString(1).equals(playerUUID)) {
-                   found = true;
-               }
-           }
-       }
-
-        return found;
-    }
-
-    public void execute(String query) throws SQLException {
-        try (Connection con = getConnection();
-             Statement statement = con.createStatement();) {
-            statement.execute(query);
-        }
-    }
-
-    public void updateColumn(Player player, String column, String updated) throws SQLException {
-        String playerUUID = player.getUniqueId().toString();
-        String updateSql = "UPDATE chess_players SET "
-                + column + " = ? "
-                + "WHERE uuid='" + playerUUID + "'";
-
-        try (Connection con = getConnection();
-             PreparedStatement updateQuery = con.prepareStatement(updateSql);) {
-            updateQuery.setString(1, updated);
-            updateQuery.execute();
-        }
-    }
-
-    public boolean tableExists(String table) throws SQLException {
-        boolean exists = false;
-        try (Connection con = getConnection();
-             ResultSet tableData = con.getMetaData().getTables(null, null, table, null);
-        ) {
-            exists = tableData.next();
-        }
-        return exists;
-    }
-
-    private void close(@Nullable ResultSet results) {
-        if (results != null) {
+    private void createChessPlayerAsync(Player player, Consumer<ChessPlayer> consumer)  {
+        executorService.submit(() -> {
             try {
-                results.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+                String playerUUID = player.getUniqueId().toString();
+                String createPlayerSql = "INSERT INTO `chess_players` (uuid) VALUES "
+                        + "('" + playerUUID + "');";
+
+                try (Connection con = getConnection();
+                     PreparedStatement sql = con.prepareStatement(createPlayerSql, Statement.RETURN_GENERATED_KEYS);
+                ) {
+                    int result = sql.executeUpdate();
+
+                    if(result == 0) {
+                        consumer.accept(null);
+                        return;
+                    }
+
+                    try (ResultSet generatedKeys = sql.getGeneratedKeys()) {
+                        if(!generatedKeys.next()) {
+                            consumer.accept(null);
+                            return;
+                        }
+
+                        int id = generatedKeys.getInt(1);
+                        ChessPlayer newPlayer = new ChessPlayer(id, playerUUID, 0, 0, 0, 0.0, 0.0, 0.0, 0);
+
+                        consumer.accept(newPlayer);
+                    }
+
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-        }
+        });
     }
 
-    public HashMap<Player, ChessPlayer> getChessPlayers() {
-        return chessPlayers;
+    public void updateColumn(String playerUUID, String column, String updated) {
+        executorService.submit(() -> {
+            try {
+                String updateSql = "UPDATE chess_players SET "
+                        + column + " = ? "
+                        + "WHERE uuid='" + playerUUID + "'";
+
+                try (Connection con = getConnection();
+                     PreparedStatement updateQuery = con.prepareStatement(updateSql);) {
+                    updateQuery.setString(1, updated);
+                    updateQuery.execute();
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
+    }
+
+    public ChessPlayer getChessPlayer(Player player) {
+        if(chessPlayers.containsKey(player)) {
+            return chessPlayers.get(player);
+        }
+
+        return null;
     }
 
     public ChessPlayer getChessPlayerByUUID(String uuid) {
@@ -195,117 +178,92 @@ public class DataSource {
             if (chessPlayer.getUuid().equals(uuid))
                 return chessPlayer;
         }
+
         return null;
     }
 
-    public ArrayList<ChessPlayer> getTopPlayers(int page) {
-        try {
-            ArrayList<ChessPlayer> topPlayers = new ArrayList<>();
-            try (Connection con = getConnection();
-                 PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
-                 ResultSet playerData = sql.executeQuery();
-            ) {
-                while(playerData.next()) {
-                    int id = playerData.getInt(1);
-                    String uuid = playerData.getString(2);
-                    int wins = playerData.getInt(3);
-                    int losses = playerData.getInt(4);
-                    int ties = playerData.getInt(5);
-                    double rating = playerData.getDouble(6);
-                    double ratingDeviation = playerData.getDouble(7);
-                    double volatility = playerData.getDouble(8);
-                    int numberOfResults = playerData.getInt(9);
-
-                    ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                    topPlayers.add(newPlayer);
+    public void getTopPlayers(int page, Consumer<ArrayList<ChessPlayer>> topPlayersConsumer) {
+        executorService.submit(() -> {
+            try {
+                ArrayList<ChessPlayer> topPlayers = new ArrayList<>();
+                try (Connection con = getConnection();
+                     PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players ORDER BY rating DESC LIMIT " + (page * 10) + ", 10");
+                     ResultSet playerData = sql.executeQuery();
+                ) {
+                    while (playerData.next()) {
+                        ChessPlayer newPlayer = new ChessPlayer(playerData);
+                        topPlayers.add(newPlayer);
+                    }
                 }
-            }
 
-            return topPlayers;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return null;
-        }
+                topPlayersConsumer.accept(topPlayers);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
     }
 
-    public ArrayList<ChessPlayer> getAllPlayers() {
-        try {
-            ArrayList<ChessPlayer> allPlayers = new ArrayList<>();
-            try(Connection con = getConnection();
-                PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players;");
-                ResultSet playerData = sql.executeQuery();) {
-                while(playerData.next()) {
-                    int id = playerData.getInt(1);
-                    String uuid = playerData.getString(2);
-                    int wins = playerData.getInt(3);
-                    int losses = playerData.getInt(4);
-                    int ties = playerData.getInt(5);
-                    double rating = playerData.getDouble(6);
-                    double ratingDeviation = playerData.getDouble(7);
-                    double volatility = playerData.getDouble(8);
-                    int numberOfResults = playerData.getInt(9);
+    public void getAllPlayers(Consumer<ArrayList<ChessPlayer>> chessPlayerConsumer) {
+        executorService.submit(() -> {
+            try {
+                ArrayList<ChessPlayer> allPlayers = new ArrayList<>();
 
-                    ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                    allPlayers.add(newPlayer);
+                try (Connection con = getConnection();
+                     PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players;");
+                     ResultSet playerData = sql.executeQuery();) {
+
+                    while (playerData.next()) {
+                        ChessPlayer newPlayer = new ChessPlayer(playerData);
+                        allPlayers.add(newPlayer);
+                    }
                 }
+
+                chessPlayerConsumer.accept(allPlayers);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-            return allPlayers;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return null;
-        }
+        });
     }
 
-    public ChessPlayer getOfflineChessPlayer(OfflinePlayer player) {
-        return getOfflineChessPlayer(player.getUniqueId().toString());
-    }
+    public void getOfflineChessPlayerAsync(String playerUUID, Consumer<ChessPlayer> chessPlayerConsumer) {
+        executorService.submit(() -> {
+            try {
+                try (Connection con = getConnection();
+                     PreparedStatement sql = con.prepareStatement("SELECT * FROM `chess_players` WHERE "
+                             + "uuid='" + playerUUID + "'");
+                     ResultSet playerData = sql.executeQuery();
+                ) {
+                    if(!playerData.next()) {
+                        chessPlayerConsumer.accept(null);
+                        return;
+                    }
 
-    public ChessPlayer getOfflineChessPlayer(String playerUUID) {
-        try {
-            if(!playerExistsInDatabase(playerUUID)) return null;
-
-            try (Connection con = getConnection();
-                 PreparedStatement sql = con.prepareStatement("SELECT * FROM `chess_players` WHERE "
-                         + "uuid='" + playerUUID + "'");
-                 ResultSet playerData = sql.executeQuery();
-            ) {
-                playerData.next();
-
-                int id = playerData.getInt(1);
-                String uuid = playerData.getString(2);
-                int wins = playerData.getInt(3);
-                int losses = playerData.getInt(4);
-                int ties = playerData.getInt(5);
-                double rating = playerData.getDouble(6);
-                double ratingDeviation = playerData.getDouble(7);
-                double volatility = playerData.getDouble(8);
-                int numberOfResults = playerData.getInt(9);
-
-                ChessPlayer newPlayer = new ChessPlayer(null, id, uuid, wins, losses, ties, rating, ratingDeviation, volatility, numberOfResults);
-                return newPlayer;
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return null;
-        }
-    }
-
-    public int getChessPlayerTotal() {
-        try {
-            int num = 0;
-            try(Connection con = getConnection();
-                PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players");
-                ResultSet playerData = sql.executeQuery();) {
-                while(playerData.next()) {
-                    num++;
+                    ChessPlayer newPlayer = new ChessPlayer(playerData);
+                    chessPlayerConsumer.accept(newPlayer);
                 }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
+        });
+    }
 
-            return num;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return 0;
-        }
+    public void getChessPlayerTotal(Consumer<Integer> totalConsumer) {
+        executorService.submit(() -> {
+            try {
+                int num = 0;
+                try (Connection con = getConnection();
+                     PreparedStatement sql = con.prepareStatement("SELECT * FROM chess_players");
+                     ResultSet playerData = sql.executeQuery();) {
+                    while (playerData.next()) {
+                        num++;
+                    }
+                }
+
+                totalConsumer.accept(num);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
     }
 
     public Connection getConnection() throws SQLException {

@@ -2,12 +2,13 @@ package water.of.cup.chessboards.data;
 
 import org.bukkit.entity.Player;
 import water.of.cup.chessboards.ChessBoards;
+import water.of.cup.chessboards.glicko2.Result;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ChessPlayer {
 
-    private Player player;
     private String uuid;
     private int wins;
     private int losses;
@@ -20,8 +21,7 @@ public class ChessPlayer {
     private ChessBoards instance = ChessBoards.getInstance();
     private DataSource dataStore = instance.getDataStore();
 
-    public ChessPlayer(Player player, int id, String uuid, int wins, int losses, int ties, double rating, double ratingDeviation, double volatility, int numberOfResults) {
-        this.player = player;
+    public ChessPlayer(int id, String uuid, int wins, int losses, int ties, double rating, double ratingDeviation, double volatility, int numberOfResults) {
         this.id = id;
         this.uuid = uuid;
         this.wins = wins;
@@ -33,8 +33,16 @@ public class ChessPlayer {
         this.numberOfResults = numberOfResults;
     }
 
-    public Player getPlayer() {
-        return player;
+    public ChessPlayer(ResultSet resultSet) throws SQLException {
+        this.id = resultSet.getInt(1);
+        this.uuid = resultSet.getString(2);
+        this.wins = resultSet.getInt(3);
+        this.losses = resultSet.getInt(4);
+        this.ties = resultSet.getInt(5);
+        this.rating = resultSet.getDouble(6);
+        this.ratingDeviation = resultSet.getDouble(7);
+        this.volatility = resultSet.getDouble(8);
+        this.numberOfResults = resultSet.getInt(9);
     }
 
     public String getUuid() {
@@ -109,10 +117,6 @@ public class ChessPlayer {
     private void updateColumn(String column, String updated) {
         if (!instance.getConfig().getBoolean("settings.database.enabled")) return;
 
-        try {
-            dataStore.updateColumn(player, column, updated);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        dataStore.updateColumn(this.uuid, column, updated);
     }
 }

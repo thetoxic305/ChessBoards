@@ -65,46 +65,47 @@ public class ChessBoardCommands implements CommandExecutor {
 						return false;
 					}
 
-					int numChessPlayers = instance.getDataStore().getChessPlayerTotal();
-
-					int page = 0;
-					if (args.length > 1) {
-						try {
-							page = Integer.parseInt(args[1]) - 1;
-						} catch (NumberFormatException e) {
+					instance.getDataStore().getChessPlayerTotal(numChessPlayers -> {
+						int page = 0;
+						if (args.length > 1) {
+							try {
+								page = Integer.parseInt(args[1]) - 1;
+							} catch (NumberFormatException e) {
+							}
 						}
-					}
 
-					if (page < 0)
-						page = 0;
+						if (page < 0)
+							page = 0;
 
-					int numOfPages = (numChessPlayers / 10) + 1;
+						int numOfPages = (numChessPlayers / 10) + 1;
 
-					if (page > numOfPages - 1)
-						page = numOfPages - 1;
+						if (page > numOfPages - 1)
+							page = numOfPages - 1;
 
-					ArrayList<ChessPlayer> topPlayers = instance.getDataStore().getTopPlayers(page);
+						int finalPage = page;
 
-					if (topPlayers == null) {
-						p.sendMessage("There was an error while trying to fetch top players");
-						return false;
-					}
+						instance.getDataStore().getTopPlayers(page, topPlayers -> {
+							if (topPlayers == null) {
+								p.sendMessage("There was an error while trying to fetch top players");
+								return;
+							}
 
-					p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
-							+ ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (" + (page + 1) + "/"
-							+ numOfPages + ")");
-					int num = 1 + (page * 10);
-					for (ChessPlayer chessPlayer : topPlayers) {
-						UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
-						OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
-						if (player == null)
-							continue;
+							p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
+									+ ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (" + (finalPage + 1) + "/"
+									+ numOfPages + ")");
+							int num = 1 + (finalPage * 10);
+							for (ChessPlayer chessPlayer : topPlayers) {
+								UUID chessPlayerUUID = UUID.fromString(chessPlayer.getUuid());
+								OfflinePlayer player = instance.getServer().getOfflinePlayer(chessPlayerUUID);
 
-						double ratingRounded = (double) Math.round(chessPlayer.getRating() * 100) / 100;
-						p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getName() + " - "
-								+ ratingRounded);
-						num++;
-					}
+								double ratingRounded = (double) Math.round(chessPlayer.getRating() * 100) / 100;
+								p.sendMessage(ChatColor.GRAY + "" + num + ". " + ChatColor.RESET + "" + player.getName() + " - "
+										+ ratingRounded);
+								num++;
+							}
+						});
+					});
+
 					return true;
 				}
 
@@ -122,19 +123,20 @@ public class ChessBoardCommands implements CommandExecutor {
 						String name = args[1];
 
 						OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-						ChessPlayer chessPlayer = instance.getDataStore().getOfflineChessPlayer(offlinePlayer);
 
-						if(chessPlayer == null) {
-							p.sendMessage("Player not found in chess database");
-							return false;
-						}
+						instance.getDataStore().getOfflineChessPlayerAsync(offlinePlayer.getUniqueId().toString(), chessPlayer -> {
+							if(chessPlayer == null) {
+								p.sendMessage("Player not found in chess database");
+								return;
+							}
 
-						p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
-										+ ChatColor.BOLD + "Boards " + ChatColor.GRAY + name + ChatColor.RESET + "'s stats");
-						p.sendMessage(ChatColor.GRAY + "W/L/D: " + ChatColor.RESET + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
-						p.sendMessage(ChatColor.GRAY + "Rating: " + ChatColor.RESET + (double) Math.round(chessPlayer.getRating() * 100) / 100);
-						p.sendMessage(ChatColor.GRAY + "Rating Deviation: " + ChatColor.RESET + chessPlayer.getRatingDeviation());
-						p.sendMessage(ChatColor.GRAY + "Volatility: " + ChatColor.RESET + chessPlayer.getVolatility());
+							p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
+									+ ChatColor.BOLD + "Boards " + ChatColor.GRAY + name + ChatColor.RESET + "'s stats");
+							p.sendMessage(ChatColor.GRAY + "W/L/D: " + ChatColor.RESET + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
+							p.sendMessage(ChatColor.GRAY + "Rating: " + ChatColor.RESET + (double) Math.round(chessPlayer.getRating() * 100) / 100);
+							p.sendMessage(ChatColor.GRAY + "Rating Deviation: " + ChatColor.RESET + chessPlayer.getRatingDeviation());
+							p.sendMessage(ChatColor.GRAY + "Volatility: " + ChatColor.RESET + chessPlayer.getVolatility());
+						});
 
 						return true;
 					}
