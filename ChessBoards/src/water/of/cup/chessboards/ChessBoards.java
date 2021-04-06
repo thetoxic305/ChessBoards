@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -42,7 +39,6 @@ public class ChessBoards extends JavaPlugin {
 	private static ChessBoardManager chessBoardManager = new ChessBoardManager();
 	private static ImageManager imageManager = new ImageManager();
 	private HashMap<Player, ChessCreateGameInventory> createGameManager = new HashMap<>();
-	List<Integer> mapIDsNotToRender = new ArrayList<>();
 	private File configFile;
 	private FileConfiguration config;
 	private static Economy economy = null;
@@ -55,7 +51,6 @@ public class ChessBoards extends JavaPlugin {
 		key = new NamespacedKey(this, "chess_game_item");
 
 		loadConfig();
-		chessBoardManager.loadGames();
 
 		boolean loadedImages = imageManager.loadImages();
 		if(!loadedImages) {
@@ -81,37 +76,13 @@ public class ChessBoards extends JavaPlugin {
 				this.dataStore.addChessPlayer(player);
 			}
 		}
-
-		File folder = new File(getDataFolder() + "/saved_games");
-		File[] listOfFiles = folder.listFiles();
 		
 		boolean hasEconomy = setupEconomy();
 		if (!hasEconomy) {
 			Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
 		}
 
-		for (File file : listOfFiles) {
-			if (file.isFile()) {
-				try {
-					int gameId = Integer.parseInt(file.getName().split("_")[1].split(Pattern.quote("."))[0]);
-					BufferedReader br = new BufferedReader(new FileReader(file));
-					String encodedData = br.readLine();
-
-					ItemStack chessBoardItem = new ItemStack(Material.FILLED_MAP, 1);
-					MapMeta mapMeta = (MapMeta) chessBoardItem.getItemMeta();
-					MapView mapView = Bukkit.getMap(gameId);
-					mapMeta.setMapView(mapView);
-					chessBoardItem.setItemMeta(mapMeta);
-
-					ChessGame newChessGame = new ChessGame(chessBoardItem, encodedData, gameId);
-					newChessGame.renderBoardForPlayers();
-
-					chessBoardManager.addGame(newChessGame);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		chessBoardManager.loadGames();
 
 		// Add bStats
 		Metrics metrics = new Metrics(this, 10153);
@@ -126,9 +97,8 @@ public class ChessBoards extends JavaPlugin {
 		if(databaseEnabled && this.dataStore != null)
 			this.dataStore.closeConnection();
 
-		for(ChessGame chessGame : chessBoardManager.getGames()) {
-			chessGame.storeGame();
-		}
+		chessBoardManager.saveGames();
+
 		/* Disable all current async tasks */
 		Bukkit.getScheduler().cancelTasks(this);
 	}
@@ -262,10 +232,6 @@ public class ChessBoards extends JavaPlugin {
 	public ImageManager getImageManager() {
 		return imageManager;
 	}
-
-	public HashMap<Player, ChessCreateGameInventory> getCreateGameManager() {
-		return createGameManager;
-	}
 	
 	public Economy getEconomy() {
         return economy;
@@ -277,5 +243,25 @@ public class ChessBoards extends JavaPlugin {
 
 	public DataSource getDataStore() {
 		return dataStore;
+	}
+
+	public ChessCreateGameInventory getCreateGameInventory(Player player) {
+		return this.createGameManager.get(player);
+	}
+
+	public void removeCreateGamePlayer(Player player) {
+		this.createGameManager.remove(player);
+	}
+
+	public void addCreateGamePlayer(Player player, ChessCreateGameInventory inventory) {
+		this.createGameManager.put(player, inventory);
+	}
+
+	public boolean playerHasCreateGame(Player player) {
+		return this.createGameManager.containsKey(player);
+	}
+
+	public Set<Player> getCreateGamePlayers() {
+		return this.createGameManager.keySet();
 	}
 }

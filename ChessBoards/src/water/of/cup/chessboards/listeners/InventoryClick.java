@@ -37,11 +37,11 @@ public class InventoryClick implements Listener {
                 && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
                 && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
 
-            if(!pluginInstance.getCreateGameManager().containsKey(player)) return;
+            if(!pluginInstance.playerHasCreateGame(player)) return;
 
             event.setCancelled(true);
 
-            ChessCreateGameInventory chessCreateGameInventory = pluginInstance.getCreateGameManager().get(player);
+            ChessCreateGameInventory chessCreateGameInventory = pluginInstance.getCreateGameInventory(player);
 
             String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
 
@@ -78,9 +78,9 @@ public class InventoryClick implements Listener {
                 chessCreateGameInventory.getChessGame().openWaitingPlayerInventory();
 
                 // Close inventories
-                for(Player player1 : pluginInstance.getCreateGameManager().keySet()) {
-                    ChessCreateGameInventory ccInv = pluginInstance.getCreateGameManager().get(player1);
-                    if(ccInv != null && ccInv.getChessGame().equals(chessCreateGameInventory.getChessGame())) {
+                for(Player player1 : pluginInstance.getCreateGamePlayers()) {
+                    ChessCreateGameInventory ccInv = pluginInstance.getCreateGameInventory(player1);
+                    if(ccInv != null && ccInv.getChessGame().getGameId() == chessCreateGameInventory.getChessGame().getGameId()) {
                         ChessGame game = ccInv.getChessGame();
                         player1.closeInventory();
                         if (game.getPlayerQueue().size() < 3) {

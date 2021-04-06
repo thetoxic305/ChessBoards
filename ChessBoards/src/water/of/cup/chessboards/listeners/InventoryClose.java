@@ -23,9 +23,9 @@ public class InventoryClose implements Listener {
         Player player = (Player) event.getPlayer();
 
         // Player closing create game menu
-        if(instance.getCreateGameManager().containsKey(player)) {
+        if(instance.playerHasCreateGame(player)) {
             // player.sendMessage("Leaving create game");
-            instance.getCreateGameManager().remove(player);
+            instance.removeCreateGamePlayer(player);
             return;
         }
 

@@ -150,7 +150,7 @@ public class BoardInteract implements Listener {
 						if (game.getGameState().equals(ChessGameState.IDLE)) {
 							ChessCreateGameInventory chessCreateGameInventory = new ChessCreateGameInventory(game);
 							chessCreateGameInventory.displayCreateGame(player, true);
-							instance.getCreateGameManager().put(player, chessCreateGameInventory);
+							instance.addCreateGamePlayer(player, chessCreateGameInventory);
 						} else {
 							if (game.getPlayerQueue().size() < 3) {
 								game.addPlayerToDecisionQueue(player);

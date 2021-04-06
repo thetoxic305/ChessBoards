@@ -1,7 +1,15 @@
 package water.of.cup.chessboards.chessBoard;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,18 +18,18 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.util.Vector;
+import water.of.cup.chessboards.ChessBoards;
 
 public class ChessBoardManager {
-	private ArrayList<ChessGame> games;
+
+	private ArrayList<ChessGame> games = new ArrayList<>();;
 	
-	public boolean addGame(ChessGame game) {
-		
-		if (games.contains(game)) {
-			return false;
+	public void addGame(ChessGame game) {
+		if (!games.contains(game)) {
+			games.add(game);
 		}
-		games.add(game);
-		return true;
 	}
 
 	public boolean removeGame(ChessGame game) {
@@ -52,8 +60,31 @@ public class ChessBoardManager {
 	}
 	
 	public void loadGames() {
-		games = new ArrayList<ChessGame>();
-		
+		File folder = new File(ChessBoards.getInstance().getDataFolder() + "/saved_games");
+		File[] listOfFiles = folder.listFiles();
+
+		for (File file : listOfFiles) {
+			if (file.isFile()) {
+				try {
+					int gameId = Integer.parseInt(file.getName().split("_")[1].split(Pattern.quote("."))[0]);
+					BufferedReader br = new BufferedReader(new FileReader(file));
+					String encodedData = br.readLine();
+
+					ItemStack chessBoardItem = new ItemStack(Material.FILLED_MAP, 1);
+					MapMeta mapMeta = (MapMeta) chessBoardItem.getItemMeta();
+					MapView mapView = Bukkit.getMap(gameId);
+					mapMeta.setMapView(mapView);
+					chessBoardItem.setItemMeta(mapMeta);
+
+					ChessGame newChessGame = new ChessGame(chessBoardItem, encodedData, gameId);
+					newChessGame.renderBoardForPlayers();
+
+					games.add(newChessGame);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public ChessGame getGameByPlayer(Player player) {
@@ -104,7 +135,33 @@ public class ChessBoardManager {
 		return games;
 	}
 
-	public ArrayList<ChessGame> getGames() {
-		return this.games;
+	public void saveGames() {
+		for(ChessGame game : this.games) {
+			this.storeGame(game);
+		}
+	}
+
+	private void storeGame(ChessGame game) {
+		String mapData = game.toString();
+		String id = ((MapMeta) game.getItem().getItemMeta()).getMapView().getId() + "";
+		File file = new File(ChessBoards.getInstance().getDataFolder(), "saved_games/game_" + id + ".txt");
+
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+				Bukkit.getLogger().severe("[ChessBoards] Created game file for gameId: " + id);
+			} catch (IOException e1) {
+				Bukkit.getLogger().severe("Error creating game file for gameId: " + id);
+				e1.printStackTrace();
+			}
+		}
+
+		try {
+			Bukkit.getLogger().severe("[ChessBoards] Writing game data to gameId: " + id);
+			Files.write(Paths.get(file.getPath()), mapData.getBytes());
+		} catch (IOException e) {
+			Bukkit.getLogger().severe("Error writing to gameId: " + id);
+			e.printStackTrace();
+		}
 	}
 }
