@@ -51,33 +51,33 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			inv.setItem(16, playerSkull);
 			if (createWagerColor != null)
 				inv.setItem(25,
-						GUIUtils.createItemStack(createWagerColor, Material.valueOf(createWagerColor + "_WOOL")));
-			inv.setItem(34, GUIUtils.createItemStack("Wager Amount: " + wagerAmount, Material.GOLD_INGOT));
+						GUIUtils.createItemStack(ChatColor.RESET + createWagerColor, Material.valueOf(createWagerColor + "_WOOL")));
+			inv.setItem(34, GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + wagerAmount, Material.GOLD_INGOT));
 			inv.setItem(33, GUIUtils.getCustomTextureHead(
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmIwZjZlOGFmNDZhYzZmYWY4ODkxNDE5MWFiNjZmMjYxZDY3MjZhNzk5OWM2MzdjZjJlNDE1OWZlMWZjNDc3In19fQ==",
-					"Decrease", 1));
+					ChatColor.RED + "Decrease", 1));
 			inv.setItem(35, GUIUtils.getCustomTextureHead(
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjJmM2EyZGZjZTBjM2RhYjdlZTEwZGIzODVlNTIyOWYxYTM5NTM0YThiYTI2NDYxNzhlMzdjNGZhOTNiIn19fQ==",
-					"Increase", 1));
+					ChatColor.GREEN + "Increase", 1));
 
 			boolean hasWager = this.chessGame.getRequestWagerByPlayer(player) != null;
 
 			if(!hasWager) {
-				inv.setItem(43, GUIUtils.createItemStack("Create Wager", Material.GREEN_STAINED_GLASS_PANE));
+				inv.setItem(43, GUIUtils.createItemStack(ChatColor.GREEN + "Create Wager", Material.GREEN_STAINED_GLASS_PANE));
 			} else {
-				inv.setItem(44, GUIUtils.createItemStack("Cancel Wager", Material.YELLOW_STAINED_GLASS_PANE));
+				inv.setItem(44, GUIUtils.createItemStack(ChatColor.RED + "Cancel Wager", Material.YELLOW_STAINED_GLASS_PANE));
 			}
 
 		} else {
 			inv.setItem(15, GUIUtils.createGuiPlayerItem(selectedWager.getOwner()));
 			inv.setItem(17, playerSkull);
 			inv.setItem(16,
-					GUIUtils.createItemStack("Wager Amount: " + selectedWager.getAmount(), Material.GOLD_INGOT));
-			inv.setItem(24, GUIUtils.createItemStack(selectedWager.getOwnerColor(),
+					GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + selectedWager.getAmount(), Material.GOLD_INGOT));
+			inv.setItem(24, GUIUtils.createItemStack(ChatColor.RESET + selectedWager.getOwnerColor(),
 					Material.valueOf(selectedWager.getOwnerColor() + "_WOOL")));
-			inv.setItem(26, GUIUtils.createItemStack(selectedWager.getOponentColor(),
+			inv.setItem(26, GUIUtils.createItemStack(ChatColor.RESET + selectedWager.getOponentColor(),
 					Material.valueOf(selectedWager.getOponentColor() + "_WOOL")));
-			inv.setItem(34, GUIUtils.createItemStack("Accept Wager", Material.GREEN_STAINED_GLASS_PANE));
+			inv.setItem(34, GUIUtils.createItemStack(ChatColor.GREEN + "Accept Wager", Material.GREEN_STAINED_GLASS_PANE));
 		}
 
 		inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
