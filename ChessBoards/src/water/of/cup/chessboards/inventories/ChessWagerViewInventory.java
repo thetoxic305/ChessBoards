@@ -95,7 +95,7 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			if(requestWager.getOwner().equals(this.player)) continue;
 
 			ItemStack playerItem = GUIUtils.createGuiPlayerItem(requestWager.getOwner());
-			ItemStack playerWagerColor = GUIUtils.createItemStack(requestWager.getOwnerColor(), Material.valueOf(requestWager.getOwnerColor() + "_WOOL"));
+			ItemStack playerWagerColor = GUIUtils.createItemStack(ChatColor.RESET + requestWager.getOwnerColor(), Material.valueOf(requestWager.getOwnerColor() + "_WOOL"));
 
 			// Highlight selected wager
 			if(this.selectedWager != null) {
