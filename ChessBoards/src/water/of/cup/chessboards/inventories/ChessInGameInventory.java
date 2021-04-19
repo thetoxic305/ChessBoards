@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import water.of.cup.chessboards.ChessBoards;
-import water.of.cup.chessboards.Utils.GUIUtils;
+import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
 

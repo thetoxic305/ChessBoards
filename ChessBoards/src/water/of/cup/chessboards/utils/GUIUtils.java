@@ -1,4 +1,4 @@
-package water.of.cup.chessboards.Utils;
+package water.of.cup.chessboards.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

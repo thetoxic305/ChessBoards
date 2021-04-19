@@ -11,10 +11,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import water.of.cup.chessboards.ChessBoards;
-import water.of.cup.chessboards.Utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
 import water.of.cup.chessboards.chessBoard.RequestWager;

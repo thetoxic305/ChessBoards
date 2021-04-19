@@ -2,7 +2,6 @@ package water.of.cup.chessboards.inventories;
 
 import java.util.ArrayList;
 
-import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import water.of.cup.chessboards.ChessBoards;
-import water.of.cup.chessboards.Utils.GUIUtils;
+import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 
 public class ChessCreateGameInventory implements InventoryHolder {
