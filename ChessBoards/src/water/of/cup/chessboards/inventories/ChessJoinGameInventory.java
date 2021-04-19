@@ -53,11 +53,11 @@ public class ChessJoinGameInventory implements InventoryHolder {
     }
 
     private void renderHasAccepted() {
-        ItemStack playerHead = GUIUtils.createGuiPlayerItem(this.player);
-        ItemStack waiting = GUIUtils.createItemStack(ChatColor.GREEN + "Waiting for game creator to accept...", Material.CLOCK);
+        ItemStack fillTile = GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE);
+        ItemStack waiting = GUIUtils.createItemStack(ChatColor.GREEN + "Waiting for game creator...", Material.CLOCK);
 
-        this.inv.setItem(15, playerHead);
         this.inv.setItem(33, waiting);
+        this.inv.setItem(42, fillTile);
     }
 
     @Override

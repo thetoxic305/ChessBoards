@@ -9,6 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import water.of.cup.chessboards.ChessBoards;
@@ -29,13 +31,24 @@ public class InventoryClick implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        if(!(event.getWhoClicked() instanceof Player)) return;
+        if(event.getClickedInventory() == null) return;
+        if(event.getClickedInventory().getType().equals(InventoryType.PLAYER) ||
+                !event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
+
         Player player = (Player) event.getWhoClicked();
 
-        if(event.getClickedInventory() == null) return;
+        ItemStack itemStack = event.getCurrentItem();
+        if (itemStack == null || itemStack.getType() == Material.AIR) return;
 
-        if (event.getView().getTitle().contains(ChessCreateGameInventory.INVENTORY_NAME)
-                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
-                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if(itemMeta == null) return;
+
+        String itemName = ChatColor.stripColor(itemMeta.getDisplayName());
+
+        Material itemType = itemStack.getType();
+
+        if (event.getClickedInventory().getHolder() instanceof ChessCreateGameInventory) {
 
             if(!pluginInstance.playerHasCreateGame(player)) return;
 
@@ -43,15 +56,13 @@ public class InventoryClick implements Listener {
 
             ChessCreateGameInventory chessCreateGameInventory = pluginInstance.getCreateGameInventory(player);
 
-            String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
-
             // Exit button
-            if(event.getCurrentItem().getType().equals(Material.BARRIER)) {
+            if(itemType.equals(Material.BARRIER)) {
                 player.closeInventory();
                 return;
             }
 
-            if(itemName.contains("Create") && (event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE))) {
+            if(itemName.contains("Create") && (itemType.equals(Material.LIME_STAINED_GLASS_PANE))) {
                 if(!chessCreateGameInventory.getChessGame().getGameState().equals(ChessGameState.IDLE)) {
                     player.closeInventory();
                     player.sendMessage(ChatColor.RED + "A game has already been created for this board.");
@@ -93,17 +104,20 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-            if((itemName.equals("Ranked") || itemName.equals("Unranked")) && (event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE) ||
-                    event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE))) {
+            if((itemName.equals("Ranked") || itemName.equals("Unranked")) && (itemType.equals(Material.RED_STAINED_GLASS_PANE) ||
+                    itemType.equals(Material.GREEN_STAINED_GLASS_PANE))) {
                 chessCreateGameInventory.toggleRanked();
                 chessCreateGameInventory.displayCreateGame(player, false);
                 return;
             }
 
-            if(event.getCurrentItem().getType().equals(Material.PLAYER_HEAD)) {
+            if(itemType.equals(Material.PLAYER_HEAD)) {
                 // Increment
                 if(itemName.equals("/\\")) {
-                    Material materialBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9).getType();
+                    ItemStack itemBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9);
+                    if(itemBelow == null) return;
+
+                    Material materialBelow = itemBelow.getType();
                     switch (materialBelow) {
                         case CLOCK:
                             chessCreateGameInventory.incrementGameTime();
@@ -119,7 +133,10 @@ public class InventoryClick implements Listener {
 
                 // Decrement
                 if(itemName.equals("\\/")) {
-                    Material materialAbove = event.getClickedInventory().getItem(event.getRawSlot() - 9).getType();
+                    ItemStack itemAbove = event.getClickedInventory().getItem(event.getRawSlot() - 9);
+                    if(itemAbove == null) return;
+
+                    Material materialAbove = itemAbove.getType();
                     switch (materialAbove) {
                         case CLOCK:
                             chessCreateGameInventory.decrementGameTime();
@@ -137,9 +154,7 @@ public class InventoryClick implements Listener {
             }
         }
 
-        if (event.getView().getTitle().contains(ChessWaitingPlayerInventory.INVENTORY_NAME)
-                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
-                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+        if (event.getClickedInventory().getHolder() instanceof ChessWaitingPlayerInventory) {
 
             ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByPlayer(player);
 
@@ -148,17 +163,23 @@ public class InventoryClick implements Listener {
             event.setCancelled(true);
 
             // Exit button
-            if(event.getCurrentItem().getType().equals(Material.BARRIER)) {
+            if(itemType.equals(Material.BARRIER)) {
                 player.closeInventory();
                 return;
             }
 
             // Game owner accepts or declines players in queue
-            if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE) ||
-                    event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE) ) {
+            if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE) ||
+                    itemType.equals(Material.RED_STAINED_GLASS_PANE) ) {
 
-                if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
-                    String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 18).getItemMeta().getDisplayName());
+                if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)) {
+                    ItemStack playerItem = event.getClickedInventory().getItem(event.getRawSlot() - 18);
+                    if(playerItem == null) return;
+
+                    ItemMeta playerItemMeta = playerItem.getItemMeta();
+                    if(playerItemMeta == null) return;
+
+                    String playerName = ChatColor.stripColor(playerItemMeta.getDisplayName());
 
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
 
@@ -202,10 +223,17 @@ public class InventoryClick implements Listener {
                     chessGame.openConfirmGameInventory();
 
                 } else  {
-                    String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 27).getItemMeta().getDisplayName());
+                    ItemStack playerItem = event.getClickedInventory().getItem(event.getRawSlot() - 27);
+                    if(playerItem == null) return;
+
+                    ItemMeta playerItemMeta = playerItem.getItemMeta();
+                    if(playerItemMeta == null) return;
+
+                    String playerName = ChatColor.stripColor(playerItemMeta.getDisplayName());
                     Player clickedPlayer = Bukkit.getPlayer(playerName);
 
-                    clickedPlayer.closeInventory();
+                    if(clickedPlayer != null)
+                        clickedPlayer.closeInventory();
                 }
 
                 return;
@@ -214,9 +242,10 @@ public class InventoryClick implements Listener {
             return;
         }
 
-        if (event.getView().getTitle().contains(ChessJoinGameInventory.INVENTORY_NAME)
-                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
-                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+        if (event.getClickedInventory().getHolder() instanceof ChessJoinGameInventory) {
+
+            ChessJoinGameInventory joinGameInventory = (ChessJoinGameInventory) event.getView().getTopInventory().getHolder();
+            if(joinGameInventory == null) return;
 
             ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByDecisionQueuePlayer(player);
 
@@ -227,13 +256,13 @@ public class InventoryClick implements Listener {
             event.setCancelled(true);
 
             // Exit button
-            if(event.getCurrentItem().getType().equals(Material.BARRIER)) {
+            if(itemType.equals(Material.BARRIER)) {
                 player.closeInventory();
                 return;
             }
 
             // Join game button
-            if(event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
+            if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)) {
             	if (pluginInstance.getEconomy() != null && pluginInstance.getEconomy().getBalance(player) < chessGame.getGameWager()) {
         			player.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
         			return;
@@ -241,34 +270,29 @@ public class InventoryClick implements Listener {
             	
                 chessGame.addPlayerToQueue(player);
 
-                event.getClickedInventory().setItem(33, GUIUtils.createItemStack(ChatColor.GREEN + "Waiting for game creator...", Material.CLOCK));
-                event.getClickedInventory().setItem(42, GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE));
+            	joinGameInventory.display(player, false, true);
                 return;
             }
 
             // Decline game button
-            if(event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)) {
+            if(itemType.equals(Material.RED_STAINED_GLASS_PANE)) {
                 player.closeInventory();
                 return;
             }
 
         }
 
-        if (event.getView().getTitle().contains(ChessInGameInventory.INVENTORY_NAME)
-                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
-                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+        if (event.getClickedInventory().getHolder() instanceof ChessInGameInventory) {
 
+            ChessInGameInventory inGameInventory = (ChessInGameInventory) event.getView().getTopInventory().getHolder();
+            if(inGameInventory == null) return;
 
-            int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
-
-            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
+            ChessGame chessGame = inGameInventory.getChessGame();
             if(chessGame == null) return;
 
             event.setCancelled(true);
 
-            String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
-
-            if (event.getCurrentItem().getType().equals(Material.BOOK)) {
+            if (itemType.equals(Material.BOOK)) {
                 if(chessGame.getWagerViewByPlayer(player) != null) {
                     chessGame.getWagerViewByPlayer(player).display(true);
                 } else {
@@ -279,12 +303,18 @@ public class InventoryClick implements Listener {
             	return;
             }
 
-            if(event.getCurrentItem().getType().equals(Material.YELLOW_STAINED_GLASS_PANE) ||
-                    event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)) {
+            if(itemType.equals(Material.YELLOW_STAINED_GLASS_PANE) ||
+                    itemType.equals(Material.LIME_STAINED_GLASS_PANE)) {
 
                 if(!(chessGame.getGameState().equals(ChessGameState.CONFIRM_GAME))) return;
 
-                String playerName = ChatColor.stripColor(event.getClickedInventory().getItem(event.getRawSlot() - 27).getItemMeta().getDisplayName());
+                ItemStack playerItem = event.getClickedInventory().getItem(event.getRawSlot() - 27);
+                if(playerItem == null) return;
+
+                ItemMeta playerItemMeta = playerItem.getItemMeta();
+                if(playerItemMeta == null) return;
+
+                String playerName = ChatColor.stripColor(playerItemMeta.getDisplayName());
                 Player clickedPlayer = Bukkit.getPlayer(playerName);
 
                 if(clickedPlayer == null) {
@@ -299,7 +329,7 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-            if(event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)
+            if(itemType.equals(Material.RED_STAINED_GLASS_PANE)
                     && itemName.contains("Forfeit")) {
                 boolean didForfeit = chessGame.forfeitGame(player, true);
                 if(!didForfeit) Bukkit.getLogger().warning("[ChessBoards] Could not forfeit game " + chessGame.getGameId());
@@ -307,23 +337,15 @@ public class InventoryClick implements Listener {
             return;
         }
 
-		if (event.getView().getTitle().contains(ChessWagerViewInventory.INVENTORY_NAME)
-                && !event.getClickedInventory().getType().equals(InventoryType.PLAYER)
-                && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) {
+		if (event.getClickedInventory().getHolder() instanceof ChessWagerViewInventory) {
 
-            int chessGameID = event.getClickedInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(ChessBoards.getKey(), PersistentDataType.INTEGER);
-
-            ChessGame chessGame = pluginInstance.getChessBoardManager().getGameByGameId(chessGameID);
-            if(chessGame == null) return;
-
-            ChessWagerViewInventory chessWagerViewInventory = chessGame.getWagerViewByPlayer(player);
+            ChessWagerViewInventory chessWagerViewInventory = (ChessWagerViewInventory) event.getView().getTopInventory().getHolder();
             if(chessWagerViewInventory == null) return;
 
+            ChessGame chessGame = chessWagerViewInventory.getChessGame();
+            if(chessGame == null) return;
+
             event.setCancelled(true);
-
-            String itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
-
-            Material itemType = event.getCurrentItem().getType();
 
             RequestWager playerWager = chessGame.getRequestWagerByPlayer(player);
 
@@ -408,8 +430,13 @@ public class InventoryClick implements Listener {
                 if(itemType.equals(Material.PLAYER_HEAD)) {
                     playerName = itemName;
                 } else if((itemType.equals(Material.BLACK_WOOL) || itemType.equals(Material.WHITE_WOOL)) && event.getRawSlot() % 9 > 0) {
-                    playerName = player.getOpenInventory().getItem(event.getRawSlot() - 1).getItemMeta().getDisplayName();
-                    playerName = ChatColor.stripColor(playerName);
+                    ItemStack playerItem = player.getOpenInventory().getItem(event.getRawSlot() - 1);
+                    if(playerItem == null) return;
+
+                    ItemMeta playerItemMeta = playerItem.getItemMeta();
+                    if(playerItemMeta == null) return;
+
+                    playerName = ChatColor.stripColor(playerItemMeta.getDisplayName());
                 }
 
                 if(playerName == null) return;
@@ -437,7 +464,6 @@ public class InventoryClick implements Listener {
                 chessWagerViewInventory.setSelectedWager(requestWager);
                 chessWagerViewInventory.display(false);
             }
-        	return;
         }
     }
 

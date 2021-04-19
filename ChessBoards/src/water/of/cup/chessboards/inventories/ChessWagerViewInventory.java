@@ -82,7 +82,6 @@ public class ChessWagerViewInventory implements InventoryHolder {
 
 		inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
 
-		GUIUtils.setGameIDItem(inv, chessGame);
 		this.displayAvailableWagers();
 		
 		if (openInv)
@@ -158,5 +157,9 @@ public class ChessWagerViewInventory implements InventoryHolder {
 
 	public void setSelectedWager(RequestWager requestWager) {
 		this.selectedWager = requestWager;
+	}
+
+	public ChessGame getChessGame() {
+		return this.chessGame;
 	}
 }

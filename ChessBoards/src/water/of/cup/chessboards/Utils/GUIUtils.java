@@ -145,6 +145,7 @@ public class GUIUtils {
         }
     }
 
+    @Deprecated
 	public static void setGameIDItem(Inventory inv, ChessGame chessGame) {
 		ItemStack gameIDItem = inv.getItem(0);
         ItemMeta gameIDItemMeta = gameIDItem.getItemMeta();

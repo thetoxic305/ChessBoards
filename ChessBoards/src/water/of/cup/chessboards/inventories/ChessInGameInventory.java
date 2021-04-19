@@ -47,8 +47,6 @@ public class ChessInGameInventory implements InventoryHolder {
 		GUIUtils.fillRect(this.inv, new int[] { 5, 1 }, new int[] { 7, 4 },
 				GUIUtils.createItemStack(" ", Material.WHITE_STAINED_GLASS_PANE));
 
-		GUIUtils.setGameIDItem(inv, chessGame);
-
 		ArrayList<String> buttons = new ArrayList<String>();
 		if (chessGame.hasPlayer(player)) {
 			buttons.add("forfeit");
@@ -141,6 +139,10 @@ public class ChessInGameInventory implements InventoryHolder {
 		Material mat = bool ? Material.LIME_STAINED_GLASS_PANE : Material.YELLOW_STAINED_GLASS_PANE;
 		String str = bool ? ChatColor.GREEN + "READY" : ChatColor.RED + "NOT READY";
 		return GUIUtils.createItemStack(str, mat);
+	}
+
+	public ChessGame getChessGame() {
+		return this.chessGame;
 	}
 
 	@Override
