@@ -88,7 +88,8 @@ public class DataSource {
                 + "`rating` double default 0,"
                 + "`ratingDeviation` double default 0,"
                 + "`volatility` double default 0,"
-                + "`numberOfResults` int default 0);";
+                + "`numberOfResults` int default 0,"
+                + "`username` varchar(255));";
 
         try (Connection con = getConnection();
              Statement statement = con.createStatement();) {
@@ -109,6 +110,10 @@ public class DataSource {
                 this.chessPlayers.put(player, chessPlayer);
             }
         });
+
+        if(columnExists("chess_players", "username")) {
+            this.updateColumn(uuidString, "username", player.getName());
+        }
     }
 
     private void createChessPlayerAsync(Player player, Consumer<ChessPlayer> consumer)  {
@@ -163,6 +168,16 @@ public class DataSource {
                 throwables.printStackTrace();
             }
         });
+    }
+
+    private boolean columnExists(String table, String column) {
+        try (Connection con = getConnection();
+             ResultSet rs = con.getMetaData().getColumns(null, null, table, column)) {
+            return rs.next();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
     }
 
     public ChessPlayer getChessPlayer(Player player) {
