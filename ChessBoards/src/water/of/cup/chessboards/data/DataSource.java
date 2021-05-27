@@ -99,21 +99,26 @@ public class DataSource {
 
     public void addChessPlayer(Player player) {
         String uuidString = player.getUniqueId().toString();
+        boolean hasUsername = columnExists("chess_players", "username");
         getOfflineChessPlayerAsync(uuidString, chessPlayer -> {
             if(chessPlayer == null) {
                 createChessPlayerAsync(player, newChessPlayer -> {
                     if(newChessPlayer == null) return;
 
                     this.chessPlayers.put(player, newChessPlayer);
+
+                    if(hasUsername) {
+                        this.updateColumn(uuidString, "username", player.getName());
+                    }
                 });
             } else {
                 this.chessPlayers.put(player, chessPlayer);
+
+                if(hasUsername) {
+                    this.updateColumn(uuidString, "username", player.getName());
+                }
             }
         });
-
-        if(columnExists("chess_players", "username")) {
-            this.updateColumn(uuidString, "username", player.getName());
-        }
     }
 
     private void createChessPlayerAsync(Player player, Consumer<ChessPlayer> consumer)  {
