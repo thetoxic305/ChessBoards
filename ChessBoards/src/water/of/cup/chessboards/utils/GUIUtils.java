@@ -120,11 +120,11 @@ public class GUIUtils {
 		}
         
         
-        ItemStack gameTimeItem = GUIUtils.createItemStack(ChatColor.GREEN + "Game Time: " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK, timeLore);
+        ItemStack gameTimeItem = GUIUtils.createItemStack(ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_GAMETIME.toString() + " " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK, timeLore);
 
 //		int wager = chessGame.getWager();
         int wagerNum = chessGame.getGameWager();
-        ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + "" + wagerNum, Material.GOLD_INGOT);
+        ItemStack wager = GUIUtils.createItemStack(ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_WAGERAMOUNT.toString() + ChatColor.DARK_GREEN + "" + wagerNum, Material.GOLD_INGOT);
 
         if(playerHeadEnabled) {
             inventory.setItem(startPos, playerHead);

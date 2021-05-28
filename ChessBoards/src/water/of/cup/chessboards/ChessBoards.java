@@ -63,7 +63,7 @@ public class ChessBoards extends JavaPlugin {
 		getCommand("chessboards").setExecutor(new ChessBoardCommands());
 		getCommand("chessboards").setTabCompleter(new ChessBoardCommandsTabCompleter());
 
-		registerListeners(new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin(), new BlockBreak());
+		registerListeners(new BoardInteract(), new BlockPlace(), new InventoryClose(), new InventoryClick(), new HangingBreakByEntity(), new EntityDamageByEntity(), new HangingBreak(), new ChessPlayerJoin(), new BlockBreak(), new ChessPlayerQuit());
 
 		if(config.getBoolean("settings.chessboard.recipe.enabled"))
 			addChessBoardRecipe();
@@ -190,6 +190,10 @@ public class ChessBoards extends JavaPlugin {
 			}
 		});
 
+		defaultConfig.put("settings.messages.gui.up", "/\\");
+		defaultConfig.put("settings.messages.gui.down", "\\/");
+		defaultConfig.put("settings.messages.gui.gametime", "Game Time:");
+		defaultConfig.put("settings.messages.gui.wageramount", "Wager Amount: $");
 
 		if(!config.contains("settings.chessboard.recipe.ingredients")) {
 			for (String key : defaultRecipe.keySet()) {

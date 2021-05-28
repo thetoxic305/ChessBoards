@@ -11,6 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import water.of.cup.chessboards.ChessBoards;
+import water.of.cup.chessboards.utils.ConfigMessageUtils;
 import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 
@@ -86,9 +87,9 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
 	private void createGameTimeToggle() {
 		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
-				ChatColor.GREEN + "/\\", 1);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGES_GUI_UP.toString(), 1);
 		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
-				ChatColor.GREEN + "\\/", 1);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_DOWN.toString(), 1);
 
 		String gameTimeString = getGameTimeString();
 		ArrayList<String> timeLore = new ArrayList<String>();
@@ -106,7 +107,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 		}
 
 		ItemStack item = GUIUtils.createItemStack(
-				ChatColor.GREEN + "Game Time: " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_GAMETIME.toString() + " " + ChatColor.DARK_GREEN + gameTimeString, Material.CLOCK);
 		
 		ItemMeta itemMeta = item.getItemMeta();
 		itemMeta.setLore(timeLore);
@@ -120,12 +121,12 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
 	private void createWagerToggle() {
 		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
-				ChatColor.GREEN + "/\\", 1);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGES_GUI_UP.toString(), 1);
 		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
-				ChatColor.GREEN + "\\/", 1);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_DOWN.toString(), 1);
 
 		ItemStack item = GUIUtils.createItemStack(
-				ChatColor.GREEN + "Wager Amount: $" + ChatColor.DARK_GREEN + this.wager, Material.GOLD_INGOT);
+				ChatColor.GREEN + ConfigMessageUtils.MESSAGE_GUI_WAGERAMOUNT.toString() + ChatColor.DARK_GREEN + this.wager, Material.GOLD_INGOT);
 
 		this.inv.setItem(14, increment);
 		this.inv.setItem(23, item);
