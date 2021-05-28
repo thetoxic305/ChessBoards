@@ -88,7 +88,8 @@ public class DataSource {
                 + "`rating` double default 0,"
                 + "`ratingDeviation` double default 0,"
                 + "`volatility` double default 0,"
-                + "`numberOfResults` int default 0);";
+                + "`numberOfResults` int default 0,"
+                + "`username` varchar(255));";
 
         try (Connection con = getConnection();
              Statement statement = con.createStatement();) {
@@ -98,15 +99,24 @@ public class DataSource {
 
     public void addChessPlayer(Player player) {
         String uuidString = player.getUniqueId().toString();
+        boolean hasUsername = columnExists("chess_players", "username");
         getOfflineChessPlayerAsync(uuidString, chessPlayer -> {
             if(chessPlayer == null) {
                 createChessPlayerAsync(player, newChessPlayer -> {
                     if(newChessPlayer == null) return;
 
                     this.chessPlayers.put(player, newChessPlayer);
+
+                    if(hasUsername) {
+                        this.updateColumn(uuidString, "username", player.getName());
+                    }
                 });
             } else {
                 this.chessPlayers.put(player, chessPlayer);
+
+                if(hasUsername) {
+                    this.updateColumn(uuidString, "username", player.getName());
+                }
             }
         });
     }
@@ -163,6 +173,16 @@ public class DataSource {
                 throwables.printStackTrace();
             }
         });
+    }
+
+    private boolean columnExists(String table, String column) {
+        try (Connection con = getConnection();
+             ResultSet rs = con.getMetaData().getColumns(null, null, table, column)) {
+            return rs.next();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
     }
 
     public ChessPlayer getChessPlayer(Player player) {
