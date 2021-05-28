@@ -22,6 +22,7 @@ import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.inventories.ChessJoinGameInventory;
 import water.of.cup.chessboards.inventories.ChessWagerViewInventory;
 import water.of.cup.chessboards.inventories.ChessWaitingPlayerInventory;
+import water.of.cup.chessboards.utils.ConfigMessageUtils;
 
 public class InventoryClick implements Listener {
 
@@ -111,7 +112,7 @@ public class InventoryClick implements Listener {
 
             if(itemType.equals(Material.PLAYER_HEAD)) {
                 // Increment
-                if(itemName.equals("/\\")) {
+                if(itemName.equals(ConfigMessageUtils.MESSAGES_GUI_UP.toString())) {
                     ItemStack itemBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9);
                     if(itemBelow == null) return;
 
@@ -130,7 +131,7 @@ public class InventoryClick implements Listener {
                 }
 
                 // Decrement
-                if(itemName.equals("\\/")) {
+                if(itemName.equals(ConfigMessageUtils.MESSAGE_GUI_DOWN.toString())) {
                     ItemStack itemAbove = event.getClickedInventory().getItem(event.getRawSlot() - 9);
                     if(itemAbove == null) return;
 
