@@ -111,7 +111,8 @@ public enum ChessPiece {
 		case WHITE_KING:
 			// check if king can castle
 
-			if (canEndangerKing == false) {
+			if (canEndangerKing == false && !record.get(record.size() - 1).contains("+")) {
+				
 				
 				if (getColor().equals("WHITE")) {
 					row = 7;
