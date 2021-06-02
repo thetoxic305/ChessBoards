@@ -1,5 +1,6 @@
 package water.of.cup.chessboards.utils;
 
+import org.bukkit.ChatColor;
 import water.of.cup.chessboards.ChessBoards;
 
 public enum ConfigMessageUtils {
@@ -18,7 +19,15 @@ public enum ConfigMessageUtils {
 
     @Override
     public String toString() {
-        return instance.getConfig().getString(this.path);
+        String configString = instance.getConfig().getString(this.path);
+
+        if(configString == null) return null;
+
+        return ChatColor.translateAlternateColorCodes('&', configString);
+    }
+
+    public String toRawString() {
+        return ChatColor.stripColor(this.toString());
     }
 
 }

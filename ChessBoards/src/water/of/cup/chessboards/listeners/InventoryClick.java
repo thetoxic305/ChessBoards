@@ -112,7 +112,7 @@ public class InventoryClick implements Listener {
 
             if(itemType.equals(Material.PLAYER_HEAD)) {
                 // Increment
-                if(itemName.equals(ConfigMessageUtils.MESSAGES_GUI_UP.toString())) {
+                if(itemName.equals(ConfigMessageUtils.MESSAGES_GUI_UP.toRawString())) {
                     ItemStack itemBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9);
                     if(itemBelow == null) return;
 
@@ -131,7 +131,7 @@ public class InventoryClick implements Listener {
                 }
 
                 // Decrement
-                if(itemName.equals(ConfigMessageUtils.MESSAGE_GUI_DOWN.toString())) {
+                if(itemName.equals(ConfigMessageUtils.MESSAGE_GUI_DOWN.toRawString())) {
                     ItemStack itemAbove = event.getClickedInventory().getItem(event.getRawSlot() - 9);
                     if(itemAbove == null) return;
 

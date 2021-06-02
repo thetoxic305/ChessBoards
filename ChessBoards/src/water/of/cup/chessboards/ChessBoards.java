@@ -190,10 +190,10 @@ public class ChessBoards extends JavaPlugin {
 			}
 		});
 
-		defaultConfig.put("settings.messages.gui.up", "/\\");
-		defaultConfig.put("settings.messages.gui.down", "\\/");
-		defaultConfig.put("settings.messages.gui.gametime", "Game Time:");
-		defaultConfig.put("settings.messages.gui.wageramount", "Wager Amount: $");
+		defaultConfig.put("settings.messages.gui.up", "&a/\\");
+		defaultConfig.put("settings.messages.gui.down", "&a\\/");
+		defaultConfig.put("settings.messages.gui.gametime", "&aGame Time: &2");
+		defaultConfig.put("settings.messages.gui.wageramount", "&aWager Amount: &2$");
 
 		if(!config.contains("settings.chessboard.recipe.ingredients")) {
 			for (String key : defaultRecipe.keySet()) {
