@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import water.of.cup.chessboards.ChessBoards;
 import water.of.cup.chessboards.chessBoard.ChessUtils;
 import water.of.cup.chessboards.data.ChessPlayer;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class ChessBoardCommands implements CommandExecutor {
 					if (args.length == 2) {
 						gets = Bukkit.getPlayer(args[1]);
 						if (gets == null) {
-							p.sendMessage("Could not find specified player");
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_PLAYER_NOT_FOUND.toString());
 							return false;
 						}
 					}
@@ -52,7 +53,7 @@ public class ChessBoardCommands implements CommandExecutor {
 					boolean chessBoardGiven = ChessUtils.giveChessBoard(gets);
 
 					if (!chessBoardGiven)
-						p.sendMessage("The recieving player does not have room in their inventory");
+						p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_NO_INV_ROOM.toString());
 					return chessBoardGiven;
 				}
 
@@ -61,7 +62,7 @@ public class ChessBoardCommands implements CommandExecutor {
 						return false;
 
 					if (!databaseEnabled) {
-						p.sendMessage("Database configuration must be on in order to view leaderboard");
+						p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_NO_DB.toString());
 						return false;
 					}
 
@@ -86,12 +87,11 @@ public class ChessBoardCommands implements CommandExecutor {
 
 						instance.getDataStore().getTopPlayers(page, topPlayers -> {
 							if (topPlayers == null) {
-								p.sendMessage("There was an error while trying to fetch top players");
+								p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_ERROR_FETCHING_PLAYERS.toString());
 								return;
 							}
 
-							p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
-									+ ChatColor.BOLD + "Boards " + ChatColor.RESET + "Leaderboard (" + (finalPage + 1) + "/"
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_CHESSTEXT.toString() + " " + ConfigMessage.MESSAGE_CHAT_COMMANDS_LBTEXT.toString() + " (" + (finalPage + 1) + "/"
 									+ numOfPages + ")");
 							int num = 1 + (finalPage * 10);
 							for (ChessPlayer chessPlayer : topPlayers) {
@@ -114,7 +114,7 @@ public class ChessBoardCommands implements CommandExecutor {
 						return false;
 
 					if (!databaseEnabled) {
-						p.sendMessage("Database configuration must be on in order to view player stats");
+						p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_NO_DB.toString());
 						return false;
 					}
 
@@ -126,32 +126,30 @@ public class ChessBoardCommands implements CommandExecutor {
 
 						instance.getDataStore().getOfflineChessPlayerAsync(offlinePlayer.getUniqueId().toString(), chessPlayer -> {
 							if(chessPlayer == null) {
-								p.sendMessage("Player not found in chess database");
+								p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_PLAYER_NOT_FOUND.toString());
 								return;
 							}
 
-							p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + ""
-									+ ChatColor.BOLD + "Boards " + ChatColor.GRAY + name + ChatColor.RESET + "'s stats");
-							p.sendMessage(ChatColor.GRAY + "W/L/D: " + ChatColor.RESET + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
-							p.sendMessage(ChatColor.GRAY + "Rating: " + ChatColor.RESET + (double) Math.round(chessPlayer.getRating() * 100) / 100);
-							p.sendMessage(ChatColor.GRAY + "Rating Deviation: " + ChatColor.RESET + chessPlayer.getRatingDeviation());
-							p.sendMessage(ChatColor.GRAY + "Volatility: " + ChatColor.RESET + chessPlayer.getVolatility());
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_CHESSTEXT.toString() + ChatColor.GRAY + name + ChatColor.RESET + ConfigMessage.MESSAGE_CHAT_COMMANDS_STATTEXT);
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_WLDTEXT.toString() + ChatColor.RESET + chessPlayer.getWins() + " W / " + chessPlayer.getLosses() + " L / " + chessPlayer.getTies() + " D");
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_RATINGTEXT.toString() + ChatColor.RESET + (double) Math.round(chessPlayer.getRating() * 100) / 100);
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_RATINGDEVIATIONTEXT.toString() + ChatColor.RESET + chessPlayer.getRatingDeviation());
+							p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_VOLATILITYTEXT.toString() + ChatColor.RESET + chessPlayer.getVolatility());
 						});
 
 						return true;
 					}
 					// missing arg
 					
-					p.sendMessage("/chessboards stats [player name]" + ChatColor.GRAY + ": Show stats for a player");
+					p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_STATS.toString());
 					return false;
 				}
 			}
 			// Send help message
-			p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "Chess" + ChatColor.DARK_GRAY + "" + ChatColor.BOLD
-					+ "Boards");
-			p.sendMessage("/chessboards give [player name]" + ChatColor.GRAY + ": Give a player a chessboard");
-			p.sendMessage("/chessboards leaderboard" + ChatColor.GRAY + ": Lists top chess players");
-			p.sendMessage("/chessboards stats [player name]" + ChatColor.GRAY + ": Show stats for a player");
+			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_CHESSTEXT.toString());
+			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_GIVE.toString());
+			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_LB.toString());
+			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_STATS.toString());
 			return false;
 
 		}

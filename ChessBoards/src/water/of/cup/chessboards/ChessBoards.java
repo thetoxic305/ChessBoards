@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -31,6 +32,7 @@ import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.listeners.*;
 import water.of.cup.chessboards.commands.ChessBoardCommands;
 import water.of.cup.chessboards.metrics.Metrics;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class ChessBoards extends JavaPlugin {
 	
@@ -76,10 +78,12 @@ public class ChessBoards extends JavaPlugin {
 				this.dataStore.addChessPlayer(player);
 			}
 		}
-		
-		boolean hasEconomy = setupEconomy();
-		if (!hasEconomy) {
-			Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
+
+		if(config.getBoolean("settings.chessboard.wagers")) {
+			boolean hasEconomy = setupEconomy();
+			if (!hasEconomy) {
+				Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
+			}
 		}
 
 		chessBoardManager.loadGames();
@@ -166,7 +170,12 @@ public class ChessBoards extends JavaPlugin {
 			- chessboard.command.leaderboard - use leaderboard command
 		 */
 		defaultConfig.put("settings.chessboard.permissions", true);
+		defaultConfig.put("settings.chessboard.wagers", true);
 		defaultConfig.put("settings.chessboard.customImages", false); // Default false
+
+		defaultConfig.put("settings.sounds.move", "BLOCK_WOOD_PLACE");
+		defaultConfig.put("settings.sounds.check", "BLOCK_WOOD_HIT");
+		defaultConfig.put("settings.sounds.enabled", true);
 
         defaultConfig.put("settings.database.host", "localhost");
         defaultConfig.put("settings.database.port", "3306");
@@ -190,10 +199,10 @@ public class ChessBoards extends JavaPlugin {
 			}
 		});
 
-		defaultConfig.put("settings.messages.gui.up", "&a/\\");
-		defaultConfig.put("settings.messages.gui.down", "&a\\/");
-		defaultConfig.put("settings.messages.gui.gametime", "&aGame Time: &2");
-		defaultConfig.put("settings.messages.gui.wageramount", "&aWager Amount: &2$");
+		// Load in config messages
+		for(ConfigMessage configMessage : ConfigMessage.values()) {
+			defaultConfig.put(configMessage.getPath(), configMessage.getDefaultMessage());
+		}
 
 		if(!config.contains("settings.chessboard.recipe.ingredients")) {
 			for (String key : defaultRecipe.keySet()) {

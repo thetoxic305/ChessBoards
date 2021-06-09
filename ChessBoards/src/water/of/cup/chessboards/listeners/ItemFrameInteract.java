@@ -19,6 +19,7 @@ import water.of.cup.chessboards.chessBoard.ChessGameState;
 import water.of.cup.chessboards.chessBoard.ChessUtils;
 import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.inventories.ChessInGameInventory;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class ItemFrameInteract implements Listener {
 
@@ -67,7 +68,7 @@ public class ItemFrameInteract implements Listener {
 
 				if(chessBoardManager.getGameByPlayer(player) != null
 						&& chessBoardManager.getGameByPlayer(player) != game) {
-					player.sendMessage("You must finish your game before joining another.");
+					player.sendMessage(ConfigMessage.MESSAGE_CHAT_PLAYER_INGAME.toString());
 					return;
 				}
 
@@ -80,7 +81,7 @@ public class ItemFrameInteract implements Listener {
 						if(game.getPlayerQueue().size() < 3) {
 							game.addPlayerToDecisionQueue(player);
 						} else {
-							player.sendMessage(ChatColor.RED + "Too many players queuing!");
+							player.sendMessage(ConfigMessage.MESSAGE_CHAT_QUEUE_FULL.toString());
 						}
 					}
 					return;

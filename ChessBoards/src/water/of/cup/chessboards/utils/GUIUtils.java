@@ -107,7 +107,10 @@ public class GUIUtils {
 		boolean databaseEnabled = instance.getConfig().getBoolean("settings.database.enabled");
 		ItemStack playerHead = GUIUtils.createGuiPlayerItem(chessGame.getWhitePlayer());
 
-		String rankedString = chessGame.isRanked() ? ChatColor.RED + "Ranked" : ChatColor.GREEN + "Unranked";
+		String rankedString = chessGame.isRanked()
+				? ConfigMessage.MESSAGE_GUI_RANKEDTEXT.toString()
+				: ConfigMessage.MESSAGE_GUI_UNRANKEDTEXT.toString();
+
 		ItemStack ranked = GUIUtils.createItemStack(rankedString, Material.EXPERIENCE_BOTTLE);
 
 		String gameTimeString = chessGame.getGameTimeString();
@@ -127,11 +130,11 @@ public class GUIUtils {
 		}
         
         
-        ItemStack gameTimeItem = GUIUtils.createItemStack(ConfigMessageUtils.MESSAGE_GUI_GAMETIME.toString() + gameTimeString, Material.CLOCK, timeLore);
+        ItemStack gameTimeItem = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_GAMETIME.toString() + gameTimeString, Material.CLOCK, timeLore);
 
 //		int wager = chessGame.getWager();
         int wagerNum = chessGame.getGameWager();
-        ItemStack wager = GUIUtils.createItemStack(ConfigMessageUtils.MESSAGE_GUI_WAGERAMOUNT.toString() + wagerNum, Material.GOLD_INGOT);
+        ItemStack wager = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_WAGERAMOUNT.toString() + wagerNum, Material.GOLD_INGOT);
 
 		if (playerHeadEnabled) {
 			inventory.setItem(startPos, playerHead);

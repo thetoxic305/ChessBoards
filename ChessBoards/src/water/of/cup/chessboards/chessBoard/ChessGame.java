@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -27,6 +29,7 @@ import water.of.cup.chessboards.inventories.ChessWagerViewInventory;
 import water.of.cup.chessboards.inventories.ChessWaitingPlayerInventory;
 import water.of.cup.chessboards.glicko2.RatingCalculator;
 import water.of.cup.chessboards.glicko2.RatingPeriodResults;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class ChessGame {
 	private ChessBoards instance = ChessBoards.getInstance();
@@ -285,6 +288,8 @@ public class ChessGame {
 				// MoveMade!
 				String notation = "";
 
+				sendMoveSound(false);
+
 				// reset fiftyMoveDrawCount if piece is pawn
 				if (piece.toString().contains("PAWN")) {
 					fiftyMoveDrawCount = 0;
@@ -359,6 +364,7 @@ public class ChessGame {
 					// Check if move creates check
 					if (ChessUtils.locationThreatened(ChessUtils.locateKing(board, turn), board)) {
 						notation += "+";
+						sendMoveSound(true);
 						// check if move creates checkmate
 						if (!ChessUtils.colorHasMoves(board, turn, record)) {
 							notation += "+";
@@ -457,8 +463,9 @@ public class ChessGame {
 		} else {
 			// Tied game
 			record.add("1/2-1/2");
-			String endMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
-					+ loser.getDisplayName() + " as " + losingColor;
+//			String endMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
+//					+ loser.getDisplayName() + " as " + losingColor;
+			String endMessage = ConfigMessage.MESSAGE_CHAT_GAME_OVER_TIE.buildString(winner, winningColor, loser, losingColor);
 
 			winner.sendMessage(endMessage);
 			loser.sendMessage(endMessage);
@@ -480,6 +487,7 @@ public class ChessGame {
 				player2.setTies(player2Ties + 1);
 			}
 
+			setGameState(ChessGameState.IDLE);
 			return;
 		}
 
@@ -499,8 +507,15 @@ public class ChessGame {
 		whitePlayer = null;
 		blackPlayer = null;
 
-		String endMessage = winner.getDisplayName() + " " + winMessage + " as " + winningColor.toLowerCase()
-				+ " against " + loser.getDisplayName() + " as " + losingColor.toLowerCase();
+		ConfigMessage messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_WIN;
+
+		if(winMessage.contains("forfeit")) {
+			messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_FORFEIT;
+		} else if(winMessage.contains("time")) {
+			messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_TIMEWIN;
+		}
+
+		String endMessage = messageType.buildString(winner, winningColor, loser, losingColor);
 
 		winner.sendMessage(endMessage);
 		loser.sendMessage(endMessage);
@@ -881,15 +896,16 @@ public class ChessGame {
 
 	public boolean requestWagerToWager(RequestWager requestWager, Player accepter) {
 		if (instance.getEconomy().getBalance(accepter) < requestWager.getAmount()) {
-			accepter.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+			accepter.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_ACCEPT_WAGER.toString());
 			return false;
 		}
 
 		// Send messages to players
-		requestWager.getOwner().sendMessage(
-				accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
-		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of "
-				+ requestWager.getAmount() + ".");
+		String acceptWagerText = ConfigMessage.MESSAGE_CHAT_GAME_ACCEPT_WAGER.buildString(accepter, requestWager.getAmount());
+		requestWager.getOwner().sendMessage(acceptWagerText);
+
+		String wagerAcceptedText = ConfigMessage.MESSAGE_CHAT_GAME_WAGER_ACCEPTED.buildString(requestWager.getOwner(), requestWager.getAmount());
+		accepter.sendMessage(wagerAcceptedText);
 
 		wagers.add(new Wager(requestWager, accepter));
 		removeRequestWager(requestWager);
@@ -944,5 +960,26 @@ public class ChessGame {
 
 	public ArrayList<Wager> getWagers() {
 		return this.wagers;
+	}
+
+	private void sendMoveSound(boolean isCheck) {
+		if(this.blackPlayer == null) return;
+		if(this.whitePlayer == null) return;
+
+		if(instance.getConfig().getBoolean("settings.sounds.enabled")) {
+			String moveSoundName = instance.getConfig().getString("settings.sounds.move");
+			String checkSoundName = instance.getConfig().getString("settings.sounds.check");
+
+			if(!EnumUtils.isValidEnum(Sound.class, moveSoundName)) return;
+			if(!EnumUtils.isValidEnum(Sound.class, checkSoundName)) return;
+
+			Sound moveSound = Sound.valueOf(moveSoundName);
+			Sound checkSound = Sound.valueOf(checkSoundName);
+
+			Sound soundToPlay = isCheck ? checkSound : moveSound;
+
+			this.blackPlayer.playSound(this.blackPlayer.getLocation(), soundToPlay, (float) 5.0, (float) 1.0);
+			this.whitePlayer.playSound(this.whitePlayer.getLocation(), soundToPlay, (float) 5.0, (float) 1.0);
+		}
 	}
 }

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import water.of.cup.chessboards.utils.ConfigMessage;
 import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 
@@ -14,7 +15,7 @@ public class ChessWaitingPlayerInventory implements InventoryHolder {
 
     private Inventory inv;
     private ChessGame chessGame;
-    public static final String INVENTORY_NAME = "Chess | Waiting For Player";
+    public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_WAITING.toString();;
 
     public ChessWaitingPlayerInventory(ChessGame chessGame) {
         inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
@@ -31,7 +32,7 @@ public class ChessWaitingPlayerInventory implements InventoryHolder {
         GUIUtils.renderGameData(this.inv, this.chessGame, 11, true);
         this.renderQueue();
 
-        this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
+        this.inv.setItem(8, GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_EXITTEXT.toString(), Material.BARRIER));
         if(openInv) player.openInventory(inv);
     }
 
@@ -39,8 +40,8 @@ public class ChessWaitingPlayerInventory implements InventoryHolder {
         int index = 0;
         for(Player player : this.chessGame.getPlayerQueue()) {
             ItemStack playerHead = GUIUtils.createGuiPlayerItem(player);
-            ItemStack acceptButton = GUIUtils.createItemStack(ChatColor.GREEN + "Accept", Material.GREEN_STAINED_GLASS_PANE);
-            ItemStack declineButton = GUIUtils.createItemStack(ChatColor.RED + "Decline", Material.RED_STAINED_GLASS_PANE);
+            ItemStack acceptButton = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_ACCEPTTEXT.toString(), Material.GREEN_STAINED_GLASS_PANE);
+            ItemStack declineButton = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_DECLINETEXT.toString(), Material.RED_STAINED_GLASS_PANE);
 
             this.inv.setItem(14 + index, playerHead);
             this.inv.setItem(32 + index, acceptButton);

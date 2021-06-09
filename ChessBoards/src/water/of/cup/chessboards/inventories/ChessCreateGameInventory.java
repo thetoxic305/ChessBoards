@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import water.of.cup.chessboards.ChessBoards;
-import water.of.cup.chessboards.utils.ConfigMessageUtils;
+import water.of.cup.chessboards.utils.ConfigMessage;
 import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 
@@ -24,7 +24,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 			"30 min", "60 min"};
 	private int wager;
 	private ChessGame chessGame;
-	public static final String INVENTORY_NAME = "Chess | Create Game";
+	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_CREATE.toString();
 	private ChessBoards instance = ChessBoards.getInstance();
 
 	public ChessCreateGameInventory(ChessGame chessGame) {
@@ -55,29 +55,24 @@ public class ChessCreateGameInventory implements InventoryHolder {
 //					Material.YELLOW_STAINED_GLASS_PANE));
 //		}
 
-		String rankGameString = ranked ? "Ranked" : "Unranked";
-		String fullGameString = ChatColor.GREEN + "Create Game";
-
-		if(databaseEnabled) {
-			fullGameString = ChatColor.GREEN + "Create " + rankGameString + " Game";
-		}
+		String fullGameString = ConfigMessage.MESSAGE_GUI_CREATEGAME.toString();
 
 		for (int i = 0; i < 2; i++) {
 			this.inv.setItem(51 + i, GUIUtils.createItemStack(fullGameString, Material.LIME_STAINED_GLASS_PANE));
 		}
 
-		this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
+		this.inv.setItem(8, GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_EXITTEXT.toString(), Material.BARRIER));
 
 		if (openInv)
 			player.openInventory(inv);
 	}
 
 	private void createRankedToggle() {
-		String name = ChatColor.RED + "Unranked";
+		String name = ConfigMessage.MESSAGE_GUI_UNRANKEDTEXT.toString();
 		ItemStack button = GUIUtils.createItemStack(name, Material.RED_STAINED_GLASS_PANE);
 
 		if (ranked) {
-			name = ChatColor.GREEN + "Ranked";
+			name = ConfigMessage.MESSAGE_GUI_RANKEDTEXT.toString();
 			button = GUIUtils.createItemStack(name, Material.GREEN_STAINED_GLASS_PANE);
 		}
 
@@ -87,9 +82,9 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
 	private void createGameTimeToggle() {
 		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
-				ConfigMessageUtils.MESSAGES_GUI_UP.toString(), 1);
+				ConfigMessage.MESSAGE_GUI_UP.toString(), 1);
 		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
-				ConfigMessageUtils.MESSAGE_GUI_DOWN.toString(), 1);
+				ConfigMessage.MESSAGE_GUI_DOWN.toString(), 1);
 
 		String gameTimeString = getGameTimeString();
 		ArrayList<String> timeLore = new ArrayList<String>();
@@ -107,7 +102,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 		}
 
 		ItemStack item = GUIUtils.createItemStack(
-				ConfigMessageUtils.MESSAGE_GUI_GAMETIME.toString() + gameTimeString, Material.CLOCK);
+				ConfigMessage.MESSAGE_GUI_GAMETIME.toString() + gameTimeString, Material.CLOCK);
 		
 		ItemMeta itemMeta = item.getItemMeta();
 		itemMeta.setLore(timeLore);
@@ -121,12 +116,12 @@ public class ChessCreateGameInventory implements InventoryHolder {
 
 	private void createWagerToggle() {
 		ItemStack increment = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThmZTI1MWE0MGU0MTY3ZDM1ZDA4MWMyNzg2OWFjMTUxYWY5NmI2YmQxNmRkMjgzNGQ1ZGM3MjM1ZjQ3NzkxZCJ9fX0=",
-				ConfigMessageUtils.MESSAGES_GUI_UP.toString(), 1);
+				ConfigMessage.MESSAGE_GUI_UP.toString(), 1);
 		ItemStack decrement = GUIUtils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3Y2U2ODNkMDg2OGFhNDM3OGFlYjYwY2FhNWVhODA1OTZiY2ZmZGFiNmI1YWYyZDEyNTk1ODM3YTg0ODUzIn19fQ==",
-				ConfigMessageUtils.MESSAGE_GUI_DOWN.toString(), 1);
+				ConfigMessage.MESSAGE_GUI_DOWN.toString(), 1);
 
 		ItemStack item = GUIUtils.createItemStack(
-				ConfigMessageUtils.MESSAGE_GUI_WAGERAMOUNT.toString() + this.wager, Material.GOLD_INGOT);
+				ConfigMessage.MESSAGE_GUI_WAGERAMOUNT.toString() + this.wager, Material.GOLD_INGOT);
 
 		this.inv.setItem(14, increment);
 		this.inv.setItem(23, item);
