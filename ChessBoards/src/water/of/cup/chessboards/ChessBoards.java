@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -171,6 +172,10 @@ public class ChessBoards extends JavaPlugin {
 		defaultConfig.put("settings.chessboard.permissions", true);
 		defaultConfig.put("settings.chessboard.wagers", true);
 		defaultConfig.put("settings.chessboard.customImages", false); // Default false
+
+		defaultConfig.put("settings.sounds.move", "BLOCK_WOOD_PLACE");
+		defaultConfig.put("settings.sounds.check", "BLOCK_WOOD_HIT");
+		defaultConfig.put("settings.sounds.enabled", true);
 
         defaultConfig.put("settings.database.host", "localhost");
         defaultConfig.put("settings.database.port", "3306");
