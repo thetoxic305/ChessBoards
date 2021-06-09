@@ -482,6 +482,7 @@ public class ChessGame {
 				player2.setTies(player2Ties + 1);
 			}
 
+			setGameState(ChessGameState.IDLE);
 			return;
 		}
 
