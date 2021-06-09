@@ -11,6 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import water.of.cup.chessboards.ChessBoards;
+import water.of.cup.chessboards.utils.ConfigMessage;
 import water.of.cup.chessboards.utils.GUIUtils;
 import water.of.cup.chessboards.chessBoard.ChessGame;
 import water.of.cup.chessboards.chessBoard.ChessGameState;
@@ -23,7 +24,7 @@ public class ChessInGameInventory implements InventoryHolder {
 	private ChessGame chessGame;
 	private boolean whitePlayerReady;
 	private boolean blackPlayerReady;
-	public static final String INVENTORY_NAME = "Chess | Ingame";
+	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_INGAME.toString();
 
 	public ChessInGameInventory(ChessGame chessGame) {
 		inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
@@ -109,12 +110,12 @@ public class ChessInGameInventory implements InventoryHolder {
 	}
 
 	private void renderForfeitButton(int slot) {
-		ItemStack item = GUIUtils.createItemStack(ChatColor.RED + "Forfeit", Material.RED_STAINED_GLASS_PANE);
+		ItemStack item = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_FFTEXT.toString(), Material.RED_STAINED_GLASS_PANE);
 		this.inv.setItem(slot, item);
 	}
 
 	private void renderWagerButton(int slot) {
-		ItemStack item = GUIUtils.createItemStack(ChatColor.BLUE + "Wagers", Material.BOOK);
+		ItemStack item = GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_WAGERSTEXT.toString(), Material.BOOK);
 		this.inv.setItem(slot, item);
 	}
 
@@ -137,7 +138,7 @@ public class ChessInGameInventory implements InventoryHolder {
 
 	private ItemStack getButtonStack(boolean bool) {
 		Material mat = bool ? Material.LIME_STAINED_GLASS_PANE : Material.YELLOW_STAINED_GLASS_PANE;
-		String str = bool ? ChatColor.GREEN + "READY" : ChatColor.RED + "NOT READY";
+		String str = bool ? ConfigMessage.MESSAGE_GUI_READYTEXT.toString() : ConfigMessage.MESSAGE_GUI_NOTREADYTEXT.toString();
 		return GUIUtils.createItemStack(str, mat);
 	}
 

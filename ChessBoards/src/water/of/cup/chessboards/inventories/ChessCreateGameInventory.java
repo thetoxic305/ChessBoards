@@ -24,7 +24,7 @@ public class ChessCreateGameInventory implements InventoryHolder {
 			"30 min", "60 min"};
 	private int wager;
 	private ChessGame chessGame;
-	public static final String INVENTORY_NAME = "Chess | Create Game";
+	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_CREATE.toString();
 	private ChessBoards instance = ChessBoards.getInstance();
 
 	public ChessCreateGameInventory(ChessGame chessGame) {
@@ -55,29 +55,24 @@ public class ChessCreateGameInventory implements InventoryHolder {
 //					Material.YELLOW_STAINED_GLASS_PANE));
 //		}
 
-		String rankGameString = ranked ? "Ranked" : "Unranked";
-		String fullGameString = ChatColor.GREEN + "Create Game";
-
-		if(databaseEnabled) {
-			fullGameString = ChatColor.GREEN + "Create " + rankGameString + " Game";
-		}
+		String fullGameString = ConfigMessage.MESSAGE_GUI_CREATEGAME.toString();
 
 		for (int i = 0; i < 2; i++) {
 			this.inv.setItem(51 + i, GUIUtils.createItemStack(fullGameString, Material.LIME_STAINED_GLASS_PANE));
 		}
 
-		this.inv.setItem(8, GUIUtils.createItemStack(ChatColor.RED + "EXIT", Material.BARRIER));
+		this.inv.setItem(8, GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_EXITTEXT.toString(), Material.BARRIER));
 
 		if (openInv)
 			player.openInventory(inv);
 	}
 
 	private void createRankedToggle() {
-		String name = ChatColor.RED + "Unranked";
+		String name = ConfigMessage.MESSAGE_GUI_UNRANKEDTEXT.toString();
 		ItemStack button = GUIUtils.createItemStack(name, Material.RED_STAINED_GLASS_PANE);
 
 		if (ranked) {
-			name = ChatColor.GREEN + "Ranked";
+			name = ConfigMessage.MESSAGE_GUI_RANKEDTEXT.toString();
 			button = GUIUtils.createItemStack(name, Material.GREEN_STAINED_GLASS_PANE);
 		}
 

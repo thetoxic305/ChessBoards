@@ -61,7 +61,7 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-            if(itemName.contains("Create") && (itemType.equals(Material.LIME_STAINED_GLASS_PANE))) {
+            if(itemName.contains(ConfigMessage.MESSAGE_GUI_CREATEGAME.toRawString()) && (itemType.equals(Material.LIME_STAINED_GLASS_PANE))) {
                 if(!chessCreateGameInventory.getChessGame().getGameState().equals(ChessGameState.IDLE)) {
                     player.closeInventory();
                     player.sendMessage(ConfigMessage.MESSAGE_CHAT_GAME_ALREADY_CREATED.toString());
@@ -103,7 +103,7 @@ public class InventoryClick implements Listener {
                 return;
             }
 
-            if((itemName.equals("Ranked") || itemName.equals("Unranked")) && (itemType.equals(Material.RED_STAINED_GLASS_PANE) ||
+            if((itemName.equals(ConfigMessage.MESSAGE_GUI_RANKEDTEXT.toRawString()) || itemName.equals(ConfigMessage.MESSAGE_GUI_UNRANKEDTEXT.toRawString())) && (itemType.equals(Material.RED_STAINED_GLASS_PANE) ||
                     itemType.equals(Material.GREEN_STAINED_GLASS_PANE))) {
                 chessCreateGameInventory.toggleRanked();
                 chessCreateGameInventory.displayCreateGame(player, false);
@@ -329,7 +329,7 @@ public class InventoryClick implements Listener {
             }
 
             if(itemType.equals(Material.RED_STAINED_GLASS_PANE)
-                    && itemName.contains("Forfeit")) {
+                    && itemName.contains(ConfigMessage.MESSAGE_GUI_FFTEXT.toRawString())) {
                 boolean didForfeit = chessGame.forfeitGame(player, true);
                 if(!didForfeit) Bukkit.getLogger().warning("[ChessBoards] Could not forfeit game " + chessGame.getGameId());
             }
@@ -353,17 +353,21 @@ public class InventoryClick implements Listener {
                 return;
             }
 
+            String increaseText = ConfigMessage.MESSAGE_GUI_WAGER_INCREASE.toRawString();
+            String decreaseText = ConfigMessage.MESSAGE_GUI_WAGER_DECREASE.toRawString();
+
+            String createText = ConfigMessage.MESSAGE_GUI_WAGER_CREATE.toRawString();
+            String cancelText = ConfigMessage.MESSAGE_GUI_WAGER_CANCEL.toRawString();
+            String acceptText = ConfigMessage.MESSAGE_GUI_WAGER_ACCEPT.toRawString();
+
             if(itemType.equals(Material.PLAYER_HEAD)
-                    && (itemName.equals("Decrease") || itemName.equals("Increase")) && playerWager == null) {
+                    && (itemName.equals(decreaseText) || itemName.equals(increaseText)) && playerWager == null) {
                 boolean shifting = event.getClick().equals(ClickType.SHIFT_LEFT);
 
-                switch (itemName) {
-                    case "Increase":
-                        chessWagerViewInventory.incrementWager(shifting);
-                        break;
-                    case "Decrease":
-                        chessWagerViewInventory.decrementWager(shifting);
-                        break;
+                if(itemName.equals(increaseText)) {
+                    chessWagerViewInventory.incrementWager(shifting);
+                } else {
+                    chessWagerViewInventory.decrementWager(shifting);
                 }
 
                 chessWagerViewInventory.display(false);
@@ -372,7 +376,7 @@ public class InventoryClick implements Listener {
 
             // Create wager
             if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)
-                    && itemName.contains("Create") && playerWager == null) {
+                    && itemName.equals(createText) && playerWager == null) {
 
                 int wager = chessWagerViewInventory.getWagerAmount();
                 if(wager <= 0) return;
@@ -390,7 +394,7 @@ public class InventoryClick implements Listener {
 
             // Cancel wager
             if(itemType.equals(Material.YELLOW_STAINED_GLASS_PANE)
-                    && itemName.contains("Cancel") && playerWager != null) {
+                    && itemName.equals(cancelText) && playerWager != null) {
 
                 chessGame.removeRequestWager(playerWager);
 
@@ -406,7 +410,7 @@ public class InventoryClick implements Listener {
 
             // Accept wager
             if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)
-                    && itemName.contains("Accept Wager") && playerWager != chessWagerViewInventory.getSelectedWager()) {
+                    && itemName.equals(acceptText) && playerWager != chessWagerViewInventory.getSelectedWager()) {
             		
                boolean didCreateWager = chessGame.requestWagerToWager(chessWagerViewInventory.getSelectedWager(), player);
 

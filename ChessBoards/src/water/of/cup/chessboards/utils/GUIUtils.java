@@ -107,7 +107,10 @@ public class GUIUtils {
 		boolean databaseEnabled = instance.getConfig().getBoolean("settings.database.enabled");
 		ItemStack playerHead = GUIUtils.createGuiPlayerItem(chessGame.getWhitePlayer());
 
-		String rankedString = chessGame.isRanked() ? ChatColor.RED + "Ranked" : ChatColor.GREEN + "Unranked";
+		String rankedString = chessGame.isRanked()
+				? ConfigMessage.MESSAGE_GUI_RANKEDTEXT.toString()
+				: ConfigMessage.MESSAGE_GUI_UNRANKEDTEXT.toString();
+
 		ItemStack ranked = GUIUtils.createItemStack(rankedString, Material.EXPERIENCE_BOTTLE);
 
 		String gameTimeString = chessGame.getGameTimeString();

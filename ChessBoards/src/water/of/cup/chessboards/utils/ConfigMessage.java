@@ -11,6 +11,31 @@ public enum ConfigMessage {
     MESSAGE_GUI_DOWN("settings.messages.gui.down", "&a\\/"),
     MESSAGE_GUI_GAMETIME("settings.messages.gui.gametime", "&aGame Time: &2"),
     MESSAGE_GUI_WAGERAMOUNT("settings.messages.gui.wageramount", "&aWager Amount: &2$"),
+    MESSAGE_GUI_CREATEGAME("settings.messages.gui.creategame", "&aCreate Game"),
+    MESSAGE_GUI_RANKEDTEXT("settings.messages.gui.rankedtext", "&aRanked"),
+    MESSAGE_GUI_UNRANKEDTEXT("settings.messages.gui.unrankedtext", "&cUnranked"),
+    MESSAGE_GUI_ACCEPTTEXT("settings.messages.gui.accepttext", "&aAccept"),
+    MESSAGE_GUI_DECLINETEXT("settings.messages.gui.declinetext", "&cDecline"),
+    MESSAGE_GUI_JOINTEXT("settings.messages.gui.jointext", "&aJoin Game"),
+    MESSAGE_GUI_WAITFORCREATOR("settings.messages.gui.waitforcreator", "&aWaiting for game creator..."),
+    MESSAGE_GUI_FFTEXT("settings.messages.gui.fftext", "&cForfeit"),
+    MESSAGE_GUI_WAGERSTEXT("settings.messages.gui.wagerstext", "&9Wagers"),
+    MESSAGE_GUI_READYTEXT("settings.messages.gui.readytext", "&aReady"),
+    MESSAGE_GUI_NOTREADYTEXT("settings.messages.gui.notreadytext", "&cNOT READY"),
+    MESSAGE_GUI_EXITTEXT("settings.messages.gui.exittext", "&cEXIT"),
+
+    MESSAGE_GUI_WAGER_CREATE("settings.messages.gui.createwager", "&aCreate Wager"),
+    MESSAGE_GUI_WAGER_CANCEL("settings.messages.gui.cancelwager", "&cCancel Wager"),
+    MESSAGE_GUI_WAGER_ACCEPT("settings.messages.gui.acceptwager", "&aAccept Wager"),
+    MESSAGE_GUI_WAGER_INCREASE("settings.messages.gui.increasewager", "&aIncrease"),
+    MESSAGE_GUI_WAGER_DECREASE("settings.messages.gui.decreasewager", "&cDecrease"),
+
+    MESSAGE_GUI_TITLE_CREATE("settings.messages.gui.title.create", "Chess | Create Game"),
+    MESSAGE_GUI_TITLE_INGAME("settings.messages.gui.title.ingame", "Chess | Ingame"),
+    MESSAGE_GUI_TITLE_JOIN("settings.messages.gui.title.join", "Chess | Join Game"),
+    MESSAGE_GUI_TITLE_WAGERS("settings.messages.gui.title.wagers", "Chess | Wagers"),
+    MESSAGE_GUI_TITLE_WAITING("settings.messages.gui.title.waiting", "Chess | Waiting For Player"),
+
 
     // CHAT MESSAGES
     MESSAGE_CHAT_PLAYER_INGAME("settings.messages.chat.playeringame", "&cYou must finish your game before joining another."),
@@ -44,15 +69,6 @@ public enum ConfigMessage {
     MESSAGE_CHAT_COMMANDS_HELP_STATS("settings.messages.chat.commands.help.stats", "/chessboards stats [player name]&7: Show stats for a player"),
     MESSAGE_CHAT_COMMANDS_HELP_GIVE("settings.messages.chat.commands.help.give", "/chessboards give [player name]&7: Give a player a chessboard"),
     MESSAGE_CHAT_COMMANDS_HELP_LB("settings.messages.chat.commands.help.lb", "/chessboards leaderboard&7: Lists top chess players");
-
-    //    MESSAGE_CHAT_COMMANDS_("settings.messages.chat.commands.", ""),
-    // GUI titles
-    // Create Ranked/Unranked Game
-    // Ranked/Unranked
-    // Join Game/Decline
-    // Waiting for game creator
-    // White/Black, Ready/Unready, Forfeit
-
 
     private final ChessBoards instance = ChessBoards.getInstance();
     private final String path;
