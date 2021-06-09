@@ -77,10 +77,12 @@ public class ChessBoards extends JavaPlugin {
 				this.dataStore.addChessPlayer(player);
 			}
 		}
-		
-		boolean hasEconomy = setupEconomy();
-		if (!hasEconomy) {
-			Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
+
+		if(config.getBoolean("settings.chessboard.wagers")) {
+			boolean hasEconomy = setupEconomy();
+			if (!hasEconomy) {
+				Bukkit.getLogger().info("Server must have Vault in order to place wagers on chess games.");
+			}
 		}
 
 		chessBoardManager.loadGames();
@@ -167,6 +169,7 @@ public class ChessBoards extends JavaPlugin {
 			- chessboard.command.leaderboard - use leaderboard command
 		 */
 		defaultConfig.put("settings.chessboard.permissions", true);
+		defaultConfig.put("settings.chessboard.wagers", true);
 		defaultConfig.put("settings.chessboard.customImages", false); // Default false
 
         defaultConfig.put("settings.database.host", "localhost");
