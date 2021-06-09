@@ -22,7 +22,7 @@ import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.inventories.ChessJoinGameInventory;
 import water.of.cup.chessboards.inventories.ChessWagerViewInventory;
 import water.of.cup.chessboards.inventories.ChessWaitingPlayerInventory;
-import water.of.cup.chessboards.utils.ConfigMessageUtils;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class InventoryClick implements Listener {
 
@@ -64,11 +64,11 @@ public class InventoryClick implements Listener {
             if(itemName.contains("Create") && (itemType.equals(Material.LIME_STAINED_GLASS_PANE))) {
                 if(!chessCreateGameInventory.getChessGame().getGameState().equals(ChessGameState.IDLE)) {
                     player.closeInventory();
-                    player.sendMessage(ChatColor.RED + "A game has already been created for this board.");
+                    player.sendMessage(ConfigMessage.MESSAGE_CHAT_GAME_ALREADY_CREATED.toString());
                     return;
                 }
                 if (pluginInstance.getEconomy() != null && pluginInstance.getEconomy().getBalance(player) < chessCreateGameInventory.getWager()) {
-        			player.sendMessage(ChatColor.RED + "You do not have enough money to create the wager for this game.");
+        			player.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_CREATE_WAGER.toString());
         			return;
         		}
 
@@ -96,7 +96,7 @@ public class InventoryClick implements Listener {
                         if (game.getPlayerQueue().size() < 3) {
                             game.addPlayerToDecisionQueue(player1);
                         } else {
-                            player1.sendMessage(ChatColor.RED + "A game has already been created for this board.");
+                            player1.sendMessage(ConfigMessage.MESSAGE_CHAT_GAME_ALREADY_CREATED.toString());
                         }
                     }
                 }
@@ -112,7 +112,7 @@ public class InventoryClick implements Listener {
 
             if(itemType.equals(Material.PLAYER_HEAD)) {
                 // Increment
-                if(itemName.equals(ConfigMessageUtils.MESSAGES_GUI_UP.toRawString())) {
+                if(itemName.equals(ConfigMessage.MESSAGE_GUI_UP.toRawString())) {
                     ItemStack itemBelow = event.getClickedInventory().getItem(event.getRawSlot() + 9);
                     if(itemBelow == null) return;
 
@@ -131,7 +131,7 @@ public class InventoryClick implements Listener {
                 }
 
                 // Decrement
-                if(itemName.equals(ConfigMessageUtils.MESSAGE_GUI_DOWN.toRawString())) {
+                if(itemName.equals(ConfigMessage.MESSAGE_GUI_DOWN.toRawString())) {
                     ItemStack itemAbove = event.getClickedInventory().getItem(event.getRawSlot() - 9);
                     if(itemAbove == null) return;
 
@@ -198,12 +198,12 @@ public class InventoryClick implements Listener {
 
                     // Remove everyone else in GUI
                     for(Player player1 : chessGame.getPlayerQueue()) {
-                        player1.sendMessage("Game owner has started the game.");
+                        player1.sendMessage(ConfigMessage.MESSAGE_CHAT_GAME_ALREADY_STARTED.toString());
                         player1.closeInventory();
                     }
 
                     for(Player player1 : chessGame.getPlayerDecideQueue()) {
-                        player1.sendMessage("Game owner has started the game.");
+                        player1.sendMessage(ConfigMessage.MESSAGE_CHAT_GAME_ALREADY_STARTED.toString());
                         player1.closeInventory();
                     }
 
@@ -263,7 +263,7 @@ public class InventoryClick implements Listener {
             // Join game button
             if(itemType.equals(Material.GREEN_STAINED_GLASS_PANE)) {
             	if (pluginInstance.getEconomy() != null && pluginInstance.getEconomy().getBalance(player) < chessGame.getGameWager()) {
-        			player.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+        			player.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_ACCEPT_WAGER.toString());
         			return;
         		}
             	
@@ -378,7 +378,7 @@ public class InventoryClick implements Listener {
                 if(wager <= 0) return;
                 
                 if (pluginInstance.getEconomy().getBalance(player) < wager) {
-        			player.sendMessage(ChatColor.RED + "You do not have enough money to create this wager.");
+        			player.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_CREATE_WAGER.toString());
         			return;
         		}
                 

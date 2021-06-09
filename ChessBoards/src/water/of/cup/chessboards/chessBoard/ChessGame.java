@@ -27,6 +27,7 @@ import water.of.cup.chessboards.inventories.ChessWagerViewInventory;
 import water.of.cup.chessboards.inventories.ChessWaitingPlayerInventory;
 import water.of.cup.chessboards.glicko2.RatingCalculator;
 import water.of.cup.chessboards.glicko2.RatingPeriodResults;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class ChessGame {
 	private ChessBoards instance = ChessBoards.getInstance();
@@ -457,8 +458,9 @@ public class ChessGame {
 		} else {
 			// Tied game
 			record.add("1/2-1/2");
-			String endMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
-					+ loser.getDisplayName() + " as " + losingColor;
+//			String endMessage = winner.getDisplayName() + " tied as " + winningColor.toLowerCase() + " against "
+//					+ loser.getDisplayName() + " as " + losingColor;
+			String endMessage = ConfigMessage.MESSAGE_CHAT_GAME_OVER_TIE.buildString(winner, winningColor, loser, losingColor);
 
 			winner.sendMessage(endMessage);
 			loser.sendMessage(endMessage);
@@ -499,8 +501,15 @@ public class ChessGame {
 		whitePlayer = null;
 		blackPlayer = null;
 
-		String endMessage = winner.getDisplayName() + " " + winMessage + " as " + winningColor.toLowerCase()
-				+ " against " + loser.getDisplayName() + " as " + losingColor.toLowerCase();
+		ConfigMessage messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_WIN;
+
+		if(winMessage.contains("forfeit")) {
+			messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_FORFEIT;
+		} else if(winMessage.contains("time")) {
+			messageType = ConfigMessage.MESSAGE_CHAT_GAME_OVER_TIMEWIN;
+		}
+
+		String endMessage = messageType.buildString(winner, winningColor, loser, losingColor);
 
 		winner.sendMessage(endMessage);
 		loser.sendMessage(endMessage);
@@ -881,15 +890,16 @@ public class ChessGame {
 
 	public boolean requestWagerToWager(RequestWager requestWager, Player accepter) {
 		if (instance.getEconomy().getBalance(accepter) < requestWager.getAmount()) {
-			accepter.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+			accepter.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_ACCEPT_WAGER.toString());
 			return false;
 		}
 
 		// Send messages to players
-		requestWager.getOwner().sendMessage(
-				accepter.getDisplayName() + " has accepted your wager of " + requestWager.getAmount() + ".");
-		accepter.sendMessage("You have accepted " + requestWager.getOwner().getDisplayName() + "'s wager of "
-				+ requestWager.getAmount() + ".");
+		String acceptWagerText = ConfigMessage.MESSAGE_CHAT_GAME_ACCEPT_WAGER.buildString(accepter, requestWager.getAmount());
+		requestWager.getOwner().sendMessage(acceptWagerText);
+
+		String wagerAcceptedText = ConfigMessage.MESSAGE_CHAT_GAME_WAGER_ACCEPTED.buildString(requestWager.getOwner(), requestWager.getAmount());
+		accepter.sendMessage(wagerAcceptedText);
 
 		wagers.add(new Wager(requestWager, accepter));
 		removeRequestWager(requestWager);

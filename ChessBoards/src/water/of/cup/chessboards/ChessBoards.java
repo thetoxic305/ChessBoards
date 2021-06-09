@@ -31,6 +31,7 @@ import water.of.cup.chessboards.inventories.ChessCreateGameInventory;
 import water.of.cup.chessboards.listeners.*;
 import water.of.cup.chessboards.commands.ChessBoardCommands;
 import water.of.cup.chessboards.metrics.Metrics;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class ChessBoards extends JavaPlugin {
 	
@@ -190,10 +191,10 @@ public class ChessBoards extends JavaPlugin {
 			}
 		});
 
-		defaultConfig.put("settings.messages.gui.up", "&a/\\");
-		defaultConfig.put("settings.messages.gui.down", "&a\\/");
-		defaultConfig.put("settings.messages.gui.gametime", "&aGame Time: &2");
-		defaultConfig.put("settings.messages.gui.wageramount", "&aWager Amount: &2$");
+		// Load in config messages
+		for(ConfigMessage configMessage : ConfigMessage.values()) {
+			defaultConfig.put(configMessage.getPath(), configMessage.getDefaultMessage());
+		}
 
 		if(!config.contains("settings.chessboard.recipe.ingredients")) {
 			for (String key : defaultRecipe.keySet()) {

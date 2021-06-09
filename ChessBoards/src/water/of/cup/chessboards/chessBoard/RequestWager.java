@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 import water.of.cup.chessboards.ChessBoards;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class RequestWager {
 	private ChessBoards instance = ChessBoards.getInstance();
@@ -22,7 +23,7 @@ public class RequestWager {
 
 	public Wager createWager(Player otherPlayer) {
 		if (instance.getEconomy().getBalance(otherPlayer) < amount) {
-			otherPlayer.sendMessage(ChatColor.RED + "You do not have enough money to accept this wager.");
+			otherPlayer.sendMessage(ConfigMessage.MESSAGE_CHAT_NOT_ENOUGH_MONEY_ACCEPT_WAGER.toString());
 			return null;
 		}
 
