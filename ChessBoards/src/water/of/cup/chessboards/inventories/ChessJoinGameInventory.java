@@ -16,10 +16,9 @@ public class ChessJoinGameInventory implements InventoryHolder {
     private Inventory inv;
     private ChessGame chessGame;
     private Player player;
-    public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_JOIN.toString();
 
     public ChessJoinGameInventory(ChessGame chessGame, Player player) {
-        inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
+        inv = Bukkit.createInventory(this, 54, ConfigMessage.MESSAGE_GUI_TITLE_JOIN.toString());
         this.chessGame = chessGame;
         this.player = player;
     }

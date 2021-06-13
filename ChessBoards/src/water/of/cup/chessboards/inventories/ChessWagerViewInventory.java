@@ -27,10 +27,9 @@ public class ChessWagerViewInventory implements InventoryHolder {
 	private static final int WAGER_SHIFT_INCREMENT = 10;
 	private static final int WAGER_MAX = 9999;
 
-	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_WAGERS.toString();
 
 	public ChessWagerViewInventory(ChessGame chessGame, Player player) {
-		inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
+		inv = Bukkit.createInventory(this, 54, ConfigMessage.MESSAGE_GUI_TITLE_WAGERS.toString());
 		this.chessGame = chessGame;
 		this.player = player;
 		selectedWager = null;

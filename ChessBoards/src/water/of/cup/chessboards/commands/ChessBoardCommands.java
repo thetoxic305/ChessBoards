@@ -144,12 +144,23 @@ public class ChessBoardCommands implements CommandExecutor {
 					p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_STATS.toString());
 					return false;
 				}
+
+				if (args[0].equalsIgnoreCase("reload")) {
+					if (permissionsEnabled && !p.hasPermission("chessboard.command.reload"))
+						return false;
+
+					instance.loadConfig();
+
+					p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_RELOAD.toString());
+					return true;
+				}
 			}
 			// Send help message
 			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_CHESSTEXT.toString());
 			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_GIVE.toString());
 			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_LB.toString());
 			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_STATS.toString());
+			p.sendMessage(ConfigMessage.MESSAGE_CHAT_COMMANDS_HELP_RELOAD.toString());
 			return false;
 
 		}

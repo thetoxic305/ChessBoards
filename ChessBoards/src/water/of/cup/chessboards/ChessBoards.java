@@ -143,7 +143,7 @@ public class ChessBoards extends JavaPlugin {
 		Bukkit.addRecipe(recipe);
 	}
 
-	private void loadConfig() {
+	public void loadConfig() {
 		if (!getDataFolder().exists()) {
 			getDataFolder().mkdir();
 		}

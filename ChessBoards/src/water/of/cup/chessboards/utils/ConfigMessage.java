@@ -57,6 +57,7 @@ public enum ConfigMessage {
     MESSAGE_CHAT_COMMANDS_NO_INV_ROOM("settings.messages.chat.commands.noinvroom", "The receiving player does not have room in their inventory"),
     MESSAGE_CHAT_COMMANDS_NO_DB("settings.messages.chat.commands.nodb", "Database configuration must be on in order to view leaderboard"),
     MESSAGE_CHAT_COMMANDS_ERROR_FETCHING_PLAYERS("settings.messages.chat.commands.errortopplayers", "There was an error while trying to fetch top players"),
+    MESSAGE_CHAT_COMMANDS_RELOAD("settings.messages.chat.commands.reload", "Reloaded chess config."),
 
     MESSAGE_CHAT_COMMANDS_CHESSTEXT("settings.messages.chat.commands.chesstext", "&f&lChess&8&lBoards"),
     MESSAGE_CHAT_COMMANDS_LBTEXT("settings.messages.chat.commands.leaderboardtext", "&rLeaderboard"),
@@ -68,7 +69,8 @@ public enum ConfigMessage {
 
     MESSAGE_CHAT_COMMANDS_HELP_STATS("settings.messages.chat.commands.help.stats", "/chessboards stats [player name]&7: Show stats for a player"),
     MESSAGE_CHAT_COMMANDS_HELP_GIVE("settings.messages.chat.commands.help.give", "/chessboards give [player name]&7: Give a player a chessboard"),
-    MESSAGE_CHAT_COMMANDS_HELP_LB("settings.messages.chat.commands.help.lb", "/chessboards leaderboard&7: Lists top chess players");
+    MESSAGE_CHAT_COMMANDS_HELP_LB("settings.messages.chat.commands.help.lb", "/chessboards leaderboard&7: Lists top chess players"),
+    MESSAGE_CHAT_COMMANDS_HELP_RELOAD("settings.messages.chat.commands.help.reload", "/chessboards reload&7: Reloads chess config");
 
     private final ChessBoards instance = ChessBoards.getInstance();
     private final String path;

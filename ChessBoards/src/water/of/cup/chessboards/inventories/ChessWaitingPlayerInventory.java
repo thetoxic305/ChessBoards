@@ -15,10 +15,9 @@ public class ChessWaitingPlayerInventory implements InventoryHolder {
 
     private Inventory inv;
     private ChessGame chessGame;
-    public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_WAITING.toString();;
 
     public ChessWaitingPlayerInventory(ChessGame chessGame) {
-        inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
+        inv = Bukkit.createInventory(this, 54, ConfigMessage.MESSAGE_GUI_TITLE_WAITING.toString());
         this.chessGame = chessGame;
     }
 

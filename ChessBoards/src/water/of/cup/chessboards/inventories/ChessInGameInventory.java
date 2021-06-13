@@ -24,10 +24,9 @@ public class ChessInGameInventory implements InventoryHolder {
 	private ChessGame chessGame;
 	private boolean whitePlayerReady;
 	private boolean blackPlayerReady;
-	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_INGAME.toString();
 
 	public ChessInGameInventory(ChessGame chessGame) {
-		inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
+		inv = Bukkit.createInventory(this, 54, ConfigMessage.MESSAGE_GUI_TITLE_INGAME.toString());
 		this.chessGame = chessGame;
 	}
 

@@ -24,11 +24,10 @@ public class ChessCreateGameInventory implements InventoryHolder {
 			"30 min", "60 min"};
 	private int wager;
 	private ChessGame chessGame;
-	public static final String INVENTORY_NAME = ConfigMessage.MESSAGE_GUI_TITLE_CREATE.toString();
 	private ChessBoards instance = ChessBoards.getInstance();
 
 	public ChessCreateGameInventory(ChessGame chessGame) {
-		inv = Bukkit.createInventory(this, 54, INVENTORY_NAME);
+		inv = Bukkit.createInventory(this, 54, ConfigMessage.MESSAGE_GUI_TITLE_CREATE.toString());
 		this.chessGame = chessGame;
 	}
 

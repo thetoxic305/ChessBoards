@@ -22,6 +22,7 @@ public class ChessBoardCommandsTabCompleter implements TabCompleter {
 			arguments.add("leaderboard");
 			arguments.add("give");
 			arguments.add("stats");
+			arguments.add("reload");
 		} else if (strings.length == 2) {
 			if (strings[0].equalsIgnoreCase("leaderboard")) {
 				instance.getDataStore().getChessPlayerTotal(numChessPlayers -> {
