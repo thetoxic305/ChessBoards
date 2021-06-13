@@ -5,6 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import water.of.cup.chessboards.utils.ConfigMessage;
 
 public class Clock extends BukkitRunnable {
 	private ChessGame game;
@@ -56,12 +57,14 @@ public class Clock extends BukkitRunnable {
 		}
 
 		// send players clock times
-		String blackTimeText = "BLACK: " + (int) blackTime / 60 + ":" + (int) (blackTime % 60);
-		String whiteTimeText = "WHITE: " + (int) whiteTime / 60 + ":" + (int) (whiteTime % 60);
+		String blackTimeText = ConfigMessage.MESSAGE_CHAT_GAME_ACTIONBAR_BLACK.toString() + (int) blackTime / 60 + ":" + (int) (blackTime % 60);
+		String whiteTimeText = ConfigMessage.MESSAGE_CHAT_GAME_ACTIONBAR_WHITE.toString() + (int) whiteTime / 60 + ":" + (int) (whiteTime % 60);
+		String divText = ConfigMessage.MESSAGE_CHAT_GAME_ACTIONBAR_DIV.toString();
+
 		game.getBlackPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-				TextComponent.fromLegacyText(ChatColor.YELLOW + blackTimeText + " | " + whiteTimeText));
+				TextComponent.fromLegacyText(blackTimeText + divText + whiteTimeText));
 		game.getWhitePlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-				TextComponent.fromLegacyText(ChatColor.YELLOW + whiteTimeText + " | " + blackTimeText));
+				TextComponent.fromLegacyText(whiteTimeText + divText + blackTimeText));
 	}
 
 	public void incementTime(String color, double amount) {

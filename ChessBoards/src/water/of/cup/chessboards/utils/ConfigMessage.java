@@ -23,6 +23,11 @@ public enum ConfigMessage {
     MESSAGE_GUI_READYTEXT("settings.messages.gui.readytext", "&aReady"),
     MESSAGE_GUI_NOTREADYTEXT("settings.messages.gui.notreadytext", "&cNOT READY"),
     MESSAGE_GUI_EXITTEXT("settings.messages.gui.exittext", "&cEXIT"),
+    MESSAGE_GUI_BLACKTEXT("settings.messages.gui.blacktext", "&0BLACK"),
+    MESSAGE_GUI_WHITETEXT("settings.messages.gui.whitetext", "&fWHITE"),
+    MESSAGE_GUI_BULLETTEXT("settings.messages.gui.bullettext", "Bullet"),
+    MESSAGE_GUI_BLITZTEXT("settings.messages.gui.blitztext", "Blitz"),
+    MESSAGE_GUI_RAPIDTEXT("settings.messages.gui.rapidtext", "Rapid"),
 
     MESSAGE_GUI_WAGER_CREATE("settings.messages.gui.createwager", "&aCreate Wager"),
     MESSAGE_GUI_WAGER_CANCEL("settings.messages.gui.cancelwager", "&cCancel Wager"),
@@ -45,10 +50,13 @@ public enum ConfigMessage {
     MESSAGE_CHAT_GAME_ALREADY_STARTED("settings.messages.chat.gamealreadystarted", "&cGame owner has started the game."),
     MESSAGE_CHAT_NOT_ENOUGH_MONEY_ACCEPT_WAGER("settings.messages.chat.insufficientwageracceptfunds", "&cYou do not have enough money to accept this wager."),
 
-    MESSAGE_CHAT_GAME_OVER_TIE("settings.messages.chat.tie", "%player_winnner% tied as %color_winner% against %player_loser% as %color_loser%"),
-    MESSAGE_CHAT_GAME_OVER_WIN("settings.messages.chat.win", "%player_winnner% won as %color_winner% against %player_loser% as %color_loser%"),
-    MESSAGE_CHAT_GAME_OVER_TIMEWIN("settings.messages.chat.timewin", "%player_winnner% won on time as %color_winner% against %player_loser% as %color_loser%"),
-    MESSAGE_CHAT_GAME_OVER_FORFEIT("settings.messages.chat.forfeit", "%player_winnner% won by forfeit as %color_winner% against %player_loser% as %color_loser%"),
+    MESSAGE_CHAT_GAME_OVER_TIE("settings.messages.chat.tie", "%player_winner% tied as %color_winner% against %player_loser% as %color_loser%"),
+    MESSAGE_CHAT_GAME_OVER_WIN("settings.messages.chat.win", "%player_winner% won as %color_winner% against %player_loser% as %color_loser%"),
+    MESSAGE_CHAT_GAME_OVER_TIMEWIN("settings.messages.chat.timewin", "%player_winner% won on time as %color_winner% against %player_loser% as %color_loser%"),
+    MESSAGE_CHAT_GAME_OVER_FORFEIT("settings.messages.chat.forfeit", "%player_winner% won by forfeit as %color_winner% against %player_loser% as %color_loser%"),
+    MESSAGE_CHAT_GAME_ACTIONBAR_BLACK("settings.messages.chat.actionbarblack", "&eBLACK: "),
+    MESSAGE_CHAT_GAME_ACTIONBAR_WHITE("settings.messages.chat.actionbarwhite", "&eWHITE: "),
+    MESSAGE_CHAT_GAME_ACTIONBAR_DIV("settings.messages.chat.actionbardiv", "&e | "),
 
     MESSAGE_CHAT_GAME_ACCEPT_WAGER("settings.messages.chat.acceptwager", "%wager_player% has accepted your wager of %wager_amount%."),
     MESSAGE_CHAT_GAME_WAGER_ACCEPTED("settings.messages.chat.wageraccepted", "You have accepted %wager_player%'s wager of %wager_amount%."),
@@ -93,7 +101,8 @@ public enum ConfigMessage {
     public String buildString(Player winner, String winnerColor, Player loser, String loserColor) {
         String formatted = this.toString();
 
-        formatted = formatted.replace("%player_winnner%", winner.getDisplayName())
+        formatted = formatted.replace("%player_winner%", winner.getDisplayName())
+                .replace("%player_winnner%", winner.getDisplayName()) // Typo in earlier version, keeping to prevent breaks
                 .replace("%player_loser%", loser.getDisplayName())
                 .replace("%color_winner%", winnerColor)
                 .replace("%color_loser%", loserColor);
@@ -120,6 +129,11 @@ public enum ConfigMessage {
 
     public String getDefaultMessage() {
         return this.defaultMessage;
+    }
+
+    public static String getTeamColor(String color) {
+        if(color.equals("BLACK")) return MESSAGE_GUI_BLACKTEXT.toString();
+        return MESSAGE_GUI_WHITETEXT.toString();
     }
 
 }

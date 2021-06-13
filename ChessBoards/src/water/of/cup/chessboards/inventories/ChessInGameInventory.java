@@ -123,7 +123,9 @@ public class ChessInGameInventory implements InventoryHolder {
 		boolean playerReady = isWhite ? whitePlayerReady : blackPlayerReady;
 
 		Material woolColor = isWhite ? Material.WHITE_WOOL : Material.BLACK_WOOL;
-		String colorString = isWhite ? ChatColor.WHITE + "WHITE" : ChatColor.BLACK + "BLACK";
+		String colorString = isWhite
+				? ConfigMessage.MESSAGE_GUI_WHITETEXT.toString()
+				: ConfigMessage.MESSAGE_GUI_BLACKTEXT.toString();
 
 		ItemStack playerHead = GUIUtils.createGuiPlayerItem(player);
 		ItemStack playerColor = GUIUtils.createItemStack(colorString, woolColor);

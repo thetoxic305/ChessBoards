@@ -51,7 +51,7 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			inv.setItem(16, playerSkull);
 			if (createWagerColor != null)
 				inv.setItem(25,
-						GUIUtils.createItemStack(ChatColor.RESET + createWagerColor, Material.valueOf(createWagerColor + "_WOOL")));
+						GUIUtils.createItemStack(ConfigMessage.getTeamColor(createWagerColor), Material.valueOf(createWagerColor + "_WOOL")));
 			inv.setItem(34, GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_WAGERAMOUNT.toString() + wagerAmount, Material.GOLD_INGOT));
 			inv.setItem(33, GUIUtils.getCustomTextureHead(
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmIwZjZlOGFmNDZhYzZmYWY4ODkxNDE5MWFiNjZmMjYxZDY3MjZhNzk5OWM2MzdjZjJlNDE1OWZlMWZjNDc3In19fQ==",
@@ -73,9 +73,9 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			inv.setItem(17, playerSkull);
 			inv.setItem(16,
 					GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_WAGERAMOUNT.toString() + selectedWager.getAmount(), Material.GOLD_INGOT));
-			inv.setItem(24, GUIUtils.createItemStack(ChatColor.RESET + selectedWager.getOwnerColor(),
+			inv.setItem(24, GUIUtils.createItemStack(ConfigMessage.getTeamColor(selectedWager.getOwnerColor()),
 					Material.valueOf(selectedWager.getOwnerColor() + "_WOOL")));
-			inv.setItem(26, GUIUtils.createItemStack(ChatColor.RESET + selectedWager.getOponentColor(),
+			inv.setItem(26, GUIUtils.createItemStack(ConfigMessage.getTeamColor(selectedWager.getOponentColor()),
 					Material.valueOf(selectedWager.getOponentColor() + "_WOOL")));
 			inv.setItem(34, GUIUtils.createItemStack(ConfigMessage.MESSAGE_GUI_WAGER_ACCEPT.toString(), Material.GREEN_STAINED_GLASS_PANE));
 		}
@@ -95,7 +95,7 @@ public class ChessWagerViewInventory implements InventoryHolder {
 			if(requestWager.getOwner().equals(this.player)) continue;
 
 			ItemStack playerItem = GUIUtils.createGuiPlayerItem(requestWager.getOwner());
-			ItemStack playerWagerColor = GUIUtils.createItemStack(ChatColor.RESET + requestWager.getOwnerColor(), Material.valueOf(requestWager.getOwnerColor() + "_WOOL"));
+			ItemStack playerWagerColor = GUIUtils.createItemStack(ConfigMessage.getTeamColor(requestWager.getOwnerColor()), Material.valueOf(requestWager.getOwnerColor() + "_WOOL"));
 
 			// Highlight selected wager
 			if(this.selectedWager != null) {

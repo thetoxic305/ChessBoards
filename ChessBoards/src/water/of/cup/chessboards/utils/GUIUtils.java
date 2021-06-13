@@ -119,14 +119,14 @@ public class GUIUtils {
 
 		// set the lore to the type of timed Chess Game
 		if (minutes <= 1) {
-			// Bullet game
-			timeLore.add("Bullet");
+			//Bullet game
+			timeLore.add(ConfigMessage.MESSAGE_GUI_BULLETTEXT.toString());
 		} else if (minutes <= 5) {
-			// Blitz game
-			timeLore.add("Blitz");
+			//Blitz game
+			timeLore.add(ConfigMessage.MESSAGE_GUI_BLITZTEXT.toString());
 		} else {
-			// Rapid game
-			timeLore.add("Rapid");
+			//Rapid game
+			timeLore.add(ConfigMessage.MESSAGE_GUI_RAPIDTEXT.toString());
 		}
         
         
