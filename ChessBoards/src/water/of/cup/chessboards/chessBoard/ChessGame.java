@@ -220,7 +220,8 @@ public class ChessGame {
 
 		gameItem.setItemMeta(mapMeta);
 
-		mapView.getWorld().getPlayers().forEach(player -> player.sendMap(mapView));
+		if(mapView.getWorld() != null)
+			mapView.getWorld().getPlayers().forEach(player -> player.sendMap(mapView));
 	}
 
 	public int[] getSelectedLocation() {
