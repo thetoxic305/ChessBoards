@@ -207,6 +207,10 @@ public class ChessGame {
 	public void renderBoardForPlayers() {
 		MapMeta mapMeta = (MapMeta) gameItem.getItemMeta();
 
+		if(mapMeta == null) return;
+
+		if(!mapMeta.hasMapView()) return;
+
 		MapView mapView = mapMeta.getMapView();
 
 		mapView.setTrackingPosition(false);
